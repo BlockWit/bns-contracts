@@ -37,10 +37,10 @@
     "ethers": "^5.4.6",
     "md-to-pdf": "^4.0.0",
     "mocha": "^9.0.3",
-    "solhint": "^3.3.6",
-    "truffle": "^5.4.5",
-    "truffle-plugin-verify": "^0.5.11",
-    "web3": "^1.5.1",
+    "solhint": "^3.3.7",
+    "truffle": "^5.5.18",
+    "truffle-plugin-verify": "^0.5.26",
+    "web3": "^1.7.3",
     "webpack": "^5.52.1",
     "webpack-cli": "^4.8.0"
   }

@@ -13,13 +13,14 @@ const ADDRESSES_TO_CONTENTS = [
     content: "<!DOCTYPE html>\n" +
         "<html>\n" +
         "<head>\n" +
-        "\t<title>Simple site in blockchain</title>\n" +
-        "\t<meta name=\"description>Simple site in blockchain demonstate storage reading</meta>\n" +
+        "        <meta charset=\"utf-8\">\n" +
+        "        <title>Simple site in blockchain</title>\n" +
+        "        <meta name=\"description\" content=\"Simple site in blockchain demonstate storage reading\">\n" +
         "</head>\n" +
         "<body>\n" +
-        "\tThis is first in the world site in simple blockchain storage!\n" +
+        "        This is first in the world site in simple blockchain storage!\n" +
         "</body>\n" +
-        "</html>"
+        "</html>\n"
   }
 ];
 
@@ -37,6 +38,8 @@ const DOMAINS_TO_ADDRESSES = [
     address: "bns.bsc.simple_storage_" + ADDRESS_PATTERN + "://" + SITE_NAME
   }
 ];
+
+//bns.bsc.simple_storage_0x2Ad485e03e5A6846187f8eD12bd402458647f330://simple-site-in-blockchain
 
 async function deploy () {
   const { log } = logger(await web3.eth.net.getNetworkType());

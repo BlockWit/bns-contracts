@@ -9,10 +9,14 @@ import "./BNSNFT.sol";
 import "./BNSMarketPricePolicy.sol";
 import "./BNSNamesPolicy.sol";
 import "./StringUtils.sol";
+import "./lib/Tokens.sol";
 
 contract BNSDomainNameMarket is Pausable, AccessControl {
 
     using StringUtils for string;
+    using Tokens for Tokens.Token;
+
+    Tokens.Map currencies;
 
     BNSMarketPricePolicy public pricePolicy;
 
@@ -51,7 +55,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl {
         return pricePolicy.getPrice(domainName);
     }
 
-    function buy(string memory domainName) whenNotPaused external payable {
+    function buy(string memory domainName, uint256 tokenId) whenNotPaused external payable {
         domainName = namesPolicy.perform(domainName);
         uint price = getPrice(domainName);
         require(msg.value >= price, "Not enough funds");

@@ -10,22 +10,16 @@ import "./BNSMarketPricePolicy.sol";
 import "./BNSNamesPolicy.sol";
 import "./StringUtils.sol";
 import "./lib/Tokens.sol";
+import "./PaymentController.sol";
 
 contract BNSDomainNameMarket is Pausable, AccessControl {
 
-    using StringUtils for string;
-    using Tokens for Tokens.Token;
-
-    Tokens.Map currencies;
-
+    PaymentController public paymentController;
     BNSMarketPricePolicy public pricePolicy;
-
     BNSNamesPolicy public namesPolicy;
-
     BNSNFT public bnsnft;
-
+    address public fundraisingWallet;
     mapping (string => address) public domainBuyers;
-
     mapping (string => uint) public domainPrices;
 
     constructor() {
@@ -36,41 +30,30 @@ contract BNSDomainNameMarket is Pausable, AccessControl {
         bnsnft = BNSNFT(newBnsnft);
     }
 
-    function setPricePolicy(address newPricePolicy) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setPaymentController(address newPaymentController) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        paymentController = PaymentController(newPaymentController);
+    }
+
+    function setPricePolicy(address newPricePolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {
         pricePolicy = BNSMarketPricePolicy(newPricePolicy);
     }
 
-    function setNamesPolicy(address newNamesPolicy) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setNamesPolicy(address newNamesPolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {
         namesPolicy = BNSNamesPolicy(newNamesPolicy);
     }
 
-    function getPrice(string memory domainName) public view returns(uint) {
+    function buy(string memory domainName, uint256 tokenId) whenNotPaused external {
+        // sanitize domain name and calculate price
         domainName = namesPolicy.perform(domainName);
-        return getPriceForPerformedName(domainName);
-    }
-
-    function getPriceForPerformedName(string memory domainName) private view returns(uint) {
-        require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
         namesPolicy.check(domainName);
-        return pricePolicy.getPrice(domainName);
-    }
-
-    function buy(string memory domainName, uint256 tokenId) whenNotPaused external payable {
-        domainName = namesPolicy.perform(domainName);
-        uint price = getPrice(domainName);
-        require(msg.value >= price, "Not enough funds");
-        uint change = msg.value - price;
-        if(change != 0) {
-            // check reentrancy
-            (bool sent, ) = msg.sender.call{value: change}("");
-            require(sent, "Failed to send change");
-        }
-
-        // for statistics
+        require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
+        uint256 price = pricePolicy.getPrice(domainName, tokenId);
+        // charge payment
+        paymentController.transfer(msg.sender, fundraisingWallet, price, tokenId);
+        // update statistics
         domainBuyers[domainName] = msg.sender;
         domainPrices[domainName] = price;
-        // TODO and other
-
+        // mint NFT
         bnsnft.safeMint(msg.sender, domainName);
     }
 

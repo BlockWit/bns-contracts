@@ -8,22 +8,14 @@ library Tokens {
 
     using EnumerableSet for EnumerableSet.UintSet;
 
-    enum Currency {
+    enum TokenType {
         ERC20,
         NATIVE
     }
 
     struct Token {
-        address addr;
-        Currency currencyType;
-    }
-
-    function transferFrom(Token memory currency, address sender, address recipient, uint256 amount) internal {
-        if (currency.currencyType == Currency.ERC20) {
-            IERC20(currency.addr).transferFrom(sender, recipient, amount);
-        } else {
-            payable(recipient).transfer(amount);
-        }
+        address tokenAddress;
+        TokenType tokenType;
     }
 
     struct Map {

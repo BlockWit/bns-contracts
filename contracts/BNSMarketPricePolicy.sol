@@ -4,14 +4,9 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./StringUtils.sol";
-
 contract BNSMarketPricePolicy is Ownable {
 
-    using StringUtils for string;
-
     mapping (uint => uint) public pricePerNameLength;
-
     uint public defaultPrice;
 
     function getPrice(string memory domainName, uint256 tokenId) public view returns(uint) {

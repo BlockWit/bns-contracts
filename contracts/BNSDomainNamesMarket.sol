@@ -8,9 +8,8 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./BNSNFT.sol";
 import "./BNSMarketPricePolicy.sol";
 import "./BNSNamesPolicy.sol";
-import "./StringUtils.sol";
-import "./lib/Tokens.sol";
 import "./PaymentController.sol";
+import "./lib/Tokens.sol";
 
 contract BNSDomainNameMarket is Pausable, AccessControl {
 

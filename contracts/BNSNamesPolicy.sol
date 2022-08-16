@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "./StringUtils.sol";
+import "./lib/StringUtils.sol";
 
 contract BNSNamesPolicy is AccessControl {
 

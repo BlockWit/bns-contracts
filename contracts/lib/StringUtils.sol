@@ -54,6 +54,29 @@ library StringUtils {
     }
 
     /**
+     * Contains Any Of
+     *
+     * Checks if a string contains any character from another string
+     *
+     * @param _base When being used for a data type this is the extended object
+     *              otherwise this is the string acting as the haystack to be
+     *              searched
+     * @param _value The string with characters to be found
+     * @return bool Simply notates if the first string contatins any of the chararacters
+     *              from the second one
+     */
+    function containsAnyOf(string memory _base, string memory _value) internal pure returns (bool) {
+        bytes memory _baseBytes = bytes(_base);
+        bytes memory _valueBytes = bytes(_value);
+        for (uint i = 0; i < _baseBytes.length; i++) {
+            for (uint j = 0; j < _valueBytes.length; j++) {
+                if (_baseBytes[i] == _valueBytes[j]) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Index Of
      *
      * Locates and returns the position of a character within a string

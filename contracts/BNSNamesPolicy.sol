@@ -34,12 +34,9 @@ contract BNSNamesPolicy is AccessControl {
         return -1;
     }
 
-    function check(string memory domainName) external pure {
+    function check(string memory domainName) external view {
         require(domainName.length() > 0, "Domain name should not be empty!");
-        bytes memory _forbiddenSymbols = bytes(forbiddenSymbols);
-        for (uint i = 0; i < _forbiddenSymbols.length; i++) {
-            if (_indexOf(domainName, _forbiddenSymbols[i], 0) >= 0) revert("Domain name contains forbidden symbol");
-        }
+        if (domainName.containsAnyOf(forbiddenSymbols)) revert("Domain name contains forbidden symbol");
     }
 
 }

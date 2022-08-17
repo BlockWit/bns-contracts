@@ -5,6 +5,7 @@ env.properties
 HELP.md
 node_modules/
 target/
+build/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###

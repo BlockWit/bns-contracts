@@ -9,11 +9,11 @@ library Tokens {
     using EnumerableSet for EnumerableSet.UintSet;
 
     enum TokenType {
-        ERC20,
-        NATIVE
+        NATIVE,
+        ERC20
     }
 
-    struct Token {
+struct Token {
         address tokenAddress;
         TokenType tokenType;
     }

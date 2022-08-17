@@ -8,12 +8,11 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./BNSNFT.sol";
 import "./BNSMarketPricePolicy.sol";
 import "./BNSNamesPolicy.sol";
-import "./PaymentController.sol";
 import "./lib/Tokens.sol";
+import "./PaymentHelper.sol";
 
-contract BNSDomainNameMarket is Pausable, AccessControl {
+contract BNSDomainNameMarket is Pausable, AccessControl, PaymentHelper {
 
-    PaymentController public paymentController;
     BNSMarketPricePolicy public pricePolicy;
     BNSNamesPolicy public namesPolicy;
     BNSNFT public bnsnft;
@@ -29,16 +28,20 @@ contract BNSDomainNameMarket is Pausable, AccessControl {
         bnsnft = BNSNFT(newBnsnft);
     }
 
-    function setPaymentController(address newPaymentController) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        paymentController = PaymentController(newPaymentController);
-    }
-
     function setPricePolicy(address newPricePolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {
         pricePolicy = BNSMarketPricePolicy(newPricePolicy);
     }
 
     function setNamesPolicy(address newNamesPolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {
         namesPolicy = BNSNamesPolicy(newNamesPolicy);
+    }
+
+    function setToken(uint256 key, address tokenAddress, Tokens.TokenType tokenType) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+        return _setToken(key, tokenAddress, tokenType);
+    }
+
+    function removeToken(uint256 key) external returns (bool) {
+        return _removeToken(key);
     }
 
     function buy(string memory domainName, uint256 tokenId) whenNotPaused external {
@@ -48,7 +51,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl {
         require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
         uint256 price = pricePolicy.getPrice(domainName, tokenId);
         // charge payment
-        paymentController.transfer(msg.sender, fundraisingWallet, price, tokenId);
+        _transfer(msg.sender, fundraisingWallet, price, tokenId);
         // update statistics
         domainBuyers[domainName] = msg.sender;
         domainPrices[domainName] = price;

@@ -28,6 +28,10 @@ contract BNSDomainNameMarket is Pausable, AccessControl, PaymentHelper {
         bnsnft = BNSNFT(newBnsnft);
     }
 
+    function setFundraisingWallet(address newFundraisingWallet) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        fundraisingWallet = newFundraisingWallet;
+    }
+
     function setPricePolicy(address newPricePolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {
         pricePolicy = BNSMarketPricePolicy(newPricePolicy);
     }

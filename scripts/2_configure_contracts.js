@@ -3,7 +3,6 @@ const BNSMarketPricePolicy = artifacts.require('BNSMarketPricePolicy');
 const BNSNFT = artifacts.require('BNSNFT');
 const { logger } = require('./util');
 const { ether, time, BN} = require('@openzeppelin/test-helpers');
-const {web3} = require("@openzeppelin/test-environment");
 
 const SIZES = [1,2,3,4,5,6,7,8];
 const PRICES_USDT = [300000,250000,200000,100000,50000,10000,1000,100];
@@ -31,7 +30,7 @@ async function deploy () {
   }
   {
     log(`Market. Set NFT.`);
-    const tx = await market.setBNSNFT(bnsnft, {from: deployer});
+    const tx = await market.setBNSNFT(NFT_ADDRESS, {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {
@@ -61,7 +60,7 @@ async function deploy () {
   }
   {
     log(`PricingController. Set prices.`);
-    const tx = await pricingController.setPrices(SIZES, PRICES_USDT, 30, {from: deployer});
+    const tx = await pricingController.setPrices(ether('30'), SIZES, PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
 }

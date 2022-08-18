@@ -71,6 +71,8 @@ module.exports = {
     bsctestnet: {
       provider: () => new HDWalletProvider(ETH_TEST_MNEMONIC, `https://data-seed-prebsc-1-s1.binance.org:8545`),
       network_id: 97,
+      networkCheckTimeout: 10000,
+      gas: 12500000,
       gasPrice: 18000000000,  // 18 Gwei
       confirmations: 2,
       timeoutBlocks: 200,
@@ -131,6 +133,7 @@ module.exports = {
   ],
 
   api_keys: {
+    bscscan: CONFIG.BSCSCAN_KEY,
     etherscan: CONFIG.ETHERSCAN_KEY
   }
 

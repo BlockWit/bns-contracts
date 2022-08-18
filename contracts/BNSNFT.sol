@@ -44,11 +44,11 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
         return getContent(domainName, relativePath);
     }
 
-    function getContent(string domainName, string memory relativePath) public view returns (IContentRouter.ContentType contentType, string memory)  {
+    function getContent(string memory domainName, string memory relativePath) public view returns (IContentRouter.ContentType contentType, string memory)  {
         return contentRouter.getContentOrAddress(domainName, relativePath);
     }
 
-    function setContentOrAddress(uint tokenId, string relativePath, string content, IContentRouter.ContentType contentType, address contentProvider) external {
+    function setContentOrAddress(uint tokenId, string memory relativePath, string memory content, IContentRouter.ContentType contentType, address contentProvider) external {
         require(msg.sender == ownerOf(tokenId) || hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "BNSNFT: Only admin or token owner can set content");
         require(_exists(tokenId), "BNSNFT: Content query for nonexistent token");
         string memory domainName = tokenIdToDomainNames[tokenId];

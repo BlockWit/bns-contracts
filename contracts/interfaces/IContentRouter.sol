@@ -20,6 +20,6 @@ interface IContentRouter {
     }
 
     function setContentOrAddress(string memory name, string memory relativePath, string memory content, ContentType contentType, address contentProvider) external;
-    function getContentOrAddress(string name, string realtivePath) external view returns (ContentType contentType, string memory);
+    function getContentOrAddress(string memory name, string memory realtivePath) external view returns (ContentType contentType, string memory);
 
 }

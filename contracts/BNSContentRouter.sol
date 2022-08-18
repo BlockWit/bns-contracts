@@ -22,13 +22,13 @@ contract BNSContentRouter is IContentRouter, RecoverableFunds, AccessControl {
     }
 
     function setContentOrAddress(string memory name, string memory relativePath, string memory content, ContentType contentType, address contentProvider) override external onlyRole(CONTENT_MANAGER) {
-        ContentRoute route = contentRoutes[name];
+        ContentRoute storage route = contentRoutes[name];
         route.exists = true;
         route.contentType = contentType;
         if (contentType == ContentType.INTERNAL) {
-            if (contentProvider != 0x0) {
-                route.contentProvider = contentProvider;
-            } else if (route.contentProvider == 0x0) {
+            if (contentProvider != address(0x0)) {
+                route.contentProvider = IContentProvider(contentProvider);
+            } else if (address(route.contentProvider) == address(0x0)) {
                 route.contentProvider = defaultContentProvider;
             }
             route.contentProvider.setContent(name, relativePath, content);
@@ -37,7 +37,7 @@ contract BNSContentRouter is IContentRouter, RecoverableFunds, AccessControl {
         }
     }
 
-    function getContentOrAddress(string name, string relativePath) override external view returns (string memory) {
+    function getContentOrAddress(string memory name, string memory relativePath) override external view returns (ContentType, string memory) {
         ContentType contentType = contentRoutes[name].contentType;
         if (contentType == ContentType.INTERNAL) {
             return (contentType, getContent(name, relativePath));
@@ -53,7 +53,7 @@ contract BNSContentRouter is IContentRouter, RecoverableFunds, AccessControl {
         return IContentProvider(route.contentProvider).getContent(name, relativePath);
     }
 
-    function getContentAddress(string memory name, string relativePath) public view returns (string memory) {
+    function getContentAddress(string memory name, string memory relativePath) public view returns (string memory) {
         ContentRoute memory route = contentRoutes[name];
         require(route.exists, "ContentRouter: Requested name record not found");
         require(route.contentType == ContentType.EXTERNAL, "ContentRouter: This method is only used for external content");

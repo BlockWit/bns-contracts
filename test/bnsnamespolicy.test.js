@@ -6,55 +6,58 @@ const BNSNamesPolicy = contract.fromArtifact('BNSNamesPolicy');
 
 const [account1, owner ] = accounts;
 
-describe('test setForbiddenSymbols', function () {
+describe('BNSNamesPolicy', function () {
     let contract;
 
     beforeEach(async function () {
         contract = await BNSNamesPolicy.new({from: owner});
     });
 
-    it('forbiddenSymbols check', async function () {
-        expect(await contract.forbiddenSymbols()).to.be.equal(".*/ ");
+    describe('setForbiddenSymbols', function () {
+        it('should change forbiddenSymbols if called by admin', async function () {
+            await contract.setForbiddenSymbols(",|*", {from : owner});
+            expect(await contract.forbiddenSymbols()).to.be.equal(",|*");
+        });
+
+        it('should throw an error if called not by admin', async function () {
+            await expectRevert.unspecified(contract.setForbiddenSymbols("| *", {from: account1}));
+        });
     });
 
-    it('admin(owner) can change forbiddenSymbols', async function () {
-        await contract.setForbiddenSymbols(",|*", {from : owner});
-        expect(await contract.forbiddenSymbols()).to.be.equal(",|*");
+    describe('perform', function () {
+        let contract;
+
+        beforeEach(async function () {
+            contract = await BNSNamesPolicy.new({from: owner});
+        });
+
+        it('should change domainName to lowercase', async function () {
+            expect(await contract.perform("HaHaHa")).to.be.equal("hahaha");
+        });
     });
 
-    it('not admin can`t change forbiddenSymbols', async function () {
-        await expectRevert.unspecified(contract.setForbiddenSymbols("| *", {from: account1}));
-    });
-});
+    describe('check', function () {
+        let contract;
 
-describe('test perform', function () {
-    let contract;
+        beforeEach(async function () {
+            contract = await BNSNamesPolicy.new({from: owner});
+        });
 
-    beforeEach(async function () {
-        contract = await BNSNamesPolicy.new({from: owner});
-    });
+        it('should work if domainName is not empty and doesn`t contain forbiddenSymbols', async function () {
+            expect(await contract.check("haHaha"));
+        });
 
-    it('changing to lowercase', async function () {
-        expect(await contract.perform("HaHaHa")).to.be.equal("hahaha");
-    });
-});
+        it('should throw an error if forbiddenSymbols was changed and domainName contains it', async function () {
+            await contract.setForbiddenSymbols(",", {from : owner});
+            await expectRevert(contract.check("ha,ha"), "Domain name contains forbidden symbol");
+        });
 
-describe('test check', function () {
-    let contract;
+        it('should throw an error if domainName is empty', async function () {
+            await expectRevert(contract.check(""), "Domain name should not be empty!");
+        });
 
-    beforeEach(async function () {
-        contract = await BNSNamesPolicy.new({from: owner});
-    });
-
-    it('working', async function () {
-        expect(await contract.check("haHaha"));
-    });
-
-    it('if domainName is empty -> error', async function () {
-        await expectRevert(contract.check(""), "Domain name should not be empty!");
-    });
-
-    it('if domainName contains forbidden symbol -> error', async function () {
-        await expectRevert(contract.check("ha*ha"), "Domain name contains forbidden symbol");
+        it('should throw an error if domainName contains forbiddenSymbols', async function () {
+            await expectRevert(contract.check("ha*ha"), "Domain name contains forbidden symbol");
+        });
     });
 });

@@ -4,64 +4,60 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./RecoverableFunds.sol";
+import "./interfaces/IContentRouter.sol";
 
-contract BNSContentRouter is RecoverableFunds, AccessControl {
+contract BNSContentRouter is IContentRouter, RecoverableFunds, AccessControl {
 
-    uint8 public constant CONTENT_TYPE_INTERNAL = 0;
+    IContentProvider public defaultContentProvider;
+    mapping(string => ContentRoute) public contentRoutes;
 
-    uint8 public constant CONTENT_TYPE_EXTERNAL = 1;
-
-    BNSContentProvider public defaultContentProvider;
-
-    mapping(string => ContentRecord) public contentRoutes;
-
-    struct ContentRoute {
-        bool exists;
-        uint8 contentType;
-        IBNSContentPtovider contentProvider; // отдается, если контент внутренний
-        string contentAddress; // Отдается, если контент внешний
-    }
+    bytes32 public constant CONTENT_MANAGER = keccak256("CONTENT_MANAGER");
 
     constructor() {
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender); // должна быть еще роль для BNSNFT
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    function setContentOrAddress(string memory name, string relativePath, String content, cotntenType, address contentProvider) only(BNSNFT, admin) {
-      if(contentTypeinternal) {
-         ContentRoute contentRoute = contentRoutes[name];
-         if(!contentRoute.exists) {
-           contentRoute.exists = true;
-           contentRoute.contentType = contentType;
-           if(contentType == CONTENT_TYPE_INTERNAL) {
-              if(contentProvider != 0xx)
-                 contentRoute.contentProvider = contentProvider;
-              else 
-                 contentRoute.contentProvider = defaultContentProvider;
-              contentRoute.contentProvider.setContent(name, relativePath, content);
-           } else {
-              contentRoute.contentAddress = content;
-           }
-         } else {
-           if(contentType == CONTENT_TYPE_INTERNAL) {
-              contentRoute.contentProvider.setContent(name, relativePath, content);
-           } else {
-              contentRoute.contentAddress = content;
-           }
-         }
-       }
-    } 
+    function setDefaultContentProvider(address newDefaultContentProvider) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        defaultContentProvider = IContentProvider(newDefaultContentProvider);
+    }
 
-    function getContent(string memory name, string relativePath) public view returns (string memory) {
-        ContentRecord memory contentRecord = contentRecords[name];
-        require(contentRecord.exists, "Requested name record not found!");
-        require(contentRecord.contentType == CONTENT_TYPE_INTERNAL, "Route for requested name not found!");
-        return contentProvider.getContent(name, realtivePath);
+    function setContentOrAddress(string memory name, string memory relativePath, string memory content, ContentType contentType, address contentProvider) override external onlyRole(CONTENT_MANAGER) {
+        ContentRoute route = contentRoutes[name];
+        route.exists = true;
+        route.contentType = contentType;
+        if (contentType == ContentType.INTERNAL) {
+            if (contentProvider != 0x0) {
+                route.contentProvider = contentProvider;
+            } else if (route.contentProvider == 0x0) {
+                route.contentProvider = defaultContentProvider;
+            }
+            route.contentProvider.setContent(name, relativePath, content);
+        } else {
+            route.contentAddress = content;
+        }
+    }
+
+    function getContentOrAddress(string name, string relativePath) override external view returns (string memory) {
+        ContentType contentType = contentRoutes[name].contentType;
+        if (contentType == ContentType.INTERNAL) {
+            return (contentType, getContent(name, relativePath));
+        } else {
+            return (contentType, getContentAddress(name, relativePath));
+        }
+    }
+
+    function getContent(string memory name, string memory relativePath) public view returns (string memory) {
+        ContentRoute memory route = contentRoutes[name];
+        require(route.exists, "ContentRouter: Requested name record not found");
+        require(route.contentType == ContentType.INTERNAL, "ContentRouter: This method is only used for internal content");
+        return IContentProvider(route.contentProvider).getContent(name, relativePath);
     }
 
     function getContentAddress(string memory name, string relativePath) public view returns (string memory) {
-        require(contentRecord.exists, "Requested name record not found!");
-        require(contentRecord.contentType == CONTENT_TYPE_ETERNAL, "Route for requested name not found!");
-        return contentProvider.contentAddress;
+        ContentRoute memory route = contentRoutes[name];
+        require(route.exists, "ContentRouter: Requested name record not found");
+        require(route.contentType == ContentType.EXTERNAL, "ContentRouter: This method is only used for external content");
+        return route.contentAddress;
     }
 
 }

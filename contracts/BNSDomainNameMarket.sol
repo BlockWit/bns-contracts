@@ -52,7 +52,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, PaymentHelper {
         // sanitize domain name and calculate price
         domainName = namesPolicy.perform(domainName);
         namesPolicy.check(domainName);
-        require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
+        require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
         uint256 price = pricePolicy.getPrice(domainName, tokenId);
         // charge payment
         _transfer(msg.sender, fundraisingWallet, price, tokenId);

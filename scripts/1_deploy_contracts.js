@@ -1,4 +1,4 @@
-const BNSDomainNamesMarket = artifacts.require('BNSDomainNamesMarket');
+const BNSDomainNameMarket = artifacts.require('BNSDomainNameMarket');
 const BNSMarketPricePolicy = artifacts.require('BNSMarketPricePolicy');
 const BNSNamesPolicy = artifacts.require('BNSNamesPolicy');
 const BNSNFT = artifacts.require('BNSNFT');
@@ -10,7 +10,7 @@ async function deploy () {
   const { log } = logger(await web3.eth.net.getNetworkType());
   const [deployer] = await web3.eth.getAccounts();
 
-  const market = await BNSDomainNamesMarket.new({ from: deployer });
+  const market = await BNSDomainNameMarket.new({ from: deployer });
   log(`Market deployed: @address{${market.address}}`);
 
   const pricing = await BNSMarketPricePolicy.new({ from: deployer });

@@ -2,6 +2,8 @@ const BNSDomainNamesMarket = artifacts.require('BNSDomainNamesMarket');
 const BNSMarketPricePolicy = artifacts.require('BNSMarketPricePolicy');
 const BNSNamesPolicy = artifacts.require('BNSNamesPolicy');
 const BNSNFT = artifacts.require('BNSNFT');
+const BNSRepository = artifacts.require('BNSRepository');
+const BNSSimpleStorage = artifacts.require('BNSSimpleStorage');
 const { logger } = require('./util');
 
 async function deploy () {
@@ -19,6 +21,12 @@ async function deploy () {
 
   const nft = await BNSNFT.new({ from: deployer });
   log(`NFT deployed: @address{${nft.address}}`);
+
+  const storage = await BNSSimpleStorage.new({ from: deployer });
+  log(`BNSSimpleStorage deployed: @address{${storage.address}}`);
+
+  const repository = await BNSRepository.new({ from: deployer });
+  log(`BNSRepository deployed: @address{${repository.address}}`);
 }
 
 module.exports = async function main (callback) {

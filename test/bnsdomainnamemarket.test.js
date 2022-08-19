@@ -7,6 +7,7 @@ const BNSDomainNameMarket = contract.fromArtifact('BNSDomainNameMarket');
 const BNSMarketPricePolicy = contract.fromArtifact('BNSMarketPricePolicy');
 const BNSNamesPolicy = contract.fromArtifact('BNSNamesPolicy');
 const BNSNFT = contract.fromArtifact('BNSNFT');
+const PaymentHelper = contract.fromArtifact('PaymentHelper');
 const ERC20Mock = contract.fromArtifact('ERC20Mock');
 
 const SIZES = [1,2,3,4,5,6,7,8];
@@ -20,14 +21,16 @@ describe('BNSDomainNameMarket', function () {
   let names;
   let nft;
   let pricing;
-  let tokens = { usdt: { id: 1, contract: undefined }, busd: { id: 2, contract: undefined }};
+  let payment;
+  let tokens = { usdt: { id: 1, contract: undefined, key: 12345 }, busd: { id: 2, contract: undefined, key: 23456 }};
 
   beforeEach(async function () {
-    [ market, names, nft, pricing, tokens.busd.contract, tokens.usdt.contract ] = await Promise.all([
+    [ market, names, nft, pricing, payment, tokens.busd.contract, tokens.usdt.contract ] = await Promise.all([
       BNSDomainNameMarket.new({ from: deployer }),
       BNSNamesPolicy.new({ from: deployer }),
       BNSNFT.new({ from: deployer }),
       BNSMarketPricePolicy.new({ from: deployer }),
+      PaymentHelper.new({ from: deployer}),
       ERC20Mock.new('BUSD Mock Token', 'BUSD', deployer, ether('10000000'), { from: deployer }),
       ERC20Mock.new('USDT Mock Token', 'USDT', deployer, ether('10000000'), { from: deployer }),
     ]);
@@ -38,62 +41,79 @@ describe('BNSDomainNameMarket', function () {
   });
 
   describe('setBNSNFT', function () {
-    it('should change bnsnft if called by admin', async function () {
-      await market.setBNSNFT(nft.address, {from : deployer});
-      expect(await market.bnsnft()).to.be.equal(nft.address);
+    context('when called by admin', function () {
+      it('should change bnsnft', async function () {
+        await market.setBNSNFT(nft.address, {from : deployer});
+        expect(await market.bnsnft()).to.be.equal(nft.address);
+      });
     });
-
-    it('should throw an error if called not by admin', async function () {
-      await expectRevert.unspecified(market.setBNSNFT(nft.address, {from : user}));
+    context('when called not by admin', function () {
+      it('revert', async function () {
+        await expectRevert.unspecified(market.setBNSNFT(nft.address, {from : user}));
+      });
     });
   });
 
   describe('setFundraisingWallet', function () {
-    it('should change fundraisingWallet if called by admin', async function () {
-      await market.setFundraisingWallet(fundraisingWallet, {from : deployer});
-      expect(await market.fundraisingWallet()).to.be.equal(fundraisingWallet);
+    context('when called by admin', function () {
+      it('should change fundraisingWallet', async function () {
+        await market.setFundraisingWallet(fundraisingWallet, {from : deployer});
+        expect(await market.fundraisingWallet()).to.be.equal(fundraisingWallet);
+      });
     });
-
-    it('should throw an error if called not by admin', async function () {
-      await expectRevert.unspecified(market.setFundraisingWallet(fundraisingWallet, {from : user}));
+    context('when called not by admin', function () {
+      it('revert', async function () {
+        await expectRevert.unspecified(market.setFundraisingWallet(fundraisingWallet, {from : user}));
+      });
     });
   });
 
   describe('setPricePolicy', function () {
-    it('should change pricePolicy if called by admin', async function () {
-      await market.setPricePolicy(pricing.address, {from : deployer});
-      expect(await market.pricePolicy()).to.be.equal(pricing.address);
+    context('when called by admin', function () {
+      it('should change pricePolicy', async function () {
+        await market.setPricePolicy(pricing.address, {from : deployer});
+        expect(await market.pricePolicy()).to.be.equal(pricing.address);
+      });
     });
-
-    it('should throw an error if called not by admin', async function () {
-      await expectRevert.unspecified(market.setPricePolicy(pricing.address, {from : user}));
+    context('when called not by admin', function () {
+      it('revert', async function () {
+        await expectRevert.unspecified(market.setPricePolicy(pricing.address, {from : user}));
+      });
     });
   });
 
   describe('setNamesPolicy', function () {
-    it('should change namesPolicy if called by admin', async function () {
-      await market.setNamesPolicy(names.address, {from : deployer});
-      expect(await market.namesPolicy()).to.be.equal(names.address);
+    context('when called by admin', function () {
+      it('should change namesPolicy', async function () {
+        await market.setNamesPolicy(names.address, {from : deployer});
+        expect(await market.namesPolicy()).to.be.equal(names.address);
+      });
     });
-
-    it('should throw an error if called not by admin', async function () {
-      await expectRevert.unspecified(market.setNamesPolicy(names.address, {from : user}));
+    context('when called not by admin', function () {
+      it('revert', async function () {
+        await expectRevert.unspecified(market.setNamesPolicy(names.address, {from : user}));
+      });
     });
   });
 
   describe('setToken', function () {
-    it('should return true if called by admin', async function () {
-      expect(await market.setToken(tokens.usdt.id, tokens.usdt.contract.address, 1, {from : deployer})).to.be.equal(true);
-    });
+    context('when called by admin', function () {
+      it('should add token to tokens.map', async function () {
+        await market.setToken(tokens.usdt.key, tokens.usdt.contract.address, 1, {from : deployer});
+        const tempToken = await payment.getToken(tokens.usdt.key);
 
-    it('should throw an error if called not by admin', async function () {
-      await expectRevert.unspecified(market.setToken(tokens.usdt.id, tokens.usdt.contract.address, 1, {from : user}));
+      });
+    });
+    context('when called not by admin', function () {
+      it('revert', async function () {
+        await expectRevert.unspecified(market.setToken(tokens.usdt.key, tokens.usdt.contract.address, 1, {from : user}));
+      });
     });
   });
 
   describe('removeToken', function () {
-    it('should return true if token removed', async function () {
-      expect(await market.removeToken(tokens.usdt.id, {from : deployer})).to.be.equal(true);
+    it('should remove token', async function () {
+      // expect(await market.removeToken(tokens.usdt.id, {from : deployer})).to.be.equal(true);
     });
   });
 

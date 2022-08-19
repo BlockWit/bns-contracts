@@ -14,50 +14,58 @@ describe('BNSNamesPolicy', function () {
     });
 
     describe('setForbiddenSymbols', function () {
-        it('should change forbiddenSymbols if called by admin', async function () {
-            await contract.setForbiddenSymbols(",|*", {from : owner});
-            expect(await contract.forbiddenSymbols()).to.be.equal(",|*");
+        context('when called by admin', function () {
+            it('should change forbiddenSymbols', async function () {
+                await contract.setForbiddenSymbols(",|*", {from : owner});
+                expect(await contract.forbiddenSymbols()).to.be.equal(",|*");
+            });
         });
-
-        it('should throw an error if called not by admin', async function () {
-            await expectRevert.unspecified(contract.setForbiddenSymbols("| *", {from: account1}));
+        context('when called not by admin', function () {
+            it('revert', async function () {
+                await expectRevert.unspecified(contract.setForbiddenSymbols("| *", {from: account1}));
+            });
         });
     });
 
     describe('perform', function () {
-        let contract;
-
-        beforeEach(async function () {
-            contract = await BNSNamesPolicy.new({from: owner});
-        });
-
-        it('should change domainName to lowercase', async function () {
-            expect(await contract.perform("HaHaHa")).to.be.equal("hahaha");
+        context('when domainName contains uppercase symbols', function () {
+            it('should change to lowercase', async function () {
+                expect(await contract.perform("HaHaHa")).to.be.equal("hahaha");
+            });
         });
     });
 
     describe('check', function () {
-        let contract;
-
-        beforeEach(async function () {
-            contract = await BNSNamesPolicy.new({from: owner});
+        context('when domainName', function () {
+            context('is not empty and doesn`t contain forbiddenSymbols', function () {
+                it('should work', async function () {
+                    expect(await contract.check("haHaha"));
+                });
+            });
+            context('is empty', function () {
+                it('revert', async function () {
+                    await expectRevert(contract.check(""), "Domain name should not be empty!");
+                });
+            });
+            context('contains forbiddenSymbols', function () {
+                it('revert', async function () {
+                    await expectRevert(contract.check("ha*ha"), "Domain name contains forbidden symbol");
+                });
+            });
         });
-
-        it('should work if domainName is not empty and doesn`t contain forbiddenSymbols', async function () {
-            expect(await contract.check("haHaha"));
-        });
-
-        it('should throw an error if forbiddenSymbols was changed and domainName contains it', async function () {
-            await contract.setForbiddenSymbols(",", {from : owner});
-            await expectRevert(contract.check("ha,ha"), "Domain name contains forbidden symbol");
-        });
-
-        it('should throw an error if domainName is empty', async function () {
-            await expectRevert(contract.check(""), "Domain name should not be empty!");
-        });
-
-        it('should throw an error if domainName contains forbiddenSymbols', async function () {
-            await expectRevert(contract.check("ha*ha"), "Domain name contains forbidden symbol");
+        context('when forbiddenSymbols were changed', function () {
+            context('if domainName doesn`t contain forbiddenSymbols', function () {
+                it('should work', async function () {
+                    await contract.setForbiddenSymbols(",", {from : owner});
+                    expect(await contract.check("haha"));
+                });
+            });
+            context('if domainName contains forbiddenSymbols', function () {
+                it('revert', async function () {
+                    await contract.setForbiddenSymbols(",", {from : owner});
+                    await expectRevert(contract.check("ha,ha"), "Domain name contains forbidden symbol");
+                });
+            });
         });
     });
 });

@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./BNSNFT.sol";
 import "./BNSMarketPricePolicy.sol";
 import "./BNSNamesPolicy.sol";
-import "./lib/Tokens.sol";
+import "./lib/Assets.sol";
 import "./AssetHandler.sol";
 
 contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
@@ -40,22 +40,22 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         namesPolicy = BNSNamesPolicy(newNamesPolicy);
     }
 
-    function setToken(uint256 key, address tokenAddress, Tokens.TokenType tokenType) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
-        return _setToken(key, tokenAddress, tokenType);
+    function setAsset(uint256 key, address tokenAddress, Assets.AssetType assetType) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+        return _setAsset(key, tokenAddress, assetType);
     }
 
-    function removeToken(uint256 key) external returns (bool) {
-        return _removeToken(key);
+    function removeAsset(uint256 key) external returns (bool) {
+        return _removeAsset(key);
     }
 
-    function buy(string memory domainName, uint256 tokenId) whenNotPaused external {
+    function buy(string memory domainName, uint256 assetId) whenNotPaused external {
         // sanitize domain name and calculate price
         domainName = namesPolicy.perform(domainName);
         namesPolicy.check(domainName);
         require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
-        uint256 price = pricePolicy.getPrice(domainName, tokenId);
+        uint256 price = pricePolicy.getPrice(domainName, assetId);
         // charge payment
-        _transfer(msg.sender, fundraisingWallet, price, tokenId);
+        _transfer(msg.sender, fundraisingWallet, price, assetId);
         // update statistics
         domainBuyers[domainName] = msg.sender;
         domainPrices[domainName] = price;

@@ -6,12 +6,12 @@ import "../AssetHandler.sol";
 
 contract AssetHandlerMock is AssetHandler {
 
-    function setToken(uint256 key, address tokenAddress, Tokens.TokenType tokenType) external returns (bool) {
-        return _setToken(key, tokenAddress, tokenType);
+    function setAsset(uint256 key, address assetAddress, Assets.AssetType assetType) external returns (bool) {
+        return _setAsset(key, assetAddress, assetType);
     }
 
-    function removeToken(uint256 key) external returns (bool) {
-        return _removeToken(key);
+    function removeAsset(uint256 key) external returns (bool) {
+        return _removeAsset(key);
     }
 
     function transfer(address sender, address recipient, uint256 amount, uint256 currencyId) external {

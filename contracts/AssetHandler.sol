@@ -4,37 +4,37 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./lib/Tokens.sol";
+import "./lib/Assets.sol";
 
 contract AssetHandler {
 
-    using Tokens for Tokens.Map;
+    using Assets for Assets.Map;
 
-    Tokens.Map tokens;
+    Assets.Map assets;
 
-    function _setToken(uint256 key, address tokenAddress, Tokens.TokenType tokenType) internal virtual returns (bool) {
-        return tokens.set(key, Tokens.Token(tokenAddress, tokenType));
+    function _setAsset(uint256 key, address tokenAddress, Assets.AssetType tokenType) internal virtual returns (bool) {
+        return assets.set(key, Assets.Asset(tokenAddress, tokenType));
     }
 
-    function _removeToken(uint256 key) internal virtual returns (bool) {
-        return tokens.remove(key);
+    function _removeAsset(uint256 key) internal virtual returns (bool) {
+        return assets.remove(key);
     }
 
-    function tokensLength() public view returns (uint256) {
-        return tokens.length();
+    function assetsLength() public view returns (uint256) {
+        return assets.length();
     }
 
-    function getTokenAt(uint256 index) public view returns (uint256, Tokens.Token memory) {
-        return tokens.at(index);
+    function getAssetAt(uint256 index) public view returns (uint256, Assets.Asset memory) {
+        return assets.at(index);
     }
 
-    function getToken(uint256 key) public view returns (Tokens.Token memory) {
-        return tokens.get(key);
+    function getAsset(uint256 key) public view returns (Assets.Asset memory) {
+        return assets.get(key);
     }
 
-    function _transfer(address sender, address recipient, uint256 amount, uint256 currencyId) internal {
-        Tokens.Token memory token = tokens.get(currencyId);
-        IERC20(token.tokenAddress).transferFrom(sender, recipient, amount);
+    function _transfer(address sender, address recipient, uint256 amount, uint256 assetId) internal {
+        Assets.Asset memory asset = assets.get(assetId);
+        IERC20(asset.assetAddress).transferFrom(sender, recipient, amount);
     }
 
 }

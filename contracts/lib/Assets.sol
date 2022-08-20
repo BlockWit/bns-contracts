@@ -4,26 +4,26 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-library Tokens {
+library Assets {
 
     using EnumerableSet for EnumerableSet.UintSet;
 
-    enum TokenType {
+    enum AssetType {
         NATIVE,
         ERC20
     }
 
-struct Token {
-        address tokenAddress;
-        TokenType tokenType;
+struct Asset {
+        address assetAddress;
+        AssetType assetType;
     }
 
     struct Map {
         EnumerableSet.UintSet _keys;
-        mapping(uint256 => Token) _values;
+        mapping(uint256 => Asset) _values;
     }
 
-    function set(Map storage map, uint256 key, Token memory value) internal returns (bool) {
+    function set(Map storage map, uint256 key, Asset memory value) internal returns (bool) {
         map._values[key] = value;
         return map._keys.add(key);
     }
@@ -41,14 +41,14 @@ struct Token {
         return map._keys.length();
     }
 
-    function at(Map storage map, uint256 index) internal view returns (uint256, Token storage) {
+    function at(Map storage map, uint256 index) internal view returns (uint256, Asset storage) {
         uint256 key = map._keys.at(index);
         return (key, map._values[key]);
     }
 
-    function get(Map storage map, uint256 key) internal view returns (Token storage) {
-        Token storage value = map._values[key];
-        require(contains(map, key), "Tokens.Map: nonexistent key");
+    function get(Map storage map, uint256 key) internal view returns (Asset storage) {
+        Asset storage value = map._values[key];
+        require(contains(map, key), "Assets.Map: nonexistent key");
         return value;
     }
 

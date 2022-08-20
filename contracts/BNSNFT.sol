@@ -31,7 +31,7 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
     }
 
     function isDomainNameExists(string memory domainName) public view returns (bool) {
-        return _exists(domainNamesToTokenId[domainName]);
+        return domainNameExists[domainName];
     }
 
     function getTokenIdByDomainName(string calldata domainName) public view returns (uint256)  {

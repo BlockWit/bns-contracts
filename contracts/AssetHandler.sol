@@ -12,11 +12,11 @@ contract AssetHandler {
 
     Assets.Map assets;
 
-    function _setAsset(uint256 key, string memory assetTicker, Assets.AssetType assetType, address assetAddress) internal virtual returns (bool) {
-        return assets.set(key, Assets.Asset(assetTicker, assetType, assetAddress));
+    function _setAsset(address key, string memory assetTicker, Assets.AssetType assetType) internal virtual returns (bool) {
+        return assets.set(key, Assets.Asset(assetTicker, assetType));
     }
 
-    function _removeAsset(uint256 key) internal virtual returns (bool) {
+    function _removeAsset(address key) internal virtual returns (bool) {
         return assets.remove(key);
     }
 
@@ -24,17 +24,18 @@ contract AssetHandler {
         return assets.length();
     }
 
-    function getAssetAt(uint256 index) public view returns (uint256, Assets.Asset memory) {
+    function getAssetAt(uint256 index) public view returns (address, Assets.Asset memory) {
         return assets.at(index);
     }
 
-    function getAsset(uint256 key) public view returns (Assets.Asset memory) {
+    function getAsset(address key) public view returns (Assets.Asset memory) {
         return assets.get(key);
     }
 
-    function _transferAsset(address sender, address recipient, uint256 amount, uint256 assetId) internal {
-        Assets.Asset memory asset = assets.get(assetId);
-        IERC20(asset.assetAddress).transferFrom(sender, recipient, amount);
+    function _transferAsset(address sender, address recipient, uint256 amount, address assetKey) internal {
+        Assets.Asset memory asset = assets.get(assetKey);
+        require(asset.assetType == Assets.AssetType.ERC20, "AssetHandler: only ERC20 assets supported");
+        IERC20(assetKey).transferFrom(sender, recipient, amount);
     }
 
 }

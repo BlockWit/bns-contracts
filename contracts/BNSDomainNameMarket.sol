@@ -40,22 +40,22 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         namesPolicy = BNSNamesPolicy(newNamesPolicy);
     }
 
-    function setAsset(uint256 key, string memory assetTicker, Assets.AssetType assetType, address assetAddress) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
-        return _setAsset(key, assetTicker, assetType, assetAddress);
+    function setAsset(address key, string memory assetTicker, Assets.AssetType assetType) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+        return _setAsset(key, assetTicker, assetType);
     }
 
-    function removeAsset(uint256 key) external returns (bool) {
+    function removeAsset(address key) external returns (bool) {
         return _removeAsset(key);
     }
 
-    function buy(string memory domainName, uint256 assetId) whenNotPaused external {
+    function buy(string memory domainName, address assetKey) whenNotPaused external {
         // sanitize domain name and calculate price
         domainName = namesPolicy.perform(domainName);
         namesPolicy.check(domainName);
         require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
-        uint256 price = pricePolicy.getPrice(domainName, assetId);
+        uint256 price = pricePolicy.getPrice(domainName, assetKey);
         // charge payment
-        _transferAsset(msg.sender, fundraisingWallet, price, assetId);
+        _transferAsset(msg.sender, fundraisingWallet, price, assetKey);
         // update statistics
         domainBuyers[domainName] = msg.sender;
         domainPrices[domainName] = price;

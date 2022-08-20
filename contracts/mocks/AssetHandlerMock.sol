@@ -6,16 +6,16 @@ import "../AssetHandler.sol";
 
 contract AssetHandlerMock is AssetHandler {
 
-    function setAsset(uint256 key, string memory assetTicker, Assets.AssetType assetType, address assetAddress) external returns (bool) {
-        return _setAsset(key, assetTicker, assetType, assetAddress);
+    function setAsset(address key, string memory assetTicker, Assets.AssetType assetType) external returns (bool) {
+        return _setAsset(key, assetTicker, assetType);
     }
 
-    function removeAsset(uint256 key) external returns (bool) {
+    function removeAsset(address key) external returns (bool) {
         return _removeAsset(key);
     }
 
-    function transfer(address sender, address recipient, uint256 amount, uint256 currencyId) external {
-        return _transferAsset(sender, recipient, amount, currencyId);
+    function transfer(address sender, address recipient, uint256 amount, address assetKey) external {
+        return _transferAsset(sender, recipient, amount, assetKey);
     }
 
 }

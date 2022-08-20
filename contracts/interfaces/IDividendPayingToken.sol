@@ -6,6 +6,7 @@ pragma solidity ^0.8.0;
 interface IDividendPayingToken {
 
   struct Dividend {
+    address assetKey;
     string assetTicker;
     uint256 amount;
   }
@@ -25,12 +26,12 @@ interface IDividendPayingToken {
   event DividendsDistributed(
     address indexed from,
     uint256 amount,
-    uint256 assetId
+    address assetKey
   );
 
   event DividendWithdrawn(
     address indexed to,
     uint256 amount,
-    uint256 assetId
+    address assetKey
   );
 }

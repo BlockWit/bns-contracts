@@ -3,8 +3,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "../interfaces/IDividendPayingToken.sol";
-import "./SafeMath.sol";
+import "./interfaces/IDividendPayingToken.sol";
+import "./lib/SafeMath.sol";
 
 
 abstract contract DividendPayingToken is ERC20Burnable, IDividendPayingToken {

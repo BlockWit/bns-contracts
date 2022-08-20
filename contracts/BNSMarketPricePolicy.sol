@@ -12,7 +12,7 @@ contract BNSMarketPricePolicy is Ownable {
     mapping (uint => uint) public pricePerNameLength;
     uint public defaultPrice;
 
-    function getPrice(string memory domainName, uint256 tokenId) public view returns(uint) {
+    function getPrice(string memory domainName, uint256 assetId) public view returns(uint) {
         uint price = pricePerNameLength[domainName.length()];
         if(price == 0) price = defaultPrice;
         return price;

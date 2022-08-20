@@ -21,12 +21,12 @@ describe('AssetHandler', function () {
     ])
   });
 
-  describe('setToken', function () {
+  describe('setAsset', function () {
     it('should add specified token at specified index to contract', async function () {
 
     });
   });
-  describe('removeToken', function () {
+  describe('removeAsset', function () {
     it('should remove token at specified index correctly', async function () {
 
     });

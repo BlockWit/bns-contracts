@@ -14,8 +14,9 @@ library Assets {
     }
 
 struct Asset {
-        address assetAddress;
+        string assetTicker;
         AssetType assetType;
+        address assetAddress;   // ERC20 tokens only
     }
 
     struct Map {

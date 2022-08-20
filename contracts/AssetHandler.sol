@@ -12,8 +12,8 @@ contract AssetHandler {
 
     Assets.Map assets;
 
-    function _setAsset(uint256 key, address tokenAddress, Assets.AssetType tokenType) internal virtual returns (bool) {
-        return assets.set(key, Assets.Asset(tokenAddress, tokenType));
+    function _setAsset(uint256 key, string memory assetTicker, Assets.AssetType assetType, address assetAddress) internal virtual returns (bool) {
+        return assets.set(key, Assets.Asset(assetTicker, assetType, assetAddress));
     }
 
     function _removeAsset(uint256 key) internal virtual returns (bool) {
@@ -32,7 +32,7 @@ contract AssetHandler {
         return assets.get(key);
     }
 
-    function _transfer(address sender, address recipient, uint256 amount, uint256 assetId) internal {
+    function _transferAsset(address sender, address recipient, uint256 amount, uint256 assetId) internal {
         Assets.Asset memory asset = assets.get(assetId);
         IERC20(asset.assetAddress).transferFrom(sender, recipient, amount);
     }

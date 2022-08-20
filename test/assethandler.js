@@ -2,18 +2,18 @@ const { accounts, contract, web3 } = require('@openzeppelin/test-environment');
 const { balance, BN, constants, ether, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
 const { assert, expect } = require('chai');
 
-const PaymentHelperMock = contract.fromArtifact('PaymentHelperMock');
+const AssetHandlerMock = contract.fromArtifact('AssetHandlerMock');
 const ERC20Mock = contract.fromArtifact('ERC20Mock');
 
 const [ owner, user ] = accounts;
 
 
-describe('PaymentHelper', function () {
-  let paymentHelper;
+describe('AssetHandler', function () {
+  let AssetHandler;
   let tokens;
 
   beforeEach(async function () {
-    paymentHelper = await PaymentHelperMock.new({ from: owner });
+    AssetHandler = await AssetHandlerMock.new({ from: owner });
     tokens = await Promise.all([
       ERC20Mock.new('First Mock Token', 'FRST', owner, ether('10000'), { from: owner }),
       ERC20Mock.new('Second Mock Token', 'SCND', owner, ether('20000'), { from: owner }),

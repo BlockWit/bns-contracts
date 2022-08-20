@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "../PaymentHelper.sol";
+import "../AssetHandler.sol";
 
-contract PaymentHelperMock is PaymentHelper {
+contract AssetHandlerMock is AssetHandler {
 
     function setToken(uint256 key, address tokenAddress, Tokens.TokenType tokenType) external returns (bool) {
         return _setToken(key, tokenAddress, tokenType);

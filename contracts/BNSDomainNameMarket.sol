@@ -9,9 +9,9 @@ import "./BNSNFT.sol";
 import "./BNSMarketPricePolicy.sol";
 import "./BNSNamesPolicy.sol";
 import "./lib/Tokens.sol";
-import "./PaymentHelper.sol";
+import "./AssetHandler.sol";
 
-contract BNSDomainNameMarket is Pausable, AccessControl, PaymentHelper {
+contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
 
     BNSMarketPricePolicy public pricePolicy;
     BNSNamesPolicy public namesPolicy;

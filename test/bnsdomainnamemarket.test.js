@@ -7,7 +7,7 @@ const BNSDomainNameMarket = contract.fromArtifact('BNSDomainNameMarket');
 const BNSMarketPricePolicy = contract.fromArtifact('BNSMarketPricePolicy');
 const BNSNamesPolicy = contract.fromArtifact('BNSNamesPolicy');
 const BNSNFT = contract.fromArtifact('BNSNFT');
-const PaymentHelper = contract.fromArtifact('PaymentHelper');
+const AssetHandler = contract.fromArtifact('AssetHandler');
 const ERC20Mock = contract.fromArtifact('ERC20Mock');
 
 const SIZES = [1,2,3,4,5,6,7,8];
@@ -30,7 +30,7 @@ describe('BNSDomainNameMarket', function () {
       BNSNamesPolicy.new({ from: deployer }),
       BNSNFT.new({ from: deployer }),
       BNSMarketPricePolicy.new({ from: deployer }),
-      PaymentHelper.new({ from: deployer}),
+      AssetHandler.new({ from: deployer}),
       ERC20Mock.new('BUSD Mock Token', 'BUSD', deployer, ether('10000000'), { from: deployer }),
       ERC20Mock.new('USDT Mock Token', 'USDT', deployer, ether('10000000'), { from: deployer }),
     ]);

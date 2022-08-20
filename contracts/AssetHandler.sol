@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./lib/Tokens.sol";
 
-contract PaymentHelper {
+contract AssetHandler {
 
     using Tokens for Tokens.Map;
 

@@ -7,7 +7,6 @@ const BNSDomainNameMarket = contract.fromArtifact('BNSDomainNameMarket');
 const BNSMarketPricePolicy = contract.fromArtifact('BNSMarketPricePolicy');
 const BNSNamesPolicy = contract.fromArtifact('BNSNamesPolicy');
 const BNSNFT = contract.fromArtifact('BNSNFT');
-const AssetHandler = contract.fromArtifact('AssetHandler');
 const ERC20Mock = contract.fromArtifact('ERC20Mock');
 
 const SIZES = [1,2,3,4,5,6,7,8];
@@ -21,16 +20,14 @@ describe('BNSDomainNameMarket', function () {
   let names;
   let nft;
   let pricing;
-  let payment;
   let tokens = { usdt: { id: 1, contract: undefined, key: 12345 }, busd: { id: 2, contract: undefined, key: 23456 }};
 
   beforeEach(async function () {
-    [ market, names, nft, pricing, payment, tokens.busd.contract, tokens.usdt.contract ] = await Promise.all([
+    [ market, names, nft, pricing, tokens.busd.contract, tokens.usdt.contract ] = await Promise.all([
       BNSDomainNameMarket.new({ from: deployer }),
       BNSNamesPolicy.new({ from: deployer }),
       BNSNFT.new({ from: deployer }),
       BNSMarketPricePolicy.new({ from: deployer }),
-      AssetHandler.new({ from: deployer}),
       ERC20Mock.new('BUSD Mock Token', 'BUSD', deployer, ether('10000000'), { from: deployer }),
       ERC20Mock.new('USDT Mock Token', 'USDT', deployer, ether('10000000'), { from: deployer }),
     ]);
@@ -98,10 +95,12 @@ describe('BNSDomainNameMarket', function () {
 
   describe('setToken', function () {
     context('when called by admin', function () {
-      it('should add token to tokens.map', async function () {
-        await market.setToken(tokens.usdt.key, tokens.usdt.contract.address, 1, {from : deployer});
-        const tempToken = await payment.getToken(tokens.usdt.key);
-
+      it('should add specified token to tokens.map', async function () {
+        await market.setToken(tokens.usdt.key, tokens.usdt.contract.address, 1, tokens.usdt.contract.address, {from : deployer});
+        const tokenFromMap = await market.getToken(tokens.usdt.key);
+        const tempToken = [tokens.usdt.contract.address, "1"];
+        expect(tokenFromMap[0]).to.be.equal(tempToken[0]);
+        expect(tokenFromMap[1]).to.be.equal(tempToken[1]);
       });
     });
     context('when called not by admin', function () {
@@ -112,8 +111,14 @@ describe('BNSDomainNameMarket', function () {
   });
 
   describe('removeToken', function () {
-    it('should remove token', async function () {
-      // expect(await market.removeToken(tokens.usdt.id, {from : deployer})).to.be.equal(true);
+    it('should remove specified token', async function () {
+      await market.setToken(tokens.usdt.key, 'USDT', tokens.usdt.contract.address, 1, {from : deployer});
+      const tokenFromMap = await market.getToken(tokens.usdt.key);
+      const tempToken = [tokens.usdt.contract.address, "1"];
+      expect(tokenFromMap[0]).to.be.equal(tempToken[0]);
+      expect(tokenFromMap[1]).to.be.equal(tempToken[1]);
+      await market.removeToken(tokens.usdt.key, {from : deployer});
+      await expectRevert(market.getToken(tokens.usdt.key), 'Tokens.Map: nonexistent key');
     });
   });
 

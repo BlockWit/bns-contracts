@@ -17,13 +17,6 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
   mapping(address => mapping(address => int256)) internal magnifiedDividendCorrections;
   mapping(address => mapping(address => uint256)) internal withdrawnDividends;
 
-  function distributeDividends() override public payable {
-    for (uint256 i = 0; i < assetsLength(); i++) {
-      (address assetKey, ) = getAssetAt(i);
-      distributeDividends(assetKey);
-    }
-  }
-
   function withdrawDividend() override public {
     for (uint256 i = 0; i < assetsLength(); i++) {
       (address assetKey, ) = getAssetAt(i);
@@ -67,12 +60,12 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
     return dividends;
   }
 
-  function distributeDividends(address assetKey) public payable {
-    require(totalSupply() > 0);
-    if (msg.value > 0) {
-      magnifiedDividendPerShare[assetKey] = magnifiedDividendPerShare[assetKey] + (msg.value * MAGNITUDE / totalSupply());
-      emit DividendsDistributed(msg.sender, msg.value, assetKey);
-    }
+  function distributeDividends(uint256 amount, address assetKey) public {
+    require(totalSupply() > 0, "DividendPayingToken: totalSupply must be greater than 0");
+    require(amount > 0, "DividendPayingToken: amount must be greater than 0");
+    _transferAsset(msg.sender, address(this), amount, assetKey);
+    magnifiedDividendPerShare[assetKey] = magnifiedDividendPerShare[assetKey] + (amount * MAGNITUDE / totalSupply());
+    emit DividendsDistributed(msg.sender, amount, assetKey);
   }
 
   function withdrawDividend(address assetKey) public {

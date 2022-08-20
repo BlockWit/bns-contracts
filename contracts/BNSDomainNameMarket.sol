@@ -5,10 +5,11 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
+import "./interfaces/IDividendPayingToken.sol";
+import "./lib/Assets.sol";
 import "./BNSNFT.sol";
 import "./BNSMarketPricePolicy.sol";
 import "./BNSNamesPolicy.sol";
-import "./lib/Assets.sol";
 import "./AssetHandler.sol";
 
 contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
@@ -16,7 +17,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
     BNSMarketPricePolicy public pricePolicy;
     BNSNamesPolicy public namesPolicy;
     BNSNFT public bnsnft;
-    address public fundraisingWallet;
+    IDividendPayingToken public dividendManager;
     mapping (string => address) public domainBuyers;
     mapping (string => uint) public domainPrices;
 
@@ -28,8 +29,8 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         bnsnft = BNSNFT(newBnsnft);
     }
 
-    function setFundraisingWallet(address newFundraisingWallet) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        fundraisingWallet = newFundraisingWallet;
+    function setDividendManager(address newDividendManager) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        dividendManager = IDividendPayingToken(newDividendManager);
     }
 
     function setPricePolicy(address newPricePolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -55,7 +56,9 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
         uint256 price = pricePolicy.getPrice(domainName, assetKey);
         // charge payment
-        _transferAsset(msg.sender, fundraisingWallet, price, assetKey);
+        _transferAsset(msg.sender, address(this), price, assetKey);
+        IERC20(assetKey).approve(address(dividendManager), price);
+        dividendManager.distributeDividends(price, assetKey);
         // update statistics
         domainBuyers[domainName] = msg.sender;
         domainPrices[domainName] = price;

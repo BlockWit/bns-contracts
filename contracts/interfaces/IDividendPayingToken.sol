@@ -13,7 +13,7 @@ interface IDividendPayingToken {
 
   function dividendOf(address owner) external view returns(Dividend[] memory);
 
-  function distributeDividends() external payable;
+  function distributeDividends(uint256 amount, address assetKey) external;
 
   function withdrawDividend() external;
 

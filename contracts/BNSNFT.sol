@@ -76,6 +76,7 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
            _tokenIdCounter.increment();
            _balances[to] += 1;
            _owners[tokenId] = to;
+           domainNameExists[domainName] = true;
            tokenIdToDomainNames[tokenId] = domainNames[i];
            domainNamesToTokenId[domainNames[i]] = tokenId;
         }
@@ -86,6 +87,7 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
+        domainNameExists[domainName] = true;
         tokenIdToDomainNames[tokenId] = domainName;
         domainNamesToTokenId[domainName] = tokenId;
         return tokenId;

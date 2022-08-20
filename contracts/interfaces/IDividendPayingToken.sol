@@ -5,25 +5,32 @@ pragma solidity ^0.8.0;
 
 interface IDividendPayingToken {
 
-  function dividendOf(address _owner) external view returns(uint256);
+  struct Dividend {
+    string assetTicker;
+    uint256 amount;
+  }
+
+  function dividendOf(address owner) external view returns(Dividend[] memory);
 
   function distributeDividends() external payable;
 
   function withdrawDividend() external;
 
-  function withdrawableDividendOf(address _owner) external view returns(uint256);
+  function withdrawableDividendOf(address owner) external view returns(Dividend[] memory);
 
-  function withdrawnDividendOf(address _owner) external view returns(uint256);
+  function withdrawnDividendOf(address owner) external view returns(Dividend[] memory);
 
-  function accumulativeDividendOf(address _owner) external view returns(uint256);
+  function accumulativeDividendOf(address owner) external view returns(Dividend[] memory);
 
   event DividendsDistributed(
     address indexed from,
-    uint256 weiAmount
+    uint256 amount,
+    uint256 assetId
   );
 
   event DividendWithdrawn(
     address indexed to,
-    uint256 weiAmount
+    uint256 amount,
+    uint256 assetId
   );
 }

@@ -111,9 +111,9 @@ describe('BNSDomainNameMarket', function () {
     });
   });
 
-  describe('removeToken', function () {
-    context('if token is set', function () {
-      it('should remove specified token', async function () {
+  describe('removeAsset', function () {
+    context('if asset is added', function () {
+      it('should remove specified asset', async function () {
         await market.setAsset(tokens.usdt.key, 'USDT', 1, tokens.usdt.contract.address, {from : deployer});
         const tokenFromMap = await market.getAsset(tokens.usdt.key);
         const tempToken = ['USDT', "1", tokens.usdt.contract.address,];
@@ -149,12 +149,12 @@ describe('BNSDomainNameMarket', function () {
         expect(to).to.be.equal(user);
         expect(tokenId).to.be.bignumber.equal(new BN('0'));
 
-        // await tokens.busd.contract.approve(market.address, ether('250000'), { from: user });
-        // const { tx1 } = await market.buy('ba', tokens.busd.key, { from: user });
-        // const [{ args: { from1, to1, tokenId1 }}] = await getEvents(tx1, nft, 'Transfer', web3);
-        // expect(from1).to.be.equal(constants.ZERO_ADDRESS);
-        // expect(to1).to.be.equal(user);
-        // expect(tokenId1).to.be.bignumber.equal(new BN('1'));
+        await tokens.busd.contract.approve(market.address, ether('250000'), { from: user });
+        const { tx1 } = await market.buy('cdcas', tokens.busd.key, { from: user });
+        const [{ args: { from1, to1, tokenId1 }}] = await getEvents(tx1, nft, 'Transfer', web3);
+        expect(from1).to.be.equal(constants.ZERO_ADDRESS);
+        expect(to1).to.be.equal(user);
+        expect(tokenId1).to.be.bignumber.equal(new BN('1'));
       });
       it('should transfer USD to fundraising wallet', async function () {
         await tokens.usdt.contract.approve(market.address, ether('250000'), { from: user });

@@ -11,12 +11,18 @@ contract BNSNamesPolicy is AccessControl {
 
     string public forbiddenSymbols = ".*/ ";
 
+    uint256 public maxNameSizeLimit = 100;
+
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     function setForbiddenSymbols(string calldata symbols) external onlyRole(DEFAULT_ADMIN_ROLE) {
         forbiddenSymbols = symbols;
+    }
+
+    function setMaxNameSizeLimit(uint256 limit) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        maxNameSizeLimit = limit;
     }
 
     function perform(string memory domainName) external pure returns(string memory) {
@@ -36,6 +42,7 @@ contract BNSNamesPolicy is AccessControl {
 
     function check(string memory domainName) external view {
         require(domainName.length() > 0, "Domain name should not be empty!");
+        require(domainName.length() <= maxNameSizeLimit, "Domain name is too long");
         if (domainName.containsAnyOf(forbiddenSymbols)) revert("Domain name contains forbidden symbol");
     }
 

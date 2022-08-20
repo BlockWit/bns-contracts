@@ -45,7 +45,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         return _setAsset(key, assetTicker, assetType);
     }
 
-    function removeAsset(address key) external returns (bool) {
+    function removeAsset(address key) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
         return _removeAsset(key);
     }
 

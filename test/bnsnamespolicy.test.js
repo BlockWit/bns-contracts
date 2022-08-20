@@ -88,16 +88,16 @@ describe('BNSNamesPolicy', function () {
             });
         });
         context('when maxNameSizeLimit were changed', function () {
+            context('if domainName doesn`t exceeds maxNameSizeLimit', function () {
+                it('should work', async function () {
+                    await contract.setMaxNameSizeLimit(4, {from: owner});
+                    expect(await contract.check("haha"));
+                });
+            });
             context('if domainName exceeds maxNameSizeLimit', function () {
                 it('revert', async function () {
                     await contract.setMaxNameSizeLimit(2, {from: owner});
                     await expectRevert(contract.check("haha"), "Domain name is too long");
-                });
-                context('if domainName doesn`t exceeds maxNameSizeLimit', function () {
-                    it('should work', async function () {
-                        await contract.setMaxNameSizeLimit(4, {from: owner});
-                        expect(await contract.check("haha"));
-                    });
                 });
             });
         });

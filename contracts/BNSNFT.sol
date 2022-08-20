@@ -2,11 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+
+import "./token/ERC721/ERC721.sol";
+import "./token/ERC721/extensions/ERC721Enumerable.sol";
 import "./interfaces/IContentRouter.sol";
 
 contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
@@ -61,6 +62,23 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
 
     function unpause() public onlyRole(PAUSER_ROLE) {
         _unpause();
+    }
+
+
+    /**
+     *
+     * Check domain names before call this method!!!
+     *
+     **/
+    function safeMintBatch(address to, string[] calldata domainNames) public onlyRole(MINTER_ROLE) {
+        for(uint i = 0; i < domainNames.length; i++) {
+           uint256 tokenId = _tokenIdCounter.current();
+           _tokenIdCounter.increment();
+           _balances[to] += 1;
+           _owners[tokenId] = to;
+           tokenIdToDomainNames[tokenId] = domainNames[i];
+           domainNamesToTokenId[domainNames[i]] = tokenId;
+        }
     }
 
     function safeMint(address to, string calldata domainName) public onlyRole(MINTER_ROLE) returns (uint256) {

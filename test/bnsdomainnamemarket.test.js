@@ -93,32 +93,36 @@ describe('BNSDomainNameMarket', function () {
     });
   });
 
-  describe('setToken', function () {
+  describe('setAsset', function () {
     context('when called by admin', function () {
-      it('should add specified token to tokens.map', async function () {
-        await market.setToken(tokens.usdt.key, tokens.usdt.contract.address, 1, tokens.usdt.contract.address, {from : deployer});
-        const tokenFromMap = await market.getToken(tokens.usdt.key);
-        const tempToken = [tokens.usdt.contract.address, "1"];
+      it('should add specified asset to assets.map', async function () {
+        await market.setAsset(tokens.usdt.key, 'USDT', 1, tokens.usdt.contract.address, {from : deployer});
+        const tokenFromMap = await market.getAsset(tokens.usdt.key);
+        const tempToken = ['USDT', "1", tokens.usdt.contract.address,];
         expect(tokenFromMap[0]).to.be.equal(tempToken[0]);
         expect(tokenFromMap[1]).to.be.equal(tempToken[1]);
+        expect(tokenFromMap[2]).to.be.equal(tempToken[2]);
       });
     });
     context('when called not by admin', function () {
       it('revert', async function () {
-        await expectRevert.unspecified(market.setToken(tokens.usdt.key, tokens.usdt.contract.address, 1, {from : user}));
+        await expectRevert.unspecified(market.setAsset(tokens.busd.key, 'BUSD', 1, tokens.busd.contract.address, {from : user}));
       });
     });
   });
 
   describe('removeToken', function () {
-    it('should remove specified token', async function () {
-      await market.setToken(tokens.usdt.key, 'USDT', tokens.usdt.contract.address, 1, {from : deployer});
-      const tokenFromMap = await market.getToken(tokens.usdt.key);
-      const tempToken = [tokens.usdt.contract.address, "1"];
-      expect(tokenFromMap[0]).to.be.equal(tempToken[0]);
-      expect(tokenFromMap[1]).to.be.equal(tempToken[1]);
-      await market.removeToken(tokens.usdt.key, {from : deployer});
-      await expectRevert(market.getToken(tokens.usdt.key), 'Tokens.Map: nonexistent key');
+    context('if token is set', function () {
+      it('should remove specified token', async function () {
+        await market.setAsset(tokens.usdt.key, 'USDT', 1, tokens.usdt.contract.address, {from : deployer});
+        const tokenFromMap = await market.getAsset(tokens.usdt.key);
+        const tempToken = ['USDT', "1", tokens.usdt.contract.address,];
+        expect(tokenFromMap[0]).to.be.equal(tempToken[0]);
+        expect(tokenFromMap[1]).to.be.equal(tempToken[1]);
+        expect(tokenFromMap[2]).to.be.equal(tempToken[2]);
+        await market.removeAsset(tokens.usdt.key, {from : deployer});
+        await expectRevert(market.getAsset(tokens.usdt.key), 'Assets.Map: nonexistent key');
+      });
     });
   });
 
@@ -130,28 +134,43 @@ describe('BNSDomainNameMarket', function () {
         market.setBNSNFT(nft.address, { from: deployer }),
         market.setPricePolicy(pricing.address, { from: deployer }),
         market.setNamesPolicy(names.address, { from: deployer}),
-        market.setToken(tokens.usdt.id, tokens.usdt.contract.address, 1, { from: deployer }),
-        market.setToken(tokens.busd.id, tokens.busd.contract.address, 1, { from: deployer }),
+        market.setAsset(tokens.usdt.key, 'USDT', 1, tokens.usdt.contract.address, {from : deployer}),
+        market.setAsset(tokens.busd.key, 'BUSD', 1, tokens.busd.contract.address, {from : deployer}),
         pricing.setPrices(ether(BASE_PRICE_USDT.toString()), SIZES, PRICES_USDT.map(price => ether(price.toString())), { from: deployer })
       ])
     });
 
-    it('should transfer nft to buyer', async function () {
-      await tokens.usdt.contract.approve(market.address, ether('250000'), { from: user });
-      const { tx } = await market.buy('ab', tokens.usdt.id, { from: user });
-      const [{ args: { from, to, tokenId }}] = await getEvents(tx, nft, 'Transfer', web3);
-      expect(from).to.be.equal(constants.ZERO_ADDRESS);
-      expect(to).to.be.equal(user);
-      expect(tokenId).to.be.bignumber.equal(new BN('0'));
-    });
+    context('if domain doesn`t exist', function () {
+      it('should transfer nft to buyer', async function () {
+        await tokens.usdt.contract.approve(market.address, ether('250000'), { from: user });
+        const { tx } = await market.buy('ab', tokens.usdt.key, { from: user });
+        const [{ args: { from, to, tokenId }}] = await getEvents(tx, nft, 'Transfer', web3);
+        expect(from).to.be.equal(constants.ZERO_ADDRESS);
+        expect(to).to.be.equal(user);
+        expect(tokenId).to.be.bignumber.equal(new BN('0'));
 
-    it('should transfer USD to fundraising wallet', async function () {
-      await tokens.usdt.contract.approve(market.address, ether('250000'), { from: user });
-      const { tx } = await market.buy('ab', tokens.usdt.id, { from: user });
-      const [{ args: { from, to, value }}] = await getEvents(tx, tokens.usdt.contract, 'Transfer', web3);
-      expect(from).to.be.equal(user);
-      expect(to).to.be.equal(fundraisingWallet);
-      expect(value).to.be.bignumber.equal(ether('250000'));
+        // await tokens.busd.contract.approve(market.address, ether('250000'), { from: user });
+        // const { tx1 } = await market.buy('ba', tokens.busd.key, { from: user });
+        // const [{ args: { from1, to1, tokenId1 }}] = await getEvents(tx1, nft, 'Transfer', web3);
+        // expect(from1).to.be.equal(constants.ZERO_ADDRESS);
+        // expect(to1).to.be.equal(user);
+        // expect(tokenId1).to.be.bignumber.equal(new BN('1'));
+      });
+      it('should transfer USD to fundraising wallet', async function () {
+        await tokens.usdt.contract.approve(market.address, ether('250000'), { from: user });
+        const { tx } = await market.buy('ab', tokens.usdt.key, { from: user });
+        const [{ args: { from, to, value }}] = await getEvents(tx, tokens.usdt.contract, 'Transfer', web3);
+        expect(from).to.be.equal(user);
+        expect(to).to.be.equal(fundraisingWallet);
+        expect(value).to.be.bignumber.equal(ether('250000'));
+      });
+    });
+    context('if domain exist', function () {
+      it('revert', async function () {
+        await tokens.usdt.contract.approve(market.address, ether('250000'), {from: user});
+        await market.buy('ab', tokens.usdt.key, {from: user});
+        await expectRevert(market.buy('ab', tokens.usdt.key, {from: user}), 'Domain name already exists');
+      });
     });
   });
 });

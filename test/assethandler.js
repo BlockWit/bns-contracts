@@ -38,11 +38,12 @@ describe('AssetHandler', function () {
   describe('removeAsset', function () {
     it('should remove asset at specified index correctly', async function () {
       await assetHandler.setAsset(tokens.frst.id, tokens.frst.ticker, 1, tokens.frst.contract.address, {from : owner});
-      const assetFromMap = await assetHandler.getAsset(tokens.frst.id);
-      const tempAsset = ['frst', "1", tokens.frst.contract.address];
-      expect(assetFromMap[0]).to.be.equal(tempAsset[0]);
-      expect(assetFromMap[1]).to.be.equal(tempAsset[1]);
-      expect(assetFromMap[2]).to.be.equal(tempAsset[2]);
+      const assetFromMap = await assetHandler.getAssetAt(0);
+      const { 0: key, 1: array} = { 0: '1', 1: ['frst', '1', tokens.frst.contract.address]};
+      expect(assetFromMap[0]).to.be.bignumber.equal(key);
+      expect(assetFromMap[1][0]).to.be.equal(array[0]);
+      expect(assetFromMap[1][1]).to.be.equal(array[1]);
+      expect(assetFromMap[1][2]).to.be.equal(array[2]);
       await assetHandler.removeAsset(tokens.frst.id, {from : owner});
       await expectRevert(assetHandler.getAsset(tokens.frst.id), 'Assets.Map: nonexistent key');
     });

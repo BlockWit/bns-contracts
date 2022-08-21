@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./interfaces/IDividendPayingToken.sol";
 import "./lib/SafeMath.sol";
 import "./AssetHandler.sol";
@@ -63,7 +64,7 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
   function distributeDividends(uint256 amount, address assetKey) public {
     require(totalSupply() > 0, "DividendPayingToken: totalSupply must be greater than 0");
     require(amount > 0, "DividendPayingToken: amount must be greater than 0");
-    _transferAsset(msg.sender, address(this), amount, assetKey);
+    _transferAssetFrom(msg.sender, address(this), amount, assetKey);
     magnifiedDividendPerShare[assetKey] = magnifiedDividendPerShare[assetKey] + (amount * MAGNITUDE / totalSupply());
     emit DividendsDistributed(msg.sender, amount, assetKey);
   }
@@ -73,7 +74,7 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
     if (_withdrawableDividend > 0) {
       withdrawnDividends[assetKey][msg.sender] = withdrawnDividends[assetKey][msg.sender] + _withdrawableDividend;
       emit DividendWithdrawn(msg.sender, _withdrawableDividend, assetKey);
-      _transferAsset(address(this), msg.sender, _withdrawableDividend, assetKey);
+      _transferAsset(msg.sender, _withdrawableDividend, assetKey);
     }
   }
 

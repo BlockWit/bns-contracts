@@ -32,7 +32,13 @@ contract AssetHandler {
         return assets.get(key);
     }
 
-    function _transferAsset(address sender, address recipient, uint256 amount, address assetKey) internal {
+    function _transferAsset(address recipient, uint256 amount, address assetKey) internal {
+        Assets.Asset memory asset = assets.get(assetKey);
+        require(asset.assetType == Assets.AssetType.ERC20, "AssetHandler: only ERC20 assets supported");
+        IERC20(assetKey).transfer(recipient, amount);
+    }
+
+    function _transferAssetFrom(address sender, address recipient, uint256 amount, address assetKey) internal {
         Assets.Asset memory asset = assets.get(assetKey);
         require(asset.assetType == Assets.AssetType.ERC20, "AssetHandler: only ERC20 assets supported");
         IERC20(assetKey).transferFrom(sender, recipient, amount);

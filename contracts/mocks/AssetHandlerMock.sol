@@ -14,8 +14,12 @@ contract AssetHandlerMock is AssetHandler {
         return _removeAsset(key);
     }
 
-    function transfer(address sender, address recipient, uint256 amount, address assetKey) external {
-        return _transferAsset(sender, recipient, amount, assetKey);
+    function transfer(address recipient, uint256 amount, address assetKey) external {
+        return _transferAsset(recipient, amount, assetKey);
+    }
+
+    function transferFrom(address sender, address recipient, uint256 amount, address assetKey) external {
+        return _transferAssetFrom(sender, recipient, amount, assetKey);
     }
 
 }

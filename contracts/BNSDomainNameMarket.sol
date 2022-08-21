@@ -56,7 +56,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
         uint256 price = pricePolicy.getPrice(domainName, assetKey);
         // charge payment
-        _transferAsset(msg.sender, address(this), price, assetKey);
+        _transferAssetFrom(msg.sender, address(this), price, assetKey);
         IERC20(assetKey).approve(address(dividendManager), price);
         dividendManager.distributeDividends(price, assetKey);
         // update statistics

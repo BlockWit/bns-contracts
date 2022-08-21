@@ -6,7 +6,6 @@ const BNSToken = contract.fromArtifact('BNSToken');
 const ERC20Mock = contract.fromArtifact('ERC20Mock');
 
 const [ deployer, holder1, holder2, user ] = accounts;
-const totalAmount = ether('1000');
 const holder1share = 70;
 const holder2share = 30;
 
@@ -14,16 +13,18 @@ describe('BNSToken', function () {
   let token;
   let busd;
   let usdt;
+  let totalSupply;
 
   beforeEach(async function () {
     [ token, busd, usdt ] = await Promise.all([
-      BNSToken.new(deployer, totalAmount, { from: deployer }),
+      BNSToken.new({ from: deployer }),
       ERC20Mock.new('BUSD Pegged Token', 'BUSD', user, ether('20000'), { from: deployer }),
       ERC20Mock.new('USDT Pegged Token', 'USDT', user, ether('30000'), { from: deployer })
     ])
+    totalSupply = await token.totalSupply();
     await Promise.all([
-      token.transfer(holder1, totalAmount.muln(holder1share).divn(100), { from: deployer }),
-      token.transfer(holder2, totalAmount.muln(holder2share).divn(100), { from: deployer }),
+      token.transfer(holder1, totalSupply.muln(holder1share).divn(100), { from: deployer }),
+      token.transfer(holder2, totalSupply.muln(holder2share).divn(100), { from: deployer }),
       token.setAsset(busd.address, 'BUSD', 1, { from: deployer }),
       token.setAsset(usdt.address, 'USDT', 1, { from: deployer }),
     ]);

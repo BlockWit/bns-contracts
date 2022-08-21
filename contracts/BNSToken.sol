@@ -6,9 +6,9 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./DividendPayingToken.sol";
 
 contract BNSToken is DividendPayingToken, AccessControl {
-    constructor(address initialAccount, uint256 initialBalance) payable ERC20("BNSToken", "BNST") {
+    constructor() payable ERC20("BNSToken", "BNST") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _mint(initialAccount, initialBalance);
+        _mint(msg.sender, 1000000 ether);
     }
 
     function setAsset(address key, string memory assetTicker, Assets.AssetType assetType) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {

@@ -1,6 +1,7 @@
-const BNSDomainNamesMarket = artifacts.require('BNSDomainNamesMarket');
+const BNSDomainNamesMarket = artifacts.require('BNSDomainNameMarket');
 const BNSMarketPricePolicy = artifacts.require('BNSMarketPricePolicy');
 const BNSNFT = artifacts.require('BNSNFT');
+const BNSToken = artifacts.require('BNSToken');
 const { logger } = require('./util');
 const { ether, time, BN} = require('@openzeppelin/test-helpers');
 
@@ -14,6 +15,7 @@ async function deploy () {
   const MARKET_ADDRESS = args[args.findIndex(argName => argName === '--market') + 1];
   const NFT_ADDRESS = args[args.findIndex(argName => argName === '--nft') + 1];
   const PRICING_CONTROLLER_ADDRESS = args[args.findIndex(argName => argName === '--pricing') + 1];
+  const TOKEN_ADDRESS = args[args.findIndex(argName => argName === '--token') + 1];
   const BUSD_ADDRESS = args[args.findIndex(argName => argName === '--busd') + 1];
   const USDT_ADDRESS = args[args.findIndex(argName => argName === '--usdt') + 1];
   const { log } = logger(await web3.eth.net.getNetworkType());
@@ -22,6 +24,7 @@ async function deploy () {
   const nft = await BNSNFT.at(NFT_ADDRESS);
   const market = await BNSDomainNamesMarket.at(MARKET_ADDRESS);
   const pricingController = await BNSMarketPricePolicy.at(PRICING_CONTROLLER_ADDRESS);
+  const token = await BNSToken.at(TOKEN_ADDRESS);
 
   {
     log(`NFT. Grant minter role to Market.`);
@@ -45,17 +48,27 @@ async function deploy () {
   }
   {
     log(`Market. Set BUSD.`);
-    const tx = await market.setToken(1, BUSD_ADDRESS, 1, { from: deployer });
+    const tx = await market.setAsset(BUSD_ADDRESS, 'BUSD', 1, { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {
     log(`Market. Set USDT.`);
-    const tx = await market.setToken(2, USDT_ADDRESS, 1, { from: deployer });
+    const tx = await market.setAsset(USDT_ADDRESS, 'USDT', 1, { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {
     log(`Market. Set fundraising wallet.`);
-    const tx = await market.setFundraisingWallet(deployer, { from: deployer });
+    const tx = await market.setDividendManager(TOKEN_ADDRESS, { from: deployer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`Token. Set BUSD.`);
+    const tx = await token.setAsset(BUSD_ADDRESS, 'BUSD', 1, { from: deployer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`Market. Set USDT.`);
+    const tx = await token.setAsset(USDT_ADDRESS, 'USDT', 1, { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {

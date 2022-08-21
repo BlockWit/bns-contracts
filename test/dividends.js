@@ -43,19 +43,20 @@ describe('BNSToken', function () {
       {
         const busdBalance = await busd.balanceOf(holder1);
         const usdtBalance = await usdt.balanceOf(holder1);
-        withinRange(busdBalance, busdAmount.muln(holder1share).divn(100), new BN('1'));
-        withinRange(usdtBalance, usdtAmount.muln(holder1share).divn(100), new BN('1'));
+        approxEqual(busdBalance, busdAmount.muln(holder1share).divn(100), 1);
+        approxEqual(usdtBalance, usdtAmount.muln(holder1share).divn(100), 1);
       }
       {
         const busdBalance = await busd.balanceOf(holder2);
         const usdtBalance = await usdt.balanceOf(holder2);
-        withinRange(busdBalance, busdAmount.muln(holder2share).divn(100), new BN('1'));
-        withinRange(usdtBalance, usdtAmount.muln(holder2share).divn(100), new BN('1'));
+        approxEqual(busdBalance, busdAmount.muln(holder2share).divn(100), 1);
+        approxEqual(usdtBalance, usdtAmount.muln(holder2share).divn(100), 1);
       }
     });
   });
 });
 
-function withinRange(bn, target, range) {
-  expect(bn).to.be.bignumber.gte(target.sub(range)).and.lte(target.add(range));
+function approxEqual(bn, target, deviation) {
+  if (typeof deviation === 'number') deviation = new BN(deviation.toString());
+  expect(bn).to.be.bignumber.gte(target.sub(deviation)).and.lte(target.add(deviation));
 }

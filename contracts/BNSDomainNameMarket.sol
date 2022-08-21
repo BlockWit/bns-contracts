@@ -49,12 +49,22 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         return _removeAsset(key);
     }
 
+    function getPrice(string memory domainName, address assetKey) public view returns(uint) {
+        // sanitize domain name and calculate price
+        domainName = namesPolicy.perform(domainName);
+        return getPriceForPerformedName(domainName, assetKey);
+    }
+
+    function getPriceForPerformedName(string memory domainName, address assetKey) private view returns(uint) {
+        require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
+        namesPolicy.check(domainName);
+        return pricePolicy.getPrice(domainName, assetKey);
+    }
+
     function buy(string memory domainName, address assetKey) whenNotPaused external {
         // sanitize domain name and calculate price
         domainName = namesPolicy.perform(domainName);
-        namesPolicy.check(domainName);
-        require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
-        uint256 price = pricePolicy.getPrice(domainName, assetKey);
+        uint256 price = getPriceForPerformedName(domainName, assetKey);
         // charge payment
         _transferAssetFrom(msg.sender, address(this), price, assetKey);
         IERC20(assetKey).approve(address(dividendManager), price);

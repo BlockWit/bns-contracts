@@ -125,6 +125,37 @@ describe('BNSDomainNameMarket', function () {
     });
   });
 
+  describe('getPrice', function () {
+    beforeEach(async function () {
+      await Promise.all([
+        nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, { from: deployer }),
+        market.setDividendManager(token.address, { from: deployer }),
+        market.setBNSNFT(nft.address, { from: deployer }),
+        market.setPricePolicy(pricing.address, { from: deployer }),
+        market.setNamesPolicy(names.address, { from: deployer}),
+        market.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
+        market.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
+        token.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
+        token.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
+        pricing.setPrices(ether(BASE_PRICE_USDT.toString()), SIZES, PRICES_USDT.map(price => ether(price.toString())), { from: deployer })
+      ])
+    });
+
+    context('if domainName doesn`t exist', function () {
+      it('should return price for specified domainName', async function () {
+        expect (await market.getPrice('Hahaha', tokens.usdt.contract.address)).to.be.bignumber.equal(ether('10000'));
+      });
+    });
+    context('if domainName exists', function () {
+      it('revert', async function () {
+        await tokens.usdt.contract.approve(market.address, ether('250000'), {from: user});
+        await market.buy('aba', tokens.usdt.contract.address, {from: user});
+        await expectRevert(market.getPrice('aba', tokens.usdt.contract.address, {from: user}),
+            'Domain name already exists');
+      });
+    });
+  });
+
   describe('buy', function () {
     beforeEach(async function () {
       await Promise.all([
@@ -164,7 +195,8 @@ describe('BNSDomainNameMarket', function () {
       it('revert', async function () {
         await tokens.usdt.contract.approve(market.address, ether('250000'), {from: user});
         await market.buy('ab', tokens.usdt.contract.address, {from: user});
-        await expectRevert(market.buy('ab', tokens.usdt.contract.address, {from: user}), 'Domain name already exists');
+        await expectRevert(market.buy('ab', tokens.usdt.contract.address, {from: user}),
+            'Domain name already exists');
       });
     });
   });

@@ -8,7 +8,6 @@ const [account1, owner ] = accounts;
 
 describe('BNSMarketPricePolicy', function () {
     let contract;
-    let tokenId = 1;
     const sizes = [1, 2, 3];
     const prices = [100, 200, 300];
     const sizes1 = [1, 2, 3];
@@ -16,6 +15,29 @@ describe('BNSMarketPricePolicy', function () {
 
     beforeEach(async function () {
         contract = await BNSMarketPricePolicy.new({from: owner});
+    });
+
+    //waiting for assetKey logic to complete test
+    describe('getPrice', function () {
+        context('when pricePerNameLength is set ', function () {
+            it('should return price', async function () {
+                await contract.setPrice(5, 500, {from : owner});
+                expect(await contract.getPrice("HaHaH", )).to.be.bignumber.equal("500");
+            });
+        });
+        context('when pricePerNameLength is not set', function () {
+            context('if defaultPrice is set', function () {
+                it('should return defaultPrice', async function () {
+                    await contract.setDefaultPrice(300, {from : owner});
+                    expect(await contract.getPrice("HaHaHaHaH", )).to.be.bignumber.equal("300");
+                });
+            });
+            context('if defaultPrice is not set', function () {
+                it('should return 0', async function () {
+                    expect(await contract.getPrice("HaHaHaHaH", )).to.be.bignumber.equal("0");
+                });
+            });
+        });
     });
 
     describe('setDefaultPrice', function () {
@@ -69,28 +91,6 @@ describe('BNSMarketPricePolicy', function () {
             it('revert', async function () {
                 await expectRevert(contract.setPrices(2222, sizes, prices, {from : account1}),
                     "Ownable: caller is not the owner");
-            });
-        });
-    });
-
-    describe('getPrice', function () {
-        context('when pricePerNameLength is set ', function () {
-            it('should return price', async function () {
-                await contract.setPrice(5, 500, {from : owner});
-                expect(await contract.getPrice("HaHaH", tokenId)).to.be.bignumber.equal("500");
-            });
-        });
-        context('when pricePerNameLength is not set', function () {
-            context('if defaultPrice is set', function () {
-                it('should return defaultPrice', async function () {
-                    await contract.setDefaultPrice(300, {from : owner});
-                    expect(await contract.getPrice("HaHaHaHaH", tokenId)).to.be.bignumber.equal("300");
-                });
-            });
-            context('if defaultPrice is not set', function () {
-                it('should return 0', async function () {
-                    expect(await contract.getPrice("HaHaHaHaH", tokenId)).to.be.bignumber.equal("0");
-                });
             });
         });
     });

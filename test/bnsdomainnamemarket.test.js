@@ -29,7 +29,7 @@ describe('BNSDomainNameMarket', function () {
       BNSDomainNameMarket.new({ from: deployer }),
       BNSNamesPolicy.new({ from: deployer }),
       BNSNFT.new({ from: deployer }),
-      BNSToken.new(deployer, ether('1000'), { from: deployer }),
+      BNSToken.new({ from: deployer }),
       BNSMarketPricePolicy.new({ from: deployer }),
       ERC20Mock.new('BUSD Mock Token', 'BUSD', deployer, ether('10000000'), { from: deployer }),
       ERC20Mock.new('USDT Mock Token', 'USDT', deployer, ether('10000000'), { from: deployer }),

@@ -40,7 +40,10 @@ contract InvestNFTMarket is AccessControl, Pausable, AssetHandler {
     function getPrice(uint sharePercent, uint count, address assetKey) public returns (uint, uint) {
         uint countOfSharesWithPercent = investNFT.getCountOfSharesWithPercent(address(this), sharePercent);
         require(countOfSharesWithPercent > 0, "No more shares with specified percent");
-        uint price = investNFTMarketPricePolicy.getPrice(sharePercent, countOfSharesWithPercent, assetKey);
+        if(count > countOfSharesWithPercent) {
+            count = countOfSharesWithPercent;
+        }
+        uint price = investNFTMarketPricePolicy.getPrice(sharePercent, count, assetKey);
         return (price, count);
     }
 
@@ -66,6 +69,6 @@ contract InvestNFTMarket is AccessControl, Pausable, AssetHandler {
         }
     }
 
-     // return all tokens with recoverable funds
+     // FIXME: return all tokens with recoverable funds
 
 }

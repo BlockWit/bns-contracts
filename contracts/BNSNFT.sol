@@ -70,7 +70,7 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
      * Check domain names before call this method!!!
      *
      **/
-    function safeMintBatch(address to, string[] calldata domainNames) public onlyRole(MINTER_ROLE) {
+    function unsafeBatchMint(address to, string[] calldata domainNames) public onlyRole(DEFAULT_ADMIN_ROLE) {
         for(uint i = 0; i < domainNames.length; i++) {
            uint256 tokenId = _tokenIdCounter.current();
            _tokenIdCounter.increment();
@@ -79,6 +79,15 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
            domainNameExists[domainNames[i]] = true;
            tokenIdToDomainNames[tokenId] = domainNames[i];
            domainNamesToTokenId[domainNames[i]] = tokenId;
+        }
+    }
+
+    function safeBatchMint(address to, string[] calldata domainNames) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        for(uint i = 0; i < domainNames.length; i++) {
+            uint256 tokenId = _tokenIdCounter.current();
+            _tokenIdCounter.increment();
+            _balances[to] += 1;
+            _safeMint(to, tokenId);
         }
     }
 

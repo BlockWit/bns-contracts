@@ -52,20 +52,20 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
     function getPrice(string memory domainName, string memory refererDomainName, address assetKey) private view returns(uint) {
         require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
 
-        if(bytes(refererDomainName).length == 0) {
+        if (bytes(refererDomainName).length > 0) {
             refererDomainName = namesPolicy.perform(refererDomainName);
             require(bnsnft.domainNameExists(refererDomainName), "Referer domain name must exists");
         }
 
         domainName = namesPolicy.perform(domainName);
         namesPolicy.check(domainName);
-        return pricePolicy.getPrice(domainName, refererDomainName, assetKey);
+        return pricePolicy.getPrice(domainName, assetKey, bytes(refererDomainName).length > 0);
     }
 
     function buy(string memory domainName, string memory refererDomainName, address assetKey) whenNotPaused external {
         uint refererTokenId;
         address refererAddress;
-        if(bytes(refererDomainName).length == 0) {
+        if (bytes(refererDomainName).length > 0) {
             refererDomainName = namesPolicy.perform(refererDomainName);
             refererTokenId = bnsnft.getTokenIdByDomainName(refererDomainName);
             refererAddress = bnsnft.ownerOf(refererTokenId);
@@ -73,7 +73,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         // sanitize domain name and calculate price
         domainName = namesPolicy.perform(domainName);
         require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
-        uint256 price = pricePolicy.getPrice(domainName, refererDomainName, assetKey);
+        uint256 price = pricePolicy.getPrice(domainName, assetKey, refererAddress != address(0x0));
 
         // charge payment
         _transferAssetFrom(msg.sender, address(this), price, assetKey);

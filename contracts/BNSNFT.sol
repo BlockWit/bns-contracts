@@ -9,8 +9,9 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "./token/ERC721/ERC721.sol";
 import "./token/ERC721/extensions/ERC721Enumerable.sol";
 import "./interfaces/IContentRouter.sol";
+import "./RecoverableFunds.sol";
 
-contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
+contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, RecoverableFunds {
 
     using Counters for Counters.Counter;
 
@@ -110,6 +111,14 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
     // FIXME: Why?
     function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
+    }
+
+    function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveTokens(recipient, tokenAddress);
+    }
+
+    function retrieveETH(address payable recipient) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveETH(recipient);
     }
 
 }

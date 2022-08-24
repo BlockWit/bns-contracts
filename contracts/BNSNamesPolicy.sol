@@ -4,8 +4,9 @@ pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./lib/StringUtils.sol";
+import "./RecoverableFunds.sol";
 
-contract BNSNamesPolicy is AccessControl {
+contract BNSNamesPolicy is AccessControl, RecoverableFunds {
 
     using StringUtils for string;
 
@@ -44,6 +45,14 @@ contract BNSNamesPolicy is AccessControl {
         require(domainName.length() > 0, "Domain name should not be empty!");
         require(domainName.length() <= maxNameSizeLimit, "Domain name is too long");
         if (domainName.containsAnyOf(forbiddenSymbols)) revert("Domain name contains forbidden symbol");
+    }
+
+    function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveTokens(recipient, tokenAddress);
+    }
+
+    function retrieveETH(address payable recipient) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveETH(recipient);
     }
 
 }

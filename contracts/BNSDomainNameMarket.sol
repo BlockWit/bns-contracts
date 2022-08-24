@@ -12,7 +12,7 @@ import "./BNSMarketPricePolicy.sol";
 import "./BNSNamesPolicy.sol";
 import "./AssetHandler.sol";
 
-contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
+contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, RecoverableFunds {
 
     BNSMarketPricePolicy public pricePolicy;
     BNSNamesPolicy public namesPolicy;
@@ -100,6 +100,14 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         domainPrices[domainName] = price;
         // mint NFT
         bnsnft.safeMint(msg.sender, domainName);
+    }
+
+    function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveTokens(recipient, tokenAddress);
+    }
+
+    function retrieveETH(address payable recipient) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveETH(recipient);
     }
 
 }

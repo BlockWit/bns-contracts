@@ -2,9 +2,10 @@
 
 pragma solidity ^0.8.14;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./RecoverableFunds.sol";
 
-contract BNSRepository is RecoverableFunds {
+contract BNSRepository is Ownable, RecoverableFunds {
 
 
     struct DomainNameRecord {
@@ -41,6 +42,14 @@ contract BNSRepository is RecoverableFunds {
         require(domainNameRecord.exists, "Requested name record not found!");
         require(domainNameRecord.start + domainNameRecord.periodInDays * 1 days > block.timestamp, "Requested name record expired!");
         return domainNameRecord.target;
+    }
+
+    function retrieveTokens(address recipient, address tokenAddress) external onlyOwner {
+        _retrieveTokens(recipient, tokenAddress);
+    }
+
+    function retrieveETH(address payable recipient) external onlyOwner {
+        _retrieveETH(recipient);
     }
 
 }

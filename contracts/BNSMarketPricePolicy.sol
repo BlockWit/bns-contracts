@@ -5,8 +5,9 @@ pragma solidity ^0.8.14;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./lib/StringUtils.sol";
 import "./DiscountCalculator.sol";
+import "./RecoverableFunds.sol";
 
-contract BNSMarketPricePolicy is Ownable, DiscountCalculator {
+contract BNSMarketPricePolicy is Ownable, DiscountCalculator, RecoverableFunds {
 
     using StringUtils for string;
 
@@ -73,6 +74,14 @@ contract BNSMarketPricePolicy is Ownable, DiscountCalculator {
         for(uint i = 0; i<sizes.length; i++) {
             pricePerNameLength[sizes[i]] = prices[i];
         }
+    }
+
+    function retrieveTokens(address recipient, address tokenAddress) external onlyOwner {
+        _retrieveTokens(recipient, tokenAddress);
+    }
+
+    function retrieveETH(address payable recipient) external onlyOwner {
+        _retrieveETH(recipient);
     }
 
 }

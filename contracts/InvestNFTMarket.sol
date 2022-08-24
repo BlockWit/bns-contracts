@@ -11,7 +11,7 @@ import "./lib/Assets.sol";
 import "./InvestNFT.sol";
 import "./InvestNFTMarketPricePolicy.sol";
 
-contract InvestNFTMarket is AccessControl, Pausable, AssetHandler {
+contract InvestNFTMarket is AccessControl, Pausable, AssetHandler, RecoverableFunds {
 
     InvestNFT public investNFT;
 
@@ -79,6 +79,12 @@ contract InvestNFTMarket is AccessControl, Pausable, AssetHandler {
         investNFT.safeMint(msg.sender, count);
     }
 
-    // FIXME: return all tokens with recoverable funds
+    function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveTokens(recipient, tokenAddress);
+    }
+
+    function retrieveETH(address payable recipient) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveETH(recipient);
+    }
 
 }

@@ -24,4 +24,12 @@ contract BNSSimpleContentProvider is IContentProvider, RecoverableFunds, AccessC
         return domainNameToContent[name];
     }
 
+    function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveTokens(recipient, tokenAddress);
+    }
+
+    function retrieveETH(address payable recipient) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveETH(recipient);
+    }
+
 }

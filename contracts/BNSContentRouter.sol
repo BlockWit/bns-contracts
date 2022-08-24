@@ -60,4 +60,12 @@ contract BNSContentRouter is IContentRouter, RecoverableFunds, AccessControl {
         return route.contentAddress;
     }
 
+    function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveTokens(recipient, tokenAddress);
+    }
+
+    function retrieveETH(address payable recipient) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _retrieveETH(recipient);
+    }
+
 }

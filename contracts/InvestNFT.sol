@@ -19,11 +19,13 @@ contract InvestNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
 
     Counters.Counter private _tokenIdCounter;
 
-    mapping(uint => uint) shareToPercent;
+    uint public PERCENT_RATE = 100000;
 
-    uint public PERCENT_RATE = 100;
+    uint public PERCENT_PER_SHARE = 5;
 
-    uint public summaryPercent;
+    uint public SHARES_LIMIT = PERCENT_RATE / PERCENT_PER_SHARE;
+
+    uint public summaryMintedShares;
 
     constructor() ERC721("Blockchain Name Services invest NFT", "BNSI") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -39,42 +41,26 @@ contract InvestNFT is ERC721, ERC721Enumerable, Pausable, AccessControl {
         _unpause();
     }
 
-    /*
-    * safePreMintForSameShares(NFT owner, 5, 25);
-    * safePreMintForSameShares(NFT owner, 10, 10);
-    * safePreMintForSameShares(NFT owner, 20, 10);
-    * safePreMintForSameShares(NFT owner, 100, 10);
-    * safePreMintForSameShares(NFT owner, 200, 10);
-    * safePreMintForSameShares(NFT owner, 200, 2); x10
-    * safePreMintForSameShares(NFT owner, 200, 1); x15
-    *
-    */
-    function safePreMintForSameShares(address to, uint countsOfSameShares, uint percentsPerAllSameShare) public onlyRole(MINTER_ROLE) {
-        summaryPercent += percentsPerAllSameShare;
-        uint percentPerShare = percentsPerAllSameShare * (1 ether) / countsOfSameShares;
-        require(summaryPercent <= PERCENT_RATE, "Sum of common percents for all shares must be equals to 100");
-        for (uint i = 0; i < countsOfSameShares; i++) {
+    function canMint() public view returns (uint) {
+        return SHARES_LIMIT - summaryMintedShares;
+    }
+
+    function safeMint(address to, uint count) public onlyRole(MINTER_ROLE) {
+        summaryMintedShares += count;
+        require(summaryMintedShares <= SHARES_LIMIT, "Can't mint specified count of shares. Limit exceeded!");
+        for (uint i = 0; i < count; i++) {
             uint256 tokenId = _tokenIdCounter.current();
             _tokenIdCounter.increment();
             _safeMint(to, tokenId);
-            shareToPercent[tokenId] = percentPerShare;
         }
     }
 
-    function getCountOfSharesWithPercent(address target, uint percentPerShare) public returns(uint) {
-        // TODO:
-        return 0;
-    }
-
-    function getIndexesOfSharesWithPercents(address target, uint percentPerShare) public returns (uint, uint) {
-        // TODO:
-        return (12,12);
-    }
-
+    // FIXME: Why?
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal whenNotPaused override(ERC721, ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
+    // FIXME: Why?
     function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }

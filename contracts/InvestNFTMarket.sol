@@ -17,8 +17,16 @@ contract InvestNFTMarket is AccessControl, Pausable, AssetHandler {
 
     InvestNFTMarketPricePolicy public investNFTMarketPricePolicy;
 
+    uint public sharesToBuyLimit;
+
+    uint public sharesBought;
+
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
+
+    function setSharesToBuyLimit(uint newSharesToBuyLimit) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        sharesToBuyLimit = newSharesToBuyLimit;
     }
 
     function setInvestNFT(address newInvestNFT) public onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -37,38 +45,37 @@ contract InvestNFTMarket is AccessControl, Pausable, AssetHandler {
         _unpause();
     }
 
-    function getPrice(uint sharePercent, uint count, address assetKey) public returns (uint, uint) {
-        uint countOfSharesWithPercent = investNFT.getCountOfSharesWithPercent(address(this), sharePercent);
-        require(countOfSharesWithPercent > 0, "No more shares with specified percent");
-        if(count > countOfSharesWithPercent) {
-            count = countOfSharesWithPercent;
+    function canMint() public view returns (uint) {
+        uint canMintNFT = investNFT.canMint();
+        uint canBuyNFT = sharesToBuyLimit - sharesBought;
+        return canMintNFT > canBuyNFT ? canBuyNFT : canMintNFT;
+    }
+
+    function getPrice(uint count, address assetKey) public view returns (uint, uint) {
+        uint countOfSharesCanMint = canMint();
+        if (count > countOfSharesCanMint) {
+            count = countOfSharesCanMint;
         }
-        uint price = investNFTMarketPricePolicy.getPrice(sharePercent, count, assetKey);
+        uint price = investNFTMarketPricePolicy.getPrice(count, assetKey);
         return (price, count);
     }
 
-    function buy(uint sharePercent, uint count, address assetKey) public {
-        uint countOfSharesWithPercent = investNFT.getCountOfSharesWithPercent(address(this), sharePercent);
-        require(countOfSharesWithPercent > 0, "No more shares with specified percent");
-        if(count > countOfSharesWithPercent) {
-            count = countOfSharesWithPercent;
+    function buy(uint count, address assetKey) public {
+        require(sharesBought < sharesToBuyLimit, "All shares bought!");
+        uint countOfSharesCanMint = canMint();
+        require(countOfSharesCanMint > 0, "No more shares!");
+        if (count > countOfSharesCanMint) {
+            count = countOfSharesCanMint;
         }
 
-        uint price = investNFTMarketPricePolicy.getPrice(sharePercent, count, assetKey);
+        uint price = investNFTMarketPricePolicy.getPrice(count, assetKey);
 
         // charge payment
+        sharesBought += count;
         _transferAssetFrom(msg.sender, address(this), price, assetKey);
-        (uint startIndexSameShares, uint endIndexSameShares)  = investNFT.getIndexesOfSharesWithPercents(address(this), sharePercent);
-        for(uint i = 1; i < count + 1; i++) {
-            uint tokenId = startIndexSameShares + i - 1;
-            if(investNFT.ownerOf(tokenId) == address(this)) {
-                investNFT.transferFrom(address(this), msg.sender, tokenId);
-            } else {
-                i--;
-            }
-        }
+        investNFT.safeMint(msg.sender, count);
     }
 
-     // FIXME: return all tokens with recoverable funds
+    // FIXME: return all tokens with recoverable funds
 
 }

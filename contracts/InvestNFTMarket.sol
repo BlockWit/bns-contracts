@@ -45,24 +45,27 @@ contract InvestNFTMarket is AccessControl, Pausable, AssetHandler {
         _unpause();
     }
 
-    function canMint() public view returns (uint) {
+    function canBuy() public view returns (uint) {
         uint canMintNFT = investNFT.canMint();
         uint canBuyNFT = sharesToBuyLimit - sharesBought;
         return canMintNFT > canBuyNFT ? canBuyNFT : canMintNFT;
     }
 
     function getPrice(uint count, address assetKey) public view returns (uint, uint) {
-        uint countOfSharesCanMint = canMint();
+        uint countOfSharesCanMint = canBuy();
         if (count > countOfSharesCanMint) {
             count = countOfSharesCanMint;
         }
-        uint price = investNFTMarketPricePolicy.getPrice(count, assetKey);
+        uint price = 0;
+        if(count > 0) {
+            price = investNFTMarketPricePolicy.getPrice(count, assetKey);
+        }
         return (price, count);
     }
 
     function buy(uint count, address assetKey) public {
-        require(sharesBought < sharesToBuyLimit, "All shares bought!");
-        uint countOfSharesCanMint = canMint();
+        require(sharesBought <= sharesToBuyLimit, "All shares bought!");
+        uint countOfSharesCanMint = canBuy();
         require(countOfSharesCanMint > 0, "No more shares!");
         if (count > countOfSharesCanMint) {
             count = countOfSharesCanMint;

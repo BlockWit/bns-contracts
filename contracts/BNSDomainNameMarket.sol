@@ -5,7 +5,7 @@ pragma solidity ^0.8.14;
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-import "./DividendsManager.sol";
+import "./interfaces/IDividendPayingToken.sol";
 import "./lib/Assets.sol";
 import "./BNSNFT.sol";
 import "./BNSMarketPricePolicy.sol";
@@ -17,7 +17,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
     BNSMarketPricePolicy public pricePolicy;
     BNSNamesPolicy public namesPolicy;
     BNSNFT public bnsnft;
-    DividendsManager public dividendsManager;
+    IDividendPayingToken public dividendsManager;
     mapping (string => address) public domainBuyers;
     mapping (string => uint) public domainPrices;
 
@@ -29,8 +29,8 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         bnsnft = BNSNFT(newBnsnft);
     }
 
-    function setDividendsManager(address newDividendsManager) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        dividendsManager = DividendsManager(newDividendsManager);
+    function setIDividendPayingToken(address newIDividendPayingToken) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        dividendsManager = IDividendPayingToken(newIDividendPayingToken);
     }
 
     function setPricePolicy(address newPricePolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {

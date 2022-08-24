@@ -20,6 +20,8 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
     IDividendPayingToken public dividendsManager;
     mapping (string => address) public domainBuyers;
     mapping (string => uint) public domainPrices;
+    uint256 public refererBonusNumerator = 10;
+    uint256 public refererBonusDenominator = 100;
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -45,6 +47,11 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
         return _setAsset(key, assetTicker, assetType);
     }
 
+    function setRefererBonus(uint256 numerator, uint256 denominator) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        refererBonusNumerator = numerator;
+        refererBonusDenominator = denominator;
+    }
+
     function removeAsset(address key) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
         return _removeAsset(key);
     }
@@ -65,26 +72,27 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler {
     function buy(string memory domainName, string memory refererDomainName, address assetKey) whenNotPaused external {
         uint refererTokenId;
         address refererAddress;
+        bool hasReferer;
         if (bytes(refererDomainName).length > 0) {
             refererDomainName = namesPolicy.perform(refererDomainName);
             refererTokenId = bnsnft.getTokenIdByDomainName(refererDomainName);
             refererAddress = bnsnft.ownerOf(refererTokenId);
+            hasReferer = true;
         }
         // sanitize domain name and calculate price
         domainName = namesPolicy.perform(domainName);
         require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
-        uint256 price = pricePolicy.getPrice(domainName, assetKey, refererAddress != address(0x0));
+        uint256 price = pricePolicy.getPrice(domainName, assetKey, hasReferer);
 
         // charge payment
         _transferAssetFrom(msg.sender, address(this), price, assetKey);
 
-        if(bytes(refererDomainName).length == 0) {
+        if (!hasReferer) {
             IERC20(assetKey).transfer(address(dividendsManager), price);
         } else {
-            // TODO must be dynamically declared
-            uint toReferer = price*100/10;
-            IERC20(assetKey).transfer(refererAddress, toReferer);
-            IERC20(assetKey).transfer(address(dividendsManager), price - toReferer);
+            uint refererBonus = refererBonusDenominator > 0 ? price * refererBonusNumerator / refererBonusDenominator : 0;
+            IERC20(assetKey).transfer(refererAddress, refererBonus);
+            IERC20(assetKey).transfer(address(dividendsManager), price - refererBonus);
         }
 
         // update statistics

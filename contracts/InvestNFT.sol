@@ -27,7 +27,7 @@ contract InvestNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recover
 
     uint public summaryMintedShares;
 
-    constructor() ERC721("Blockchain Name Services invest NFT", "BNSI") {
+    constructor() ERC721("Blockchain Name Services Investment NFT", "BNSI") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
     }

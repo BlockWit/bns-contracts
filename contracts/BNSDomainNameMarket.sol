@@ -52,11 +52,11 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         refererBonusDenominator = denominator;
     }
 
-    function removeAsset(address key) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+    function removeAsset(AssetHandler.AssetKey key) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
         return _removeAsset(key);
     }
 
-    function getPrice(string memory domainName, string memory refererDomainName, address assetKey) private view returns(uint) {
+    function getPrice(string memory domainName, string memory refererDomainName, AssetHandler.AssetKey assetKey) private view returns(uint) {
         require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
 
         if (bytes(refererDomainName).length > 0) {
@@ -69,7 +69,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         return pricePolicy.getPrice(domainName, assetKey, bytes(refererDomainName).length > 0);
     }
 
-    function buy(string memory domainName, string memory refererDomainName, address assetKey) whenNotPaused external {
+    function buy(string memory domainName, string memory refererDomainName, AssetHandler.AssetKey assetKey) whenNotPaused external {
         uint refererTokenId;
         address refererAddress;
         bool hasReferer;
@@ -87,13 +87,17 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         // charge payment
         _transferAssetFrom(msg.sender, address(this), price, assetKey);
 
-        if (!hasReferer) {
-            IERC20(assetKey).transfer(address(dividendsManager), price);
-        } else {
-            uint refererBonus = refererBonusDenominator > 0 ? price * refererBonusNumerator / refererBonusDenominator : 0;
-            IERC20(assetKey).transfer(refererAddress, refererBonus);
-            IERC20(assetKey).transfer(address(dividendsManager), price - refererBonus);
+        uint256 refererBonus;
+        uint256 dividends = price;
+        if (hasReferer) {
+            refererBonus = refererBonusDenominator > 0 ? price * refererBonusNumerator / refererBonusDenominator : 0;
         }
+        if (refererBonus > 0) {
+            dividends = dividends - refererBonus;
+            _transferAsset(refererAddress, refererBonus, assetKey);
+        }
+        _approveAsset(address(dividendsManager), dividends, assetKey);
+        dividendsManager.distributeDividends(price - refererBonus, assetKey);
 
         // update statistics
         domainBuyers[domainName] = msg.sender;

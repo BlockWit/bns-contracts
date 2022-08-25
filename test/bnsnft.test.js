@@ -1,11 +1,7 @@
-const {
-  accounts,
-  contract
-} = require('@openzeppelin/test-environment');
-const {
-  BN
-} = require('@openzeppelin/test-helpers');
+const {accounts, contract, web3} = require('@openzeppelin/test-environment');
+const {BN, expectRevert, ether} = require('@openzeppelin/test-helpers');
 const {expect} = require('chai');
+const {getEvents} = require("./util");
 
 const BNSNFT = contract.fromArtifact('BNSNFT');
 
@@ -23,6 +19,7 @@ const DOMAINS_TO_DATA = [
     content: "Some content of mysyte"
   }
 ];
+const domainNames = ['blockwit', 'mysite', 'lol'];
 
 const ONE_DAY = new BN(1);
 
@@ -41,6 +38,36 @@ describe('BNSRepository', async () => {
       const addressTokenId = await bnsnft.getTokenIdByDomainName(DOMAINS_TO_DATA[0].domain);
       await bnsnft.setContent(tokenId, DOMAINS_TO_DATA[0].content, { from: owner });
       expect(await bnsnft.getContent(addressTokenId)).to.be.equal(DOMAINS_TO_DATA[0].content);
+    });
+  });
+
+  describe('unsafeBatchMint', function () {
+    context('when called by admin', function () {
+      it('should add domains in array to specified address', async function () {
+        expect(await bnsnft.balanceOf(account1, { from: account1})).to.be.bignumber.equal('0');
+        await bnsnft.unsafeBatchMint(account1, domainNames, { from: owner});
+        expect(await bnsnft.balanceOf(account1, { from: account1})).to.be.bignumber.equal('3');
+      });
+    });
+    context('when called by admin', function () {
+      it('revert', async function () {
+        await expectRevert.unspecified(bnsnft.unsafeBatchMint(account1, domainNames, { from: account1}));
+      });
+    });
+  });
+
+  describe('safeBatchMint', function () {
+    context('when called by admin', function () {
+      it('should mint domains in array to specified address', async function () {
+        expect(await bnsnft.balanceOf(account2, { from: account2})).to.be.bignumber.equal('0');
+        await bnsnft.safeBatchMint(account2, domainNames, { from: owner});
+        expect(await bnsnft.balanceOf(account2, { from: account2})).to.be.bignumber.equal('3');
+      });
+    });
+    context('when called by admin', function () {
+      it('revert', async function () {
+        await expectRevert.unspecified(bnsnft.safeBatchMint(account1, domainNames, { from: account1}));
+      });
     });
   });
 

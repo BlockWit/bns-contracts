@@ -15,7 +15,6 @@ contract InvestNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recover
 
     using Counters for Counters.Counter;
 
-    bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     Counters.Counter private _tokenIdCounter;
@@ -30,15 +29,14 @@ contract InvestNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recover
 
     constructor() ERC721("Blockchain Name Services invest NFT", "BNSI") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
     }
 
-    function pause() public onlyRole(PAUSER_ROLE) {
+    function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
         _pause();
     }
 
-    function unpause() public onlyRole(PAUSER_ROLE) {
+    function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
         _unpause();
     }
 
@@ -56,12 +54,10 @@ contract InvestNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recover
         }
     }
 
-    // FIXME: Why?
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal whenNotPaused override(ERC721, ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    // FIXME: Why?
     function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }

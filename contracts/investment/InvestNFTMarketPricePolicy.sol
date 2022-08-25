@@ -3,7 +3,7 @@
 pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./RecoverableFunds.sol";
+import "../RecoverableFunds.sol";
 
 
 contract InvestNFTMarketPricePolicy is Ownable, RecoverableFunds {

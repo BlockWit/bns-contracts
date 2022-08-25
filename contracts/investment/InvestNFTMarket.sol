@@ -5,9 +5,10 @@ pragma solidity ^0.8.14;
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./AssetHandler.sol";
 
-import "./lib/Assets.sol";
+import "../lib/Assets.sol";
+import "../AssetHandler.sol";
+import "../RecoverableFunds.sol";
 import "./InvestNFT.sol";
 import "./InvestNFTMarketPricePolicy.sol";
 

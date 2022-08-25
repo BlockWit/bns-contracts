@@ -2,16 +2,14 @@
 
 pragma solidity ^0.8.14;
 
-import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-import "./token/ERC721/ERC721.sol";
-import "./token/ERC721/extensions/ERC721Enumerable.sol";
-import "./interfaces/IContentRouter.sol";
-import "./RecoverableFunds.sol";
+import "../RecoverableFunds.sol";
 
-contract InvestNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, RecoverableFunds {
+contract InvestNFT is ERC721Enumerable, Pausable, AccessControl, RecoverableFunds {
 
     using Counters for Counters.Counter;
 
@@ -20,11 +18,8 @@ contract InvestNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recover
     Counters.Counter private _tokenIdCounter;
 
     uint public PERCENT_RATE = 100000;
-
     uint public PERCENT_PER_SHARE = 5;
-
     uint public SHARES_LIMIT = PERCENT_RATE / PERCENT_PER_SHARE;
-
     uint public summaryMintedShares;
 
     constructor() ERC721("Blockchain Name Services Investment NFT", "BNSI") {
@@ -54,11 +49,11 @@ contract InvestNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recover
         }
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal whenNotPaused override(ERC721, ERC721Enumerable) {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal whenNotPaused override(ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable, AccessControl) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 

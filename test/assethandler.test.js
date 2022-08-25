@@ -56,16 +56,13 @@ describe('AssetHandler', function () {
       const tempAsset = ['thrd', '1'];
       expect(assetFromMap[0]).to.be.equal(tempAsset[0]);
       expect(assetFromMap[1]).to.be.equal(tempAsset[1]);
-      // await tokens.thrd.contract.approve(assetHandler.address, ether('2000'), { from: owner });
       await tokens.thrd.contract.transfer(assetHandler.address, ether('2000'), { from: owner });
       expect(await tokens.thrd.contract.balanceOf(assetHandler.address)).to.be.bignumber.equal(ether('2000'));
-      expect(await tokens.thrd.contract.balanceOf(user)).to.be.bignumber.equal(ether('0'));
       const { tx } = await assetHandler.transfer(user, ether('1000'), tokens.thrd.contract.address, {from: owner});
-      // const [{ args: { from, to, amount }}] = await getEvents(tx, tokens.thrd.contract, 'Transfer', web3);
-      // expect(from).to.be.equal(assetHandler.address);
-      // expect(to).to.be.equal(user);
-      // expect(amount).to.be.bignumber.equal(ether('1000'));
-      expect(await tokens.thrd.contract.balanceOf(user)).to.be.bignumber.equal(ether('1000'));
+      const [{ args: { from, to, value }}] = await getEvents(tx, tokens.thrd.contract, 'Transfer', web3);
+      expect(from).to.be.equal(assetHandler.address);
+      expect(to).to.be.equal(user);
+      expect(value).to.be.bignumber.equal(ether('1000'));
     });
   });
 
@@ -78,15 +75,12 @@ describe('AssetHandler', function () {
       expect(assetFromMap[1]).to.be.equal(tempAsset[1]);
       await tokens.scnd.contract.transfer(holder, ether('2000'), { from: owner });
       expect(await tokens.scnd.contract.balanceOf(holder)).to.be.bignumber.equal(ether('2000'));
-      expect(await tokens.scnd.contract.balanceOf(user)).to.be.bignumber.equal(ether('0'));
       await tokens.scnd.contract.approve(assetHandler.address, ether('2000'), { from: holder });
       const { tx } = await assetHandler.transferFrom(holder, user, ether('1000'), tokens.scnd.contract.address, {from: owner});
-      expect(await tokens.scnd.contract.balanceOf(user)).to.be.bignumber.equal(ether('1000'));
-      expect(await tokens.scnd.contract.balanceOf(holder)).to.be.bignumber.equal(ether('1000'));
-      // const [{ args: { from, to, amount }}] = await getEvents(tx, tokens.scnd.contract, 'Transfer', web3);
-      // expect(from).to.be.equal(holder);
-      // expect(to).to.be.equal(user);
-      // expect(amount).to.be.bignumber.equal(ether('1000'));
+      const [{ args: { from, to, value }}] = await getEvents(tx, tokens.scnd.contract, 'Transfer', web3);
+      expect(from).to.be.equal(holder);
+      expect(to).to.be.equal(user);
+      expect(value).to.be.bignumber.equal(ether('1000'));
     });
   });
 

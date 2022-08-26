@@ -13,38 +13,37 @@ contract DiscountCalculator {
 
     Discount[] public discounts;
 
-    function _setDiscount(Discount[] calldata discounts) internal {
-        discounts[index] = discount;
-        if(this.discounts.length == discounts.length) {
-            for(uint i = 0; i < discounts.length; i++) {
-                this.discounts[i] = discounts[i];
+    function _setDiscount(Discount[] calldata newDiscounts) internal {
+        if(discounts.length == newDiscounts.length) {
+            for(uint i = 0; i < newDiscounts.length; i++) {
+                discounts[i] = newDiscounts[i];
             }
         }
-        if(this.discounts.length > discounts.length) {
-            uint lengthDiff = this.discounts.length - discounts.length;
+        if(discounts.length > newDiscounts.length) {
+            uint lengthDiff = discounts.length - newDiscounts.length;
             for(uint i = 0; i < lengthDiff; i++) {
-                this.discounts.pop();
+                discounts.pop();
             }
-            for(uint i = 0; i < discounts.length; i++) {
-                this.discounts[i] = discounts[i];
+            for(uint i = 0; i < newDiscounts.length; i++) {
+                discounts[i] = newDiscounts[i];
             }
         }
-        if(this.discounts.length < discounts.length) {
+        if(discounts.length < newDiscounts.length) {
             uint i;
-            uint lengthDiff = discounts.length - this.discounts.length;
-            for(i = 0; i < this.discounts.length; i++) {
-                this.discounts[i] = discounts[i];
+            uint lengthDiff = newDiscounts.length - discounts.length;
+            for(i = 0; i < discounts.length; i++) {
+                discounts[i] = newDiscounts[i];
             }
             while(lengthDiff > 0) {
                 i++;
-                this.discounts.push(discounts[i]);
+                discounts.push(newDiscounts[i]);
                 lengthDiff--;
             }
         }
     }
 
     function calculateDiscount(uint256 amount, uint256 timestamp) public view returns (uint256) {
-        uint256 i = this.discounts.length;
+        uint256 i = discounts.length;
         Discount memory discount;
         while (discounts[i].validThru >= timestamp) {
             discount = discounts[i];

@@ -1,13 +1,15 @@
 const { accounts, contract} = require('@openzeppelin/test-environment');
-const { expectRevert } = require('@openzeppelin/test-helpers');
+const { expectRevert, ether} = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 
 const BNSMarketPricePolicy = contract.fromArtifact('BNSMarketPricePolicy');
+const ERC20Mock = contract.fromArtifact('ERC20Mock');
 
 const [account1, owner ] = accounts;
 
 describe('BNSMarketPricePolicy', function () {
     let contract;
+    let asset;
     const sizes = [1, 2, 3];
     const prices = [100, 200, 300];
     const sizes1 = [1, 2, 3];
@@ -15,25 +17,58 @@ describe('BNSMarketPricePolicy', function () {
 
     beforeEach(async function () {
         contract = await BNSMarketPricePolicy.new({from: owner});
+        asset = await ERC20Mock.new('First Mock Token', 'FRST', owner, ether('10000'), { from: owner });
     });
 
-    //waiting for assetKey logic to complete test
-    describe('getPrice', function () {
-        context('when pricePerNameLength is set ', function () {
+    describe('getPriceForPremiumDomain', function () {
+        context('if premiumDomainPrice is set', function () {
             it('should return price', async function () {
-                await contract.setPrice(5, 500, {from : owner});
-                expect(await contract.getPrice("HaHaH", )).to.be.bignumber.equal("500");
+                await contract.unsafeSetPremiumDomainPrice('haha', 500, { from: owner });
+                const price = await contract.getPriceForPremiumDomain('haha');
+                expect(price).to.be.bignumber.equal('500');
             });
         });
-        context('when pricePerNameLength is not set', function () {
-            context('if defaultPrice is set', function () {
+        context('if premiumDomainPrice is not set', function () {
+            it('revert', async function () {
+                await expectRevert(contract.getPriceForPremiumDomain('haha'),
+                    "Domain not in premium list");
+            });
+        });
+    });
+
+    describe('getPrice', function () {
+        context('when premiumDomainPrice is set ', function () {
+            context('if hasReferer == false ', function () {
+                it('should return price', async function () {
+                    await contract.unsafeSetPremiumDomainPrice('haha', 500, { from: owner });
+                    expect(await contract.getPrice("haha", asset.address, false)).to.be.bignumber.equal("500");
+                });
+            });
+            context('if hasReferer == true ', function () {
+                it('should return price with discount', async function () {
+                    const discount = [1, 2, 1664478000];
+                    await contract.setDiscount(0, discount, { from: owner });
+                    expect(await contract.discounts[0]).to.be.equal(discount);
+                    await contract.unsafeSetPremiumDomainPrice('haha', 500, { from: owner });
+                    expect(await contract.getPrice("haha", asset.address, true)).to.be.bignumber.equal("500");
+                });
+            });
+        });
+        context('when premiumDomainPrice is not set', function () {
+            context('if pricePerNameLength is set', function () {
+                it('should return pricePerNameLength', async function () {
+                    await contract.setDefaultPrice(300, {from : owner});
+                    expect(await contract.getPrice("HaHaHaHaH", )).to.be.bignumber.equal("300");
+                });
+            });
+            context('if pricePerNameLength is not set', function () {
                 it('should return defaultPrice', async function () {
                     await contract.setDefaultPrice(300, {from : owner});
                     expect(await contract.getPrice("HaHaHaHaH", )).to.be.bignumber.equal("300");
                 });
             });
-            context('if defaultPrice is not set', function () {
-                it('should return 0', async function () {
+            context('if hasReferer is true', function () {
+                it('should return discounted price', async function () {
                     expect(await contract.getPrice("HaHaHaHaH", )).to.be.bignumber.equal("0");
                 });
             });

@@ -40,8 +40,8 @@ contract BNSMarketPricePolicy is Ownable, DiscountCalculator, RecoverableFunds {
         defaultPrice = price;
     }
 
-    function setDiscount(uint256 index, Discount calldata discount) external onlyOwner {
-        _setDiscount(index, discount);
+    function setDiscount(Discount[] calldata discounts) external onlyOwner {
+        _setDiscount(discounts);
     }
 
     function setPrice(uint size, uint price) public onlyOwner {

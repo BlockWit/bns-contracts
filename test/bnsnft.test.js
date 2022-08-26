@@ -20,10 +20,11 @@ const DOMAINS_TO_DATA = [
   }
 ];
 const domainNames = ['blockwit', 'mysite', 'lol'];
+const domainNames1 = ['blockwit', 'mysite', 'lol', 'blockwit'];
 
 const ONE_DAY = new BN(1);
 
-describe('BNSRepository', async () => {
+describe('BNSNFT', async () => {
   let bnsnft;
 
   beforeEach(async function () {
@@ -49,7 +50,7 @@ describe('BNSRepository', async () => {
         expect(await bnsnft.balanceOf(account1, { from: account1})).to.be.bignumber.equal('3');
       });
     });
-    context('when called by admin', function () {
+    context('when called not by admin', function () {
       it('revert', async function () {
         await expectRevert.unspecified(bnsnft.unsafeBatchMint(account1, domainNames, { from: account1}));
       });
@@ -58,13 +59,18 @@ describe('BNSRepository', async () => {
 
   describe('safeBatchMint', function () {
     context('when called by admin', function () {
-      it('should mint domains in array to specified address', async function () {
+      it('should mint domains to specified address', async function () {
         expect(await bnsnft.balanceOf(account2, { from: account2})).to.be.bignumber.equal('0');
         await bnsnft.safeBatchMint(account2, domainNames, { from: owner});
         expect(await bnsnft.balanceOf(account2, { from: account2})).to.be.bignumber.equal('3');
       });
+      it('shouldn`t mint duplicate domains to specified address', async function () {
+        expect(await bnsnft.balanceOf(account2, { from: account2})).to.be.bignumber.equal('0');
+        await bnsnft.safeBatchMint(account2, domainNames1, { from: owner});
+        expect(await bnsnft.balanceOf(account2, { from: account2})).to.be.bignumber.equal('3');
+      });
     });
-    context('when called by admin', function () {
+    context('when called not by admin', function () {
       it('revert', async function () {
         await expectRevert.unspecified(bnsnft.safeBatchMint(account1, domainNames, { from: account1}));
       });

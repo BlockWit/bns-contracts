@@ -89,6 +89,7 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
                 uint256 tokenId = _tokenIdCounter.current();
                 _tokenIdCounter.increment();
                 _safeMint(to, tokenId);
+                domainNameExists[domainNames[i]] = true;
             }
         }
     }

@@ -52,7 +52,7 @@ contract InvestNFTMarket is AccessControl, Pausable, AssetHandler, RecoverableFu
         return canMintNFT > canBuyNFT ? canBuyNFT : canMintNFT;
     }
 
-    function getPrice(uint count, address assetKey) public view returns (uint, uint) {
+    function getPrice(uint count, Assets.Key assetKey) public view returns (uint, uint) {
         uint countOfSharesCanMint = canBuy();
         if (count > countOfSharesCanMint) {
             count = countOfSharesCanMint;
@@ -64,7 +64,7 @@ contract InvestNFTMarket is AccessControl, Pausable, AssetHandler, RecoverableFu
         return (price, count);
     }
 
-    function buy(uint count, address assetKey) public {
+    function buy(uint count, Assets.Key assetKey) public {
         require(sharesBought <= sharesToBuyLimit, "All shares bought!");
         uint countOfSharesCanMint = canBuy();
         require(countOfSharesCanMint > 0, "No more shares!");

@@ -3,6 +3,7 @@
 pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./lib/Assets.sol";
 import "./lib/StringUtils.sol";
 import "./DiscountCalculator.sol";
 import "./RecoverableFunds.sol";
@@ -23,7 +24,7 @@ contract BNSMarketPricePolicy is Ownable, DiscountCalculator, RecoverableFunds {
         return price;
     }
 
-    function getPrice(string memory domainName, address assetKey, bool hasReferer) public view returns(uint) {
+    function getPrice(string memory domainName, Assets.Key assetKey, bool hasReferer) public view returns(uint) {
         uint price = premiumDomainPrices[keccak256(abi.encodePacked(domainName))];
         if(price == 0) {
             price = pricePerNameLength[domainName.length()];

@@ -45,7 +45,7 @@ library Assets {
 
     function at(Map storage map, uint256 index) internal view returns (Key, Asset storage) {
         Key key = Key.wrap(map._keys.at(index));
-        return (key, map._values[key]);
+        return (key, map._values[Key.unwrap(key)]);
     }
 
     function get(Map storage map, Key key) internal view returns (Asset storage) {

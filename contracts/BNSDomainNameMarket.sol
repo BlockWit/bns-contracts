@@ -43,7 +43,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         namesPolicy = BNSNamesPolicy(newNamesPolicy);
     }
 
-    function setAsset(address key, string memory assetTicker, Assets.AssetType assetType) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+    function setAsset(Assets.Key key, string memory assetTicker, Assets.AssetType assetType) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
         return _setAsset(key, assetTicker, assetType);
     }
 
@@ -52,11 +52,11 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         refererBonusDenominator = denominator;
     }
 
-    function removeAsset(AssetHandler.AssetKey key) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+    function removeAsset(Assets.Key key) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
         return _removeAsset(key);
     }
 
-    function getPrice(string memory domainName, string memory refererDomainName, AssetHandler.AssetKey assetKey) private view returns(uint) {
+    function getPrice(string memory domainName, string memory refererDomainName, Assets.Key assetKey) private view returns(uint) {
         require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
 
         if (bytes(refererDomainName).length > 0) {
@@ -69,7 +69,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         return pricePolicy.getPrice(domainName, assetKey, bytes(refererDomainName).length > 0);
     }
 
-    function buy(string memory domainName, string memory refererDomainName, AssetHandler.AssetKey assetKey) whenNotPaused external {
+    function buy(string memory domainName, string memory refererDomainName, Assets.Key assetKey) whenNotPaused external {
         uint refererTokenId;
         address refererAddress;
         bool hasReferer;

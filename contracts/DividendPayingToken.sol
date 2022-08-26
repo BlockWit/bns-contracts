@@ -14,13 +14,13 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
     using SafeMath for int256;
 
     uint256 constant internal MAGNITUDE = 2**128;
-    mapping(address => uint256) internal magnifiedDividendPerShare;
-    mapping(address => mapping(address => int256)) internal magnifiedDividendCorrections;
-    mapping(address => mapping(address => uint256)) internal withdrawnDividends;
+    mapping(Assets.Key => uint256) internal magnifiedDividendPerShare;
+    mapping(Assets.Key => mapping(address => int256)) internal magnifiedDividendCorrections;
+    mapping(Assets.Key => mapping(address => uint256)) internal withdrawnDividends;
 
     function withdrawDividend() override public {
         for (uint256 i = 0; i < assetsLength(); i++) {
-            (address assetKey, ) = getAssetAt(i);
+            (Assets.Key assetKey, ) = getAssetAt(i);
             withdrawDividend(assetKey);
         }
     }
@@ -28,8 +28,8 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
     function dividendOf(address _owner) override public view returns(Dividend[] memory) {
         Dividend[] memory dividends;
         for (uint256 i = 0; i < assetsLength(); i++) {
-            (address assetKey, Assets.Asset memory asset) = getAssetAt(i);
-            dividends[i] = Dividend(assetKey, asset.assetTicker, dividendOf(_owner, assetKey));
+            (Assets.Key assetKey, Assets.Asset memory asset) = getAssetAt(i);
+            dividends[i] = Dividend(Assets.Key.unwrap(assetKey), asset.assetTicker, dividendOf(_owner, assetKey));
         }
         return dividends;
     }
@@ -37,8 +37,8 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
     function withdrawableDividendOf(address _owner) override public view returns(Dividend[] memory) {
         Dividend[] memory dividends;
         for (uint256 i = 0; i < assetsLength(); i++) {
-            (address assetKey, Assets.Asset memory asset) = getAssetAt(i);
-            dividends[i] = Dividend(assetKey, asset.assetTicker, withdrawableDividendOf(_owner, assetKey));
+            (Assets.Key assetKey, Assets.Asset memory asset) = getAssetAt(i);
+            dividends[i] = Dividend(Assets.Key.unwrap(assetKey), asset.assetTicker, withdrawableDividendOf(_owner, assetKey));
         }
         return dividends;
     }
@@ -46,8 +46,8 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
     function withdrawnDividendOf(address _owner) override public view returns(Dividend[] memory) {
         Dividend[] memory dividends;
         for (uint256 i = 0; i < assetsLength(); i++) {
-            (address assetKey, Assets.Asset memory asset) = getAssetAt(i);
-            dividends[i] = Dividend(assetKey, asset.assetTicker, withdrawnDividendOf(_owner, assetKey));
+            (Assets.Key assetKey, Assets.Asset memory asset) = getAssetAt(i);
+            dividends[i] = Dividend(Assets.Key.unwrap(assetKey), asset.assetTicker, withdrawnDividendOf(_owner, assetKey));
         }
         return dividends;
     }
@@ -55,49 +55,49 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
     function accumulativeDividendOf(address _owner) override public view returns(Dividend[] memory) {
         Dividend[] memory dividends;
         for (uint256 i = 0; i < assetsLength(); i++) {
-            (address assetKey, Assets.Asset memory asset) = getAssetAt(i);
-            dividends[i] = Dividend(assetKey, asset.assetTicker, accumulativeDividendOf(_owner, assetKey));
+            (Assets.Key assetKey, Assets.Asset memory asset) = getAssetAt(i);
+            dividends[i] = Dividend(Assets.Key.unwrap(assetKey), asset.assetTicker, accumulativeDividendOf(_owner, assetKey));
         }
         return dividends;
     }
 
-    function distributeDividends(uint256 amount, address assetKey) public {
+    function distributeDividends(uint256 amount, Assets.Key assetKey) public {
         require(totalSupply() > 0, "DividendPayingToken: totalSupply must be greater than 0");
         require(amount > 0, "DividendPayingToken: amount must be greater than 0");
         _transferAssetFrom(msg.sender, address(this), amount, assetKey);
         magnifiedDividendPerShare[assetKey] = magnifiedDividendPerShare[assetKey] + (amount * MAGNITUDE / totalSupply());
-        emit DividendsDistributed(msg.sender, amount, assetKey);
+        emit DividendsDistributed(msg.sender, amount, Assets.Key.unwrap(assetKey));
     }
 
-    function withdrawDividend(address assetKey) public {
+    function withdrawDividend(Assets.Key assetKey) public {
         uint256 _withdrawableDividend = withdrawableDividendOf(msg.sender, assetKey);
         if (_withdrawableDividend > 0) {
             withdrawnDividends[assetKey][msg.sender] = withdrawnDividends[assetKey][msg.sender] + _withdrawableDividend;
-            emit DividendWithdrawn(msg.sender, _withdrawableDividend, assetKey);
+            emit DividendWithdrawn(msg.sender, _withdrawableDividend, Assets.Key.unwrap(assetKey));
             _transferAsset(msg.sender, _withdrawableDividend, assetKey);
         }
     }
 
-    function dividendOf(address _owner, address assetKey) public view returns(uint256) {
+    function dividendOf(address _owner, Assets.Key assetKey) public view returns(uint256) {
         return withdrawableDividendOf(_owner, assetKey);
     }
 
-    function withdrawableDividendOf(address _owner, address assetKey) public view returns(uint256) {
+    function withdrawableDividendOf(address _owner, Assets.Key assetKey) public view returns(uint256) {
         return accumulativeDividendOf(_owner, assetKey) - withdrawnDividends[assetKey][_owner];
     }
 
-    function withdrawnDividendOf(address _owner, address assetKey) public view returns(uint256) {
+    function withdrawnDividendOf(address _owner, Assets.Key assetKey) public view returns(uint256) {
         return withdrawnDividends[assetKey][_owner];
     }
 
-    function accumulativeDividendOf(address _owner, address assetKey) public view returns(uint256) {
+    function accumulativeDividendOf(address _owner, Assets.Key assetKey) public view returns(uint256) {
         return ((magnifiedDividendPerShare[assetKey] * balanceOf(_owner)).toInt256Safe() + magnifiedDividendCorrections[assetKey][_owner]).toUint256Safe() / MAGNITUDE;
     }
 
     function _transfer(address from, address to, uint256 value) override internal {
         super._transfer(from, to, value);
         for (uint256 i = 0; i < assetsLength(); i++) {
-            (address assetKey, ) = getAssetAt(i);
+            (Assets.Key assetKey, ) = getAssetAt(i);
             int256 _magCorrection = (magnifiedDividendPerShare[assetKey] * value).toInt256Safe();
             magnifiedDividendCorrections[assetKey][from] = magnifiedDividendCorrections[assetKey][from] + _magCorrection;
             magnifiedDividendCorrections[assetKey][to] = magnifiedDividendCorrections[assetKey][to] - _magCorrection;
@@ -107,7 +107,7 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
     function _mint(address account, uint256 value) override internal {
         super._mint(account, value);
         for (uint256 i = 0; i < assetsLength(); i++) {
-            (address assetKey, ) = getAssetAt(i);
+            (Assets.Key assetKey, ) = getAssetAt(i);
             magnifiedDividendCorrections[assetKey][account] = magnifiedDividendCorrections[assetKey][account] - (magnifiedDividendPerShare[assetKey] * value).toInt256Safe();
         }
     }
@@ -115,7 +115,7 @@ abstract contract DividendPayingToken is IDividendPayingToken, ERC20Burnable, As
     function _burn(address account, uint256 value) override internal {
         super._burn(account, value);
         for (uint256 i = 0; i < assetsLength(); i++) {
-            (address assetKey, ) = getAssetAt(i);
+            (Assets.Key assetKey, ) = getAssetAt(i);
             magnifiedDividendCorrections[assetKey][account] = magnifiedDividendCorrections[assetKey][account] + (magnifiedDividendPerShare[assetKey] * value).toInt256Safe();
         }
     }

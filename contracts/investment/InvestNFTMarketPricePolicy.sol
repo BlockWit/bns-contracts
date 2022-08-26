@@ -3,6 +3,7 @@
 pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "../lib/Assets.sol";
 import "../RecoverableFunds.sol";
 
 
@@ -10,7 +11,7 @@ contract InvestNFTMarketPricePolicy is Ownable, RecoverableFunds {
 
     uint public price;
 
-    function getPrice(uint count, address assetKey) public view returns (uint) {
+    function getPrice(uint count, Assets.Key assetKey) public view returns (uint) {
         return price;
     }
 

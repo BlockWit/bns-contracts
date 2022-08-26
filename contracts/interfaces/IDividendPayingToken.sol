@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 
 pragma solidity ^0.8.14;
+import "../lib/Assets.sol";
 
 
 interface IDividendPayingToken {
@@ -13,7 +14,7 @@ interface IDividendPayingToken {
 
   function dividendOf(address owner) external view returns(Dividend[] memory);
 
-  function distributeDividends(uint256 amount, address assetKey) external;
+  function distributeDividends(uint256 amount, Assets.Key assetKey) external;
 
   function withdrawDividend() external;
 

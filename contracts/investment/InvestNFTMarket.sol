@@ -47,7 +47,7 @@ contract InvestNFTMarket is AccessControl, Pausable, AssetHandler, RecoverableFu
     }
 
     function canBuy() public view returns (uint) {
-        uint canMintNFT = investNFT.canMint();
+        uint canMintNFT;
         uint canBuyNFT = sharesToBuyLimit - sharesBought;
         return canMintNFT > canBuyNFT ? canBuyNFT : canMintNFT;
     }

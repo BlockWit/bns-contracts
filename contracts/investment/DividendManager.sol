@@ -15,7 +15,9 @@ contract DividendManager is IDividendManager, BookKeeper, AssetHandler, AccessCo
     using SafeMath for uint256;
     using SafeMath for int256;
 
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     uint256 constant internal MAGNITUDE = 2**128;
+
     mapping(Assets.Key => uint256) internal magnifiedDividendPerShare;
     mapping(Assets.Key => mapping(AccountId => int256)) internal magnifiedDividendCorrections;
     mapping(Assets.Key => mapping(AccountId => uint256)) internal withdrawnDividends;
@@ -23,6 +25,7 @@ contract DividendManager is IDividendManager, BookKeeper, AssetHandler, AccessCo
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(MINTER_ROLE, msg.sender);
     }
 
     function setNFT(address newNFT) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -105,11 +108,11 @@ contract DividendManager is IDividendManager, BookKeeper, AssetHandler, AccessCo
         return ((magnifiedDividendPerShare[assetKey] * balanceOf(AccountId.unwrap(_owner))).toInt256Safe() + magnifiedDividendCorrections[assetKey][_owner]).toUint256Safe() / MAGNITUDE;
     }
 
-    function mint(AccountId account, uint256 amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function mint(AccountId account, uint256 amount) external onlyRole(MINTER_ROLE) {
         _mint(AccountId.unwrap(account), amount);
     }
 
-    function burn(AccountId account, uint256 amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function burn(AccountId account, uint256 amount) external onlyRole(MINTER_ROLE) {
         _burn(AccountId.unwrap(account), amount);
     }
 

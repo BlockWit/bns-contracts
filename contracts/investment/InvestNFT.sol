@@ -4,12 +4,15 @@ pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-
+import "../interfaces/IDivManager.sol";
+import "../interfaces/IInvestNFT.sol";
 import "../RecoverableFunds.sol";
+import "./Depositary.sol";
 
-contract InvestNFT is ERC721Enumerable, Pausable, AccessControl, RecoverableFunds {
+contract InvestNFT is IInvestNFT, ERC721Burnable, ERC721Enumerable, Depositary, RecoverableFunds, AccessControl, Pausable  {
 
     using Counters for Counters.Counter;
 
@@ -17,10 +20,7 @@ contract InvestNFT is ERC721Enumerable, Pausable, AccessControl, RecoverableFund
 
     Counters.Counter private _tokenIdCounter;
 
-    uint public PERCENT_RATE = 100000;
-    uint public PERCENT_PER_SHARE = 5;
-    uint public SHARES_LIMIT = PERCENT_RATE / PERCENT_PER_SHARE;
-    uint public summaryMintedShares;
+    IDivManager dividendManager;
 
     constructor() ERC721("Blockchain Name Services Investment NFT", "BNSI") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -35,25 +35,21 @@ contract InvestNFT is ERC721Enumerable, Pausable, AccessControl, RecoverableFund
         _unpause();
     }
 
-    function canMint() public view returns (uint) {
-        return SHARES_LIMIT - summaryMintedShares;
+    function safeMint(address to, uint256 shares) public onlyRole(MINTER_ROLE) {
+        uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(to, tokenId);
+        _mintShares(tokenId, shares);
+        dividendManager.handleMint(IDivManager.AccountId.wrap(tokenId));
     }
 
-    function safeMint(address to, uint count) public onlyRole(MINTER_ROLE) {
-        summaryMintedShares += count;
-        require(summaryMintedShares <= SHARES_LIMIT, "Can't mint specified count of shares. Limit exceeded!");
-        for (uint i = 0; i < count; i++) {
-            uint256 tokenId = _tokenIdCounter.current();
-            _tokenIdCounter.increment();
-            _safeMint(to, tokenId);
+    function withdrawDividend() external {
+        for (uint256 i; i < balanceOf(msg.sender); i++) {
+            dividendManager.withdrawDividend(IDivManager.AccountId.wrap(tokenOfOwnerByIndex(msg.sender, i)));
         }
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal whenNotPaused override(ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId);
-    }
-
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, AccessControl) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(IERC165, ERC721, ERC721Enumerable, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -63,6 +59,16 @@ contract InvestNFT is ERC721Enumerable, Pausable, AccessControl, RecoverableFund
 
     function retrieveETH(address payable recipient) external onlyRole(DEFAULT_ADMIN_ROLE) {
         _retrieveETH(recipient);
+    }
+
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal whenNotPaused override(ERC721, ERC721Enumerable) {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    function _burn(uint256 tokenId) override internal virtual {
+        dividendManager.handleBurn(IDivManager.AccountId.wrap(tokenId));
+        _burnShares(tokenId);
+        super._burn(tokenId);
     }
 
 }

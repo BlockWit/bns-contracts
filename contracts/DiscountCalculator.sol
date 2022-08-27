@@ -14,6 +14,11 @@ contract DiscountCalculator {
     Discount[] public discounts;
 
     function _setDiscount(Discount[] calldata newDiscounts) internal {
+        if(discounts.length == 0) {
+            for(uint i = 0; i < newDiscounts.length; i++) {
+                discounts.push(newDiscounts[i]);
+            }
+        }
         if(discounts.length == newDiscounts.length) {
             for(uint i = 0; i < newDiscounts.length; i++) {
                 discounts[i] = newDiscounts[i];

@@ -14,6 +14,7 @@ describe('BNSMarketPricePolicy', function () {
     const prices = [100, 200, 300];
     const sizes1 = [1, 2, 3];
     const prices1 = [100, 200];
+    const discounts = [['1', '2', '1664289293'],['3', '4' ,'1664289293'],['9', '10', '1664289293']];
 
     beforeEach(async function () {
         contract = await BNSMarketPricePolicy.new({from: owner});
@@ -46,11 +47,9 @@ describe('BNSMarketPricePolicy', function () {
             });
             context('if hasReferer == true ', function () {
                 it('should return price with discount', async function () {
-                    const discount = [1, 2, 1664478000];
-                    await contract.setDiscount(0, discount, { from: owner });
-                    expect(await contract.discounts[0]).to.be.equal(discount);
+                    await contract.setDiscount(discounts, { from: owner });
                     await contract.unsafeSetPremiumDomainPrice('haha', 500, { from: owner });
-                    expect(await contract.getPrice("haha", asset.address, true)).to.be.bignumber.equal("500");
+                    expect(await contract.getPrice("haha", asset.address, true)).to.be.bignumber.equal("250");
                 });
             });
         });
@@ -85,6 +84,59 @@ describe('BNSMarketPricePolicy', function () {
         context('when called not by owner', function () {
             it('revert', async function () {
                 await expectRevert.unspecified(contract.setDefaultPrice(1337, {from : account1}));
+            });
+        });
+    });
+
+    describe('setDiscount', function () {
+        context('when called by owner', function () {
+            context('if discounts was empty', function () {
+                it('should add new discounts', async function () {
+                    await contract.setDiscount(discounts, {from : owner});
+                    const temp = await contract.discounts(0);
+                    expect(temp[0]).to.be.bignumber.equal(discounts[0][0]);
+                    expect(temp[1]).to.be.bignumber.equal(discounts[0][1]);
+                    expect(temp[2]).to.be.bignumber.equal(discounts[0][2]);
+                });
+            });
+            context('if amount of new and old discounts are equal', function () {
+                it('should change discounts', async function () {
+                    const oldDiscounts = [['2', '3', '1664289293'],['4', '5' ,'1664289293'],['19', '20', '1664289293']];
+                    await contract.setDiscount(oldDiscounts, {from : owner});
+                    await contract.setDiscount(discounts, {from : owner});
+                    const temp = await contract.discounts(2);
+                    expect(temp[0]).to.be.bignumber.equal(discounts[2][0]);
+                    expect(temp[1]).to.be.bignumber.equal(discounts[2][1]);
+                    expect(temp[2]).to.be.bignumber.equal(discounts[2][2]);
+                });
+            });
+            context('if amount of old discounts > new discounts', function () {
+                it('should change discounts and trim array', async function () {
+                    const oldDiscounts = [['2', '3', '1664289293'],['4', '5' ,'1664289293'],['19', '20', '1664289293'], ['29', '30', '1664289293']];
+                    await contract.setDiscount(oldDiscounts, {from : owner});
+                    await contract.setDiscount(discounts, {from : owner});
+                    const temp = await contract.discounts(2);
+                    expect(temp[0]).to.be.bignumber.equal(discounts[2][0]);
+                    expect(temp[1]).to.be.bignumber.equal(discounts[2][1]);
+                    expect(temp[2]).to.be.bignumber.equal(discounts[2][2]);
+                    await expectRevert.unspecified(contract.discounts(3));
+                });
+            });
+            context('if amount of new discounts > old discounts', function () {
+                it('should add all new discounts', async function () {
+                    const oldDiscounts = [['2', '3', '1664289293'],['4', '5' ,'1664289293']];
+                    await contract.setDiscount(oldDiscounts, {from : owner});
+                    await contract.setDiscount(discounts, {from : owner});
+                    const temp = await contract.discounts(2);
+                    expect(temp[0]).to.be.bignumber.equal(discounts[2][0]);
+                    expect(temp[1]).to.be.bignumber.equal(discounts[2][1]);
+                    expect(temp[2]).to.be.bignumber.equal(discounts[2][2]);
+                });
+            });
+        });
+        context('when called not by owner', function () {
+            it('revert', async function () {
+                await expectRevert.unspecified(contract.setDiscount(discounts, {from : account1}));
             });
         });
     });

@@ -5,7 +5,7 @@ pragma solidity ^0.8.14;
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-import "./interfaces/IDividendPayingToken.sol";
+import "./interfaces/IDividendManager.sol";
 import "./lib/Assets.sol";
 import "./BNSNFT.sol";
 import "./BNSMarketPricePolicy.sol";
@@ -17,7 +17,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     BNSMarketPricePolicy public pricePolicy;
     BNSNamesPolicy public namesPolicy;
     BNSNFT public bnsnft;
-    IDividendPayingToken public dividendsManager;
+    IDividendManager public dividendManager;
     mapping (string => address) public domainBuyers;
     mapping (string => uint) public domainPrices;
     uint256 public refererBonusNumerator = 10;
@@ -31,8 +31,8 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         bnsnft = BNSNFT(newBnsnft);
     }
 
-    function setIDividendPayingToken(address newIDividendPayingToken) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        dividendsManager = IDividendPayingToken(newIDividendPayingToken);
+    function setIDividendManager(address newIDividendManager) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        dividendManager = IDividendManager(newIDividendManager);
     }
 
     function setPricePolicy(address newPricePolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -96,8 +96,8 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
             dividends = dividends - refererBonus;
             _transferAsset(refererAddress, refererBonus, assetKey);
         }
-        _approveAsset(address(dividendsManager), dividends, assetKey);
-        dividendsManager.distributeDividends(price - refererBonus, assetKey);
+        _approveAsset(address(dividendManager), dividends, assetKey);
+        dividendManager.distributeDividends(price - refererBonus, assetKey);
 
         // update statistics
         domainBuyers[domainName] = msg.sender;

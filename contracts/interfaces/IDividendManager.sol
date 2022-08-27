@@ -3,7 +3,6 @@
 pragma solidity ^0.8.14;
 
 import "../lib/Assets.sol";
-import "../investment/BookKeeper.sol";
 
 
 interface IDividendManager {
@@ -16,12 +15,6 @@ interface IDividendManager {
     uint256 amount;
   }
 
-  function mint(AccountId account, uint256 amount) external;
-
-  function burn(AccountId account, uint256 amount) external;
-
-  function dividendOf(AccountId account) external view returns(Dividend[] memory);
-
   function distributeDividends(uint256 amount, Assets.Key assetKey) external;
 
   function withdrawDividend(AccountId account) external;
@@ -32,6 +25,14 @@ interface IDividendManager {
 
   function accumulativeDividendOf(AccountId account) external view returns(Dividend[] memory);
 
+  function includeInDividends(AccountId account) external;
+
+  function excludeFromDividends(AccountId account) external;
+
+  function handleMint(AccountId account) external;
+
+  function handleBurn(AccountId account) external;
+
   event DividendsDistributed(
     address indexed from,
     uint256 amount,
@@ -39,7 +40,7 @@ interface IDividendManager {
   );
 
   event DividendWithdrawn(
-    AccountId indexed to,
+    AccountId account,
     uint256 amount,
     Assets.Key assetKey
   );

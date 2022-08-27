@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "../interfaces/IDivManager.sol";
+import "../interfaces/IDividendManager.sol";
 import "../interfaces/IInvestNFT.sol";
 import "../RecoverableFunds.sol";
 import "./Depositary.sol";
@@ -20,7 +20,7 @@ contract InvestNFT is IInvestNFT, ERC721Burnable, ERC721Enumerable, Depositary, 
 
     Counters.Counter private _tokenIdCounter;
 
-    IDivManager dividendManager;
+    IDividendManager dividendManager;
 
     constructor() ERC721("Blockchain Name Services Investment NFT", "BNSI") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -40,12 +40,12 @@ contract InvestNFT is IInvestNFT, ERC721Burnable, ERC721Enumerable, Depositary, 
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _mintShares(tokenId, shares);
-        dividendManager.handleMint(IDivManager.AccountId.wrap(tokenId));
+        dividendManager.handleMint(IDividendManager.AccountId.wrap(tokenId));
     }
 
     function withdrawDividend() external {
         for (uint256 i; i < balanceOf(msg.sender); i++) {
-            dividendManager.withdrawDividend(IDivManager.AccountId.wrap(tokenOfOwnerByIndex(msg.sender, i)));
+            dividendManager.withdrawDividend(IDividendManager.AccountId.wrap(tokenOfOwnerByIndex(msg.sender, i)));
         }
     }
 
@@ -66,7 +66,7 @@ contract InvestNFT is IInvestNFT, ERC721Burnable, ERC721Enumerable, Depositary, 
     }
 
     function _burn(uint256 tokenId) override internal virtual {
-        dividendManager.handleBurn(IDivManager.AccountId.wrap(tokenId));
+        dividendManager.handleBurn(IDividendManager.AccountId.wrap(tokenId));
         _burnShares(tokenId);
         super._burn(tokenId);
     }

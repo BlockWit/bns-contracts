@@ -26,8 +26,16 @@ contract InvestNFTMarket is AccessControl, Pausable, AssetHandler, RecoverableFu
         investNFT = InvestNFT(newInvestNFT);
     }
 
-    function setInvestNFTMarketPolicy(address newInvestNFTMarketPricePolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        pricePolicy = InvestNFTMarketPricePolicy(newInvestNFTMarketPricePolicy);
+    function setPricePolicy(address newPricePolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        pricePolicy = InvestNFTMarketPricePolicy(newPricePolicy);
+    }
+
+    function setAsset(Assets.Key key, string memory assetTicker, Assets.AssetType assetType) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+        return _setAsset(key, assetTicker, assetType);
+    }
+
+    function removeAsset(Assets.Key key) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+        return _removeAsset(key);
     }
 
     function pause() external onlyRole(DEFAULT_ADMIN_ROLE) {

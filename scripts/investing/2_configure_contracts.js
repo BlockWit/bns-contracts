@@ -14,6 +14,9 @@ async function deploy () {
   const DIVIDEND_MANAGER_ADDRESS = args[args.findIndex(argName => argName === '--dividends') + 1];
   const BUSD_ADDRESS = args[args.findIndex(argName => argName === '--busd') + 1];
   const USDT_ADDRESS = args[args.findIndex(argName => argName === '--usdt') + 1];
+  const DEV_ADDRESS = args[args.findIndex(argName => argName === '--devs') + 1];
+  const TEAM_ADDRESS = args[args.findIndex(argName => argName === '--team') + 1];
+  const FUND_ADDRESS = args[args.findIndex(argName => argName === '--fund') + 1];
   const { log } = logger(await web3.eth.net.getNetworkType());
   const [deployer] = await web3.eth.getAccounts();
 
@@ -30,6 +33,21 @@ async function deploy () {
   {
     log(`NFT. Grant minter role to Market.`);
     const tx = await nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, { from: deployer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`NFT. Mint dev shares.`);
+    const tx = await nft.safeMint(DEV_ADDRESS, ether('300000'), { from: deployer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`NFT. Mint team shares.`);
+    const tx = await nft.safeMint(TEAM_ADDRESS, ether('300000'), { from: deployer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`NFT. Mint fund shares.`);
+    const tx = await nft.safeMint(FUND_ADDRESS, ether('200000'), { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {

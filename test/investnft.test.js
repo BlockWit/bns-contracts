@@ -23,7 +23,6 @@ describe('InvestNFT', async () => {
     ]);
     await Promise.all([
       nft.setDividendManager(dividendManager.address, { from: deployer }),
-      dividendManager.grantRole(web3.utils.keccak256('DEPOSITARY_ROLE'), nft.address, { from: deployer }),
       dividendManager.setDepositary(nft.address, { from: deployer }),
       dividendManager.setAsset(usdt.address, 'USDT', 1, { from: deployer })
     ]);

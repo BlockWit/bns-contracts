@@ -31,6 +31,8 @@ contract DividendManager is IDividendManager, AssetHandler, AccessControl {
     }
 
     function setDepositary(address newDepositary) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        revokeRole(DEPOSITARY_ROLE, address(depositary));
+        grantRole(DEPOSITARY_ROLE, newDepositary);
         depositary = IInvestNFT(newDepositary);
     }
 

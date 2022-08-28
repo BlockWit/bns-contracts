@@ -15,6 +15,10 @@ contract InvestNFTMarketPricePolicy is Ownable, RecoverableFunds {
         return price;
     }
 
+    function getTokensForSpecifiedAmount(uint amount, Assets.Key assetKey) public view returns (uint) {
+        return amount / price;
+    }
+
     function setPrice(uint newPrice) public onlyOwner {
         price = newPrice;
     }

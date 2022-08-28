@@ -20,6 +20,10 @@ abstract contract Depositary is IDepositary {
         return _shares[tokenId];
     }
 
+    function totalShares() override public view returns (uint256) {
+        return MAX_SUPPLY;
+    }
+
     function _mintShares(uint256 tokenId, uint256 amount) internal virtual {
         require(amount > 0, "Depositary: cannot issue zero shares");
         require(_shares[tokenId] == 0, "Depositary: shares have already been issued for the specified token");

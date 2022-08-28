@@ -15,69 +15,62 @@ import "./InvestNFTMarketPricePolicy.sol";
 contract InvestNFTMarket is AccessControl, Pausable, AssetHandler, RecoverableFunds {
 
     InvestNFT public investNFT;
-
-    InvestNFTMarketPricePolicy public investNFTMarketPricePolicy;
-
-    uint public sharesToBuyLimit;
-
-    uint public sharesBought;
+    InvestNFTMarketPricePolicy public pricePolicy;
+    uint256 public sharesBought;
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    function setSharesToBuyLimit(uint newSharesToBuyLimit) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        sharesToBuyLimit = newSharesToBuyLimit;
-    }
-
-    function setInvestNFT(address newInvestNFT) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setInvestNFT(address newInvestNFT) external onlyRole(DEFAULT_ADMIN_ROLE) {
         investNFT = InvestNFT(newInvestNFT);
     }
 
-    function setInvestNFTMarketPolicy(address newInvestNFTMarketPricePolicy) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        investNFTMarketPricePolicy = InvestNFTMarketPricePolicy(newInvestNFTMarketPricePolicy);
+    function setInvestNFTMarketPolicy(address newInvestNFTMarketPricePolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        pricePolicy = InvestNFTMarketPricePolicy(newInvestNFTMarketPricePolicy);
     }
 
-    function pause() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function pause() external onlyRole(DEFAULT_ADMIN_ROLE) {
         _pause();
     }
 
-    function unpause() public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function unpause() external onlyRole(DEFAULT_ADMIN_ROLE) {
         _unpause();
     }
 
-    function canBuy() public view returns (uint) {
-        uint canMintNFT;
-        uint canBuyNFT = sharesToBuyLimit - sharesBought;
-        return canMintNFT > canBuyNFT ? canBuyNFT : canMintNFT;
+    function getAvailableShares() public view returns (uint) {
+        return investNFT.totalShares() - investNFT.issuedShares();
     }
 
-    function getPrice(uint count, Assets.Key assetKey) public view returns (uint, uint) {
-        uint countOfSharesCanMint = canBuy();
-        if (count > countOfSharesCanMint) {
-            count = countOfSharesCanMint;
-        }
-        uint price = 0;
-        if(count > 0) {
-            price = investNFTMarketPricePolicy.getPrice(count, assetKey);
-        }
-        return (price, count);
+    function getEstimationForSpecifiedShares(uint256 desiredShares, Assets.Key assetKey) public view returns (uint256 shares, uint256 sum) {
+        uint256 availableShares = getAvailableShares();
+        shares = (desiredShares > availableShares) ? availableShares : desiredShares;
+        uint256 price = pricePolicy.getPrice(shares, assetKey);
+        sum = price * shares;
     }
 
-    function buy(uint count, Assets.Key assetKey) public {
-        require(sharesBought <= sharesToBuyLimit, "All shares bought!");
-        uint countOfSharesCanMint = canBuy();
-        require(countOfSharesCanMint > 0, "No more shares!");
-        if (count > countOfSharesCanMint) {
-            count = countOfSharesCanMint;
-        }
+    function getEstimationForSpecifiedAmount(uint256 amount, Assets.Key assetKey) public view returns (uint256 shares, uint256 sum) {
+        uint256 availableShares = getAvailableShares();
+        uint256 desiredShares = pricePolicy.getTokensForSpecifiedAmount(amount, assetKey);
+        shares = (desiredShares > availableShares) ? availableShares : desiredShares;
+        uint256 price = pricePolicy.getPrice(shares, assetKey);
+        sum = shares * price;
+    }
 
-        uint price = investNFTMarketPricePolicy.getPrice(count, assetKey);
+    function buyExactShares(uint256 desiredShares, Assets.Key assetKey) external whenNotPaused {
+        (uint256 shares, uint256 sum) = getEstimationForSpecifiedShares(desiredShares, assetKey);
+        require(shares > 0, "InvestNFTMarket: no shares available for purchase");
+        sharesBought += shares;
+        _transferAssetFrom(msg.sender, address(this), sum, assetKey);
+        investNFT.safeMint(msg.sender, shares);
+    }
 
-        // charge payment
-        sharesBought += count;
-        _transferAssetFrom(msg.sender, address(this), price, assetKey);
-        investNFT.safeMint(msg.sender, count);
+    function buyForSpecifiedAmount(uint256 amount, Assets.Key assetKey) external whenNotPaused {
+        (uint256 shares, uint256 sum) = getEstimationForSpecifiedAmount(amount, assetKey);
+        require(shares > 0, "InvestNFTMarket: no shares available for purchase");
+        sharesBought += shares;
+        _transferAssetFrom(msg.sender, address(this), sum, assetKey);
+        investNFT.safeMint(msg.sender, shares);
     }
 
     function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {

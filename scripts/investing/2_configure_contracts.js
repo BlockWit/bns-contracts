@@ -1,10 +1,9 @@
-const InvestNFT = contract.fromArtifact('InvestNFT');
-const InvestNFTMarket = contract.fromArtifact('InvestNFTMarket');
-const InvestNFTMarketPricePolicy = contract.fromArtifact('InvestNFTMarketPricePolicy');
-const DividendManager = contract.fromArtifact('DividendManager');
+const InvestNFT = artifacts.require('InvestNFT');
+const InvestNFTMarket = artifacts.require('InvestNFTMarket');
+const InvestNFTMarketPricePolicy = artifacts.require('InvestNFTMarketPricePolicy');
+const DividendManager = artifacts.require('DividendManager');
 const { logger } = require('../util');
 const { ether, time, BN} = require('@openzeppelin/test-helpers');
-const {web3, contract} = require("@openzeppelin/test-environment");
 
 
 async function deploy () {
@@ -25,7 +24,7 @@ async function deploy () {
 
   {
     log(`NFT. Set DividendManager.`);
-    const tx = await nft.setDividendManager(dividendManager.address, { from: deployer });
+    const tx = await nft.setDividendManager(DIVIDEND_MANAGER_ADDRESS, { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {
@@ -35,7 +34,7 @@ async function deploy () {
   }
   {
     log(`Market. Set NFT.`);
-    const tx = await market.setInvestNFT(nft.address, { from: deployer });
+    const tx = await market.setInvestNFT(NFT_ADDRESS, { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {

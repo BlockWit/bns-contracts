@@ -9,7 +9,7 @@ import "../lib/SafeMath.sol";
 import "../AssetHandler.sol";
 
 
-contract DivManager is IDividendManager, AssetHandler, AccessControl {
+contract DividendManager is IDividendManager, AssetHandler, AccessControl {
 
     using SafeMath for uint256;
     using SafeMath for int256;
@@ -32,6 +32,14 @@ contract DivManager is IDividendManager, AssetHandler, AccessControl {
 
     function setDepositary(address newDepositary) external onlyRole(DEFAULT_ADMIN_ROLE) {
         depositary = IInvestNFT(newDepositary);
+    }
+
+    function setAsset(Assets.Key key, string memory assetTicker, Assets.AssetType assetType) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+        return _setAsset(key, assetTicker, assetType);
+    }
+
+    function removeAsset(Assets.Key key) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
+        return _removeAsset(key);
     }
 
     function withdrawDividend(AccountId account) override public {

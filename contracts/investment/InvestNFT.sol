@@ -35,6 +35,10 @@ contract InvestNFT is IInvestNFT, ERC721Burnable, ERC721Enumerable, Depositary, 
         _unpause();
     }
 
+    function setDividendManager(address newDividendManager) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        dividendManager = IDividendManager(newDividendManager);
+    }
+
     function safeMint(address to, uint256 shares) public onlyRole(MINTER_ROLE) {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();

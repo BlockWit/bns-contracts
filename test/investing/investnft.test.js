@@ -1,7 +1,7 @@
 const {accounts, contract, web3} = require('@openzeppelin/test-environment');
 const {BN, expectRevert, ether} = require('@openzeppelin/test-helpers');
 const {expect} = require('chai');
-const {getEvents} = require("./util");
+const {getEvents} = require("../util");
 
 const InvestNFT = contract.fromArtifact('InvestNFT');
 const DividendManager = contract.fromArtifact('DividendManager');

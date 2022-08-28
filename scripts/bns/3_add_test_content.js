@@ -1,6 +1,6 @@
 const BNSSimpleStorage = artifacts.require('BNSSimpleStorage');
 const BNSRepository = artifacts.require('BNSRepository');
-const { logger } = require('./util');
+const { logger } = require('../util');
 const { ether, time, BN} = require('@openzeppelin/test-helpers');
 
 const SITE_NAME = "simple-site-in-blockchain";

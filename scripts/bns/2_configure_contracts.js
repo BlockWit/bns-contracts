@@ -2,7 +2,7 @@ const BNSDomainNamesMarket = artifacts.require('BNSDomainNameMarket');
 const BNSMarketPricePolicy = artifacts.require('BNSMarketPricePolicy');
 const BNSNFT = artifacts.require('BNSNFT');
 const BNSToken = artifacts.require('BNSToken');
-const { logger } = require('./util');
+const { logger } = require('../util');
 const { ether, time, BN} = require('@openzeppelin/test-helpers');
 
 const SIZES = [1,2,3,4,5,6,7,8];

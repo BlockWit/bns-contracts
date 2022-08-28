@@ -5,7 +5,7 @@ const BNSNFT = artifacts.require('BNSNFT');
 const BNSRepository = artifacts.require('BNSRepository');
 const BNSSimpleStorage = artifacts.require('BNSSimpleStorage');
 const BNSToken = artifacts.require('BNSToken');
-const { logger } = require('./util');
+const { logger } = require('../util');
 
 async function deploy () {
   const { log } = logger(await web3.eth.net.getNetworkType());

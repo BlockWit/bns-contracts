@@ -122,7 +122,7 @@ describe('BNSMarketPricePolicy', function () {
                     await expectRevert.unspecified(contract.discounts(3));
                 });
             });
-            context('if amount of new discounts > old discounts', function () {
+            context('if amount of old discounts < new discounts', function () {
                 it('should add all new discounts', async function () {
                     const oldDiscounts = [['2', '3', '1664289293'],['4', '5' ,'1664289293']];
                     await contract.setDiscount(oldDiscounts, {from : owner});

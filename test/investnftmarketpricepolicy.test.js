@@ -66,11 +66,6 @@ describe('InvestNFTMarketPricePolicy', function () {
     });
 
     describe('retrieveETH', function () {
-        context('when called by owner', function () {
-            it('should transfer ETH to owner', async function () {
-                await invest.sendTransaction({from:owner,value:1000});
-            });
-        });
         context('when called not by owner', function () {
             it('revert', async function () {
                 await expectRevert(invest.retrieveETH(user, {from: user}),

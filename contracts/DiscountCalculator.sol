@@ -14,35 +14,36 @@ contract DiscountCalculator {
     Discount[] public discounts;
 
     function _setDiscount(Discount[] calldata newDiscounts) internal {
-        if(discounts.length == 0) {
-            for(uint i = 0; i < newDiscounts.length; i++) {
-                discounts.push(newDiscounts[i]);
-            }
-        }
         if(discounts.length == newDiscounts.length) {
             for(uint i = 0; i < newDiscounts.length; i++) {
                 discounts[i] = newDiscounts[i];
             }
         }
-        if(discounts.length > newDiscounts.length) {
-            uint lengthDiff = discounts.length - newDiscounts.length;
-            for(uint i = 0; i < lengthDiff; i++) {
-                discounts.pop();
-            }
-            for(uint i = 0; i < newDiscounts.length; i++) {
+        else if(discounts.length > newDiscounts.length){
+            uint i = 0;
+            while(newDiscounts.length > i) {
                 discounts[i] = newDiscounts[i];
+                i++;
+            }
+            while(discounts.length > i) {
+                discounts.pop();
+                i++;
             }
         }
-        if(discounts.length < newDiscounts.length) {
-            uint i;
-            uint lengthDiff = newDiscounts.length - discounts.length;
-            for(i = 0; i < discounts.length; i++) {
-                discounts[i] = newDiscounts[i];
+        else if(discounts.length == 0) {
+            for(uint i = 0; i < newDiscounts.length; i++) {
+                discounts.push(newDiscounts[i]);
             }
-            while(lengthDiff > 0) {
+        }
+        else {
+            uint i = 0;
+            while(discounts.length > i) {
+                discounts[i] = newDiscounts[i];
+                i++;
+            }
+            while(newDiscounts.length > i) {
                 i++;
                 discounts.push(newDiscounts[i]);
-                lengthDiff--;
             }
         }
     }

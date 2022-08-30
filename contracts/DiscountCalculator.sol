@@ -49,9 +49,9 @@ contract DiscountCalculator {
     }
 
     function calculateDiscount(uint256 amount, uint256 timestamp) public view returns (uint256) {
-        uint256 i = discounts.length;
+        uint256 i = discounts.length - 1;
         Discount memory discount;
-        while (discounts[i].validThru >= timestamp) {
+        while (discounts[i].validThru >= timestamp && i >= 0) {
             discount = discounts[i];
             i--;
         }

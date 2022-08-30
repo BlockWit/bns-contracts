@@ -1,6 +1,7 @@
 const { accounts, contract} = require('@openzeppelin/test-environment');
 const { expectRevert, ether} = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
+const {timestamp} = require("truffle/build/6062.bundled");
 
 const BNSMarketPricePolicy = contract.fromArtifact('BNSMarketPricePolicy');
 const ERC20Mock = contract.fromArtifact('ERC20Mock');
@@ -14,7 +15,8 @@ describe('BNSMarketPricePolicy', function () {
     const prices = [100, 200, 300];
     const sizes1 = [1, 2, 3];
     const prices1 = [100, 200];
-    const discounts = [['1', '2', '1664289293'],['3', '4' ,'1664289293'],['9', '10', '1664289293']];
+    const discounts = [['1', '2', '1693415398'],['3', '4' ,'1693415398'],['9', '10', '1693415398']];
+    const domainNames = ['block', 'site', 'lol'];
 
     beforeEach(async function () {
         contract = await BNSMarketPricePolicy.new({from: owner});
@@ -56,19 +58,20 @@ describe('BNSMarketPricePolicy', function () {
         context('when premiumDomainPrice is not set', function () {
             context('if pricePerNameLength is set', function () {
                 it('should return pricePerNameLength', async function () {
-                    await contract.setDefaultPrice(300, {from : owner});
-                    expect(await contract.getPrice("HaHaHaHaH", )).to.be.bignumber.equal("300");
+                    await contract.setPrice(4, 300, {from : owner});
+                    expect(await contract.getPrice("haha", asset.address, false)).to.be.bignumber.equal("300");
                 });
             });
             context('if pricePerNameLength is not set', function () {
                 it('should return defaultPrice', async function () {
                     await contract.setDefaultPrice(300, {from : owner});
-                    expect(await contract.getPrice("HaHaHaHaH", )).to.be.bignumber.equal("300");
+                    expect(await contract.getPrice("haha", asset.address, false)).to.be.bignumber.equal("300");
                 });
             });
             context('if hasReferer is true', function () {
                 it('should return discounted price', async function () {
-                    expect(await contract.getPrice("HaHaHaHaH", )).to.be.bignumber.equal("0");
+                    await contract.setPrice(4, 300, {from : owner});
+                    expect(await contract.getPrice("haha", asset.address, true)).to.be.bignumber.equal("150");
                 });
             });
         });
@@ -93,10 +96,10 @@ describe('BNSMarketPricePolicy', function () {
             context('if discounts was empty', function () {
                 it('should add new discounts', async function () {
                     await contract.setDiscount(discounts, {from : owner});
-                    const temp = await contract.discounts(0);
-                    expect(temp[0]).to.be.bignumber.equal(discounts[0][0]);
-                    expect(temp[1]).to.be.bignumber.equal(discounts[0][1]);
-                    expect(temp[2]).to.be.bignumber.equal(discounts[0][2]);
+                    const temp = await contract.discounts(2);
+                    expect(temp[0]).to.be.bignumber.equal(discounts[2][0]);
+                    expect(temp[1]).to.be.bignumber.equal(discounts[2][1]);
+                    expect(temp[2]).to.be.bignumber.equal(discounts[2][2]);
                 });
             });
             context('if amount of new and old discounts are equal', function () {
@@ -141,11 +144,69 @@ describe('BNSMarketPricePolicy', function () {
         });
     });
 
+    describe('calculateDiscount', function () {
+        context('if there are valid discounts', function () {
+            it('should return discount', async function () {
+                await contract.setDiscount(discounts, {from : owner});
+                const temp = await contract.discounts(2);
+                expect(temp[0]).to.be.bignumber.equal(discounts[2][0]);
+                expect(temp[1]).to.be.bignumber.equal(discounts[2][1]);
+                expect(temp[2]).to.be.bignumber.equal(discounts[2][2]);
+                expect(await contract.calculateDiscount(1000, 1661880372)).to.be.bignumber.equal('500');
+            });
+        });
+        context('if no valid discounts', function () {
+            it('should return 0', async function () {
+                expect(await contract.calculateDiscount(1000, 1661880372)).to.be.bignumber.equal('0');
+            });
+        });
+    });
+
     describe('setPrice', function () {
         context('when called by owner', function () {
             it('should change pricePerNameLength', async function () {
                 await contract.setPrice(2, 111, {from : owner});
                 expect(await contract.pricePerNameLength(2)).to.be.bignumber.equal("111");
+            });
+        });
+        context('when called not by owner', function () {
+            it('revert', async function () {
+                await expectRevert(contract.setPrice(5, 2222, {from : account1}),
+                    "Ownable: caller is not the owner");
+            });
+        });
+    });
+
+    describe('unsafeSetPremiumDomainPrices', function () {
+        context('when called by owner', function () {
+            context('if domainNames.length == prices.length', function () {
+                it('should change premiumDomainPrices', async function () {
+                    await contract.unsafeSetPremiumDomainPrices(domainNames, prices, { from: owner });
+                    expect(await contract.getPrice("block", asset.address, false)).to.be.bignumber.equal('100');
+                    expect(await contract.getPrice("site", asset.address, false)).to.be.bignumber.equal('200');
+                    expect(await contract.getPrice("lol", asset.address, false)).to.be.bignumber.equal('300');
+                });
+            });
+            context('if domainNames.length != prices.length', function () {
+                it('revert', async function () {
+                    await expectRevert(contract.unsafeSetPremiumDomainPrices(domainNames, prices1, { from: owner }),
+                        "Count of domain names and prices must be equals!");
+                });
+            });
+        });
+        context('when called not by owner', function () {
+            it('revert', async function () {
+                await expectRevert(contract.unsafeSetPremiumDomainPrices(domainNames, prices, { from: account1 }),
+                    "Ownable: caller is not the owner");
+            });
+        });
+    });
+
+    describe('unsafeSetPremiumDomainPrice', function () {
+        context('when called by owner', function () {
+            it('should set premiumDomainPrices', async function () {
+                await contract.unsafeSetPremiumDomainPrice('haha', 500, { from: owner });
+                expect(await contract.getPrice("haha", asset.address, false)).to.be.bignumber.equal("500");
             });
         });
         context('when called not by owner', function () {

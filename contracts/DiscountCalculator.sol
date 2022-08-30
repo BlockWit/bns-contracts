@@ -14,36 +14,36 @@ contract DiscountCalculator {
     Discount[] public discounts;
 
     function _setDiscount(Discount[] calldata newDiscounts) internal {
-        if(discounts.length == newDiscounts.length) {
-            for(uint i = 0; i < newDiscounts.length; i++) {
-                discounts[i] = newDiscounts[i];
-            }
-        }
-        else if(discounts.length > newDiscounts.length){
-            uint i = 0;
-            while(newDiscounts.length > i) {
+        uint length = discounts.length;
+        uint newLength = newDiscounts.length;
+        uint i = 0;
+        if(length == newLength) {
+            while(newLength > i) {
                 discounts[i] = newDiscounts[i];
                 i++;
             }
-            while(discounts.length > i) {
+        } else if(length > newLength){
+            while(newLength > i) {
+                discounts[i] = newDiscounts[i];
+                i++;
+            }
+            while(length > i) {
                 discounts.pop();
                 i++;
             }
-        }
-        else if(discounts.length == 0) {
-            for(uint i = 0; i < newDiscounts.length; i++) {
+        } else if(length == 0) {
+            while(newLength > i) {
                 discounts.push(newDiscounts[i]);
+                i++;
             }
-        }
-        else {
-            uint i = 0;
-            while(discounts.length > i) {
+        } else {
+            while(length > i) {
                 discounts[i] = newDiscounts[i];
                 i++;
             }
-            while(newDiscounts.length > i) {
-                i++;
+            while(newLength > i) {
                 discounts.push(newDiscounts[i]);
+                i++;
             }
         }
     }

@@ -18,8 +18,6 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     BNSNamesPolicy public namesPolicy;
     BNSNFT public bnsnft;
     IDividendManager public dividendManager;
-    mapping (string => address) public domainBuyers;
-    mapping (string => uint) public domainPrices;
     uint256 public refererBonusNumerator = 10;
     uint256 public refererBonusDenominator = 100;
 
@@ -57,11 +55,11 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     }
 
     function getPrice(string memory domainName, string memory refererDomainName, Assets.Key assetKey) private view returns(uint) {
-        require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
+        require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
 
         if (bytes(refererDomainName).length > 0) {
             refererDomainName = namesPolicy.perform(refererDomainName);
-            require(bnsnft.domainNameExists(refererDomainName), "Referer domain name must exists");
+            require(bnsnft.isDomainNameExists(refererDomainName), "Referer domain name must exists");
         }
 
         domainName = namesPolicy.perform(domainName);
@@ -81,7 +79,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         }
         // sanitize domain name and calculate price
         domainName = namesPolicy.perform(domainName);
-        require(!bnsnft.domainNameExists(domainName), "Domain name already exists");
+        require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
         uint256 price = pricePolicy.getPrice(domainName, assetKey, hasReferer);
 
         // charge payment
@@ -99,9 +97,6 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         _approveAsset(address(dividendManager), dividends, assetKey);
         dividendManager.distributeDividends(price - refererBonus, assetKey);
 
-        // update statistics
-        domainBuyers[domainName] = msg.sender;
-        domainPrices[domainName] = price;
         // mint NFT
         bnsnft.safeMint(msg.sender, domainName);
     }

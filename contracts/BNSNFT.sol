@@ -17,9 +17,9 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
 
     IContentRouter public contentRouter;
 
-    mapping(string => bool) public domainNameExists;
+    mapping(bytes32 => bool) public domainNameExists;
     mapping(uint256 => string) public tokenIdToDomainNames;
-    mapping(string => uint256) public domainNamesToTokenId;
+    mapping(bytes32 => uint256) public domainNamesToTokenId;
 
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -32,12 +32,13 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
     }
 
     function isDomainNameExists(string memory domainName) public view returns (bool) {
-        return domainNameExists[domainName];
+        return domainNameExists[keccak256(abi.encodePacked(domainName))];
     }
 
     function getTokenIdByDomainName(string calldata domainName) public view returns (uint256)  {
-        require(isDomainNameExists(domainName), "BNSNFT: Domain name not exists");
-        return domainNamesToTokenId[domainName];
+        bytes32 domainNameHash = keccak256(abi.encodePacked(domainName));
+        require(domainNameExists[domainNameHash], "BNSNFT: Domain name not exists");
+        return domainNamesToTokenId[domainNameHash];
     }
 
     function getContent(uint256 tokenId, string memory relativePath) public view returns (IContentRouter.ContentType contentType, string memory)  {
@@ -77,9 +78,10 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
            _tokenIdCounter.increment();
            _balances[to] += 1;
            _owners[tokenId] = to;
-           domainNameExists[domainNames[i]] = true;
+           bytes32 domainNameHash = keccak256(abi.encodePacked(domainNames[i]));
+           domainNameExists[domainNameHash] = true;
            tokenIdToDomainNames[tokenId] = domainNames[i];
-           domainNamesToTokenId[domainNames[i]] = tokenId;
+           domainNamesToTokenId[domainNameHash] = tokenId;
         }
     }
 
@@ -89,19 +91,20 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
                 uint256 tokenId = _tokenIdCounter.current();
                 _tokenIdCounter.increment();
                 _safeMint(to, tokenId);
-                domainNameExists[domainNames[i]] = true;
+                domainNameExists[keccak256(abi.encodePacked(domainNames[i]))] = true;
             }
         }
     }
 
     function safeMint(address to, string calldata domainName) public onlyRole(MINTER_ROLE) returns (uint256) {
-        require(!isDomainNameExists(domainName), "BNSNFT: Domain name already exists");
+        bytes32 domainNameHash = keccak256(abi.encodePacked(domainName));
+        require(!domainNameExists[domainNameHash], "BNSNFT: Domain name already exists");
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
-        domainNameExists[domainName] = true;
+        domainNameExists[domainNameHash] = true;
         tokenIdToDomainNames[tokenId] = domainName;
-        domainNamesToTokenId[domainName] = tokenId;
+        domainNamesToTokenId[domainNameHash] = tokenId;
         return tokenId;
     }
 

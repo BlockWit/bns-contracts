@@ -1,6 +1,20 @@
 ![BlockWit BNS](logo.png "BNS")
 
 # BlockWit Blockchain Name Services Contracts
+## How to deploy contracts
+### Investing part
+1. Run ```npx truffle exec scripts/investing/1_deploy_contracts.js --network [networkname]```  
+This command will return the list of parameters used for verification and subsequent scripts. I.E.  
+```Configuration params: --market 0x929153acb6FbFEcd180E04026698aa8eF3d3c6E5 --pricing 0x5766ae380229B1628076280808ada65a375A363E --nft 0x8e49d4B11A0A33D2c0D13F2C65D8B5F120819871 --dividends 0xa031e45C46A746c7af8386298a9705FC8FaA9dF6 --usdt 0x337610d27c682E347C9cD60BD4b3b107C9d34dDd --busd 0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee```  
+```Verification params: InvestNFTMarket@0x929153acb6FbFEcd180E04026698aa8eF3d3c6E5 InvestNFTMarketPricePolicy@0x5766ae380229B1628076280808ada65a375A363E InvestNFT@0x8e49d4B11A0A33D2c0D13F2C65D8B5F120819871 DividendManager@0xa031e45C46A746c7af8386298a9705FC8FaA9dF6```
+2. Run ```npx truffle run verify [verification params] --network [networkname]```
+3. Run ```npx truffle exec scripts/investing/2_configure_contracts.js [configuration params] --network [networkname]```  
+  You will also need to add the following params: ```--busd [BUSD address] --usdt [USDT address] --devs [devs address] --team [team address] --fund [fund address]```
+### BNS part
+1. Run ```npx truffle exec scripts/bns/1_deploy_contracts.js --network [networkname]```
+2. Run ```npx truffle run verify [verification params] --network [networkname]``` 
+3. Run ```npx truffle exec scripts/bns/2_configure_contracts.js [configuration params] --network [networkname]```
+  You will also need to add the following params: ```--dividends [DividendManager address]```
 
 ## Test network configuration (BSC Testnet)
 ### Main BNS contracts

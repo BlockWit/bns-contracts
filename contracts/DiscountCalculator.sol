@@ -52,9 +52,14 @@ contract DiscountCalculator {
         uint256 i = discounts.length;
         Discount memory discount;
         if(i > 0) {
+            i--;
             while (discounts[i].validThru >= timestamp) {
                 discount = discounts[i];
-                i--;
+                if( i > 0 ){
+                    i--;
+                } else {
+                    break;
+                }
             }
         }
         return discount.denominator > 0 ? amount * discount.numerator / discount.denominator : 0;

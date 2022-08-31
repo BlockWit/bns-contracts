@@ -71,6 +71,7 @@ describe('BNSMarketPricePolicy', function () {
             context('if hasReferer is true', function () {
                 it('should return discounted price', async function () {
                     await contract.setPrice(4, 300, {from : owner});
+                    await contract.setDiscount(discounts, { from: owner });
                     expect(await contract.getPrice("haha", asset.address, true)).to.be.bignumber.equal("150");
                 });
             });

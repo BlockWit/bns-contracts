@@ -54,16 +54,16 @@ describe('BNSDomainNameMarket', function () {
     });
   });
 
-  describe('setDividendManager', function () {
+  describe('setIDividendManager', function () {
     context('when called by admin', function () {
       it('should change address of the dividend manager', async function () {
-        await market.setDividendManager(token.address, {from : deployer});
+        await market.setIDividendManager(token.address, {from : deployer});
         expect(await market.dividendManager()).to.be.equal(token.address);
       });
     });
     context('when called not by admin', function () {
       it('revert', async function () {
-        await expectRevert.unspecified(market.setDividendManager(token.address, {from : user}));
+        await expectRevert.unspecified(market.setIDividendManager(token.address, {from : user}));
       });
     });
   });

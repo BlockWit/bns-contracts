@@ -29,8 +29,8 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         bnsnft = BNSNFT(newBnsnft);
     }
 
-    function setIDividendManager(address newIDividendManager) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        dividendManager = IDividendManager(newIDividendManager);
+    function setDividendManager(address newDividendManager) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        dividendManager = IDividendManager(newDividendManager);
     }
 
     function setPricePolicy(address newPricePolicy) external onlyRole(DEFAULT_ADMIN_ROLE) {

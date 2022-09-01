@@ -5,8 +5,11 @@ BSCSCAN_KEY=XUNFSCK7525E43VKN2JGWCC6N69IFFKRGW
 
 ADDR_BUSD=0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee
 ADDR_USDT=0x337610d27c682E347C9cD60BD4b3b107C9d34dDd
+ADDR_DEVS=0x3552CB128b2c3a789a16c8f244eDC6a64Fe3eE93
+ADDR_TEAM=0x04E438a8898223Dbcdb91fCa7A42792d41827c3F
+ADDR_FUND=0xE694Ad76d68999Ca4f6777b100ceedbc73D6BAA3
 
-NETWORK=bsctestnet_mnemonic
+NETWORK=bsctestnet_special
 
 EXEC_TYPE_DUMMY=exec_type_dummy
 EXEC_TYPE_NORMAL=exec_type_normal
@@ -21,6 +24,11 @@ REPO_DUMMY_INVESTING_1_DEPLOY_CONTRACTS_VERIFY=$REPO_REL_PATH/dummy_investing_1_
 REPO_DUMMY_INVESTING_2_CONFIGURE_CONTRACTS=$REPO_REL_PATH/dummy_investing_2_configure_contracts.sh
 
 cd ../../
+
+if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
+  npx truffle compile;
+fi;
+
 echo "ETHERSCAN_KEY =" > ./.env
 echo "BSCSCAN_KEY = $BSCSCAN_KEY" >> ./.env
 echo "INFURA_KEY =" >> ./.env
@@ -38,15 +46,12 @@ echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
 echo "$RESULT";
 
-exit 0;
-
-ADDR_DOMAIN_MARKET=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $4 }')
-ADDR_DOMAIN_PRICING=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $6 }')
-ADDR_DOMAIN_NAMES=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $8 }')
-ADDR_DOMAIN_NFT=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $10 }')
-ADDR_DOMAIN_STORAGE=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $12 }')
-ADDR_DOMAIN_REPOSITORY=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $14 }')
-ADDR_DOMAIN_TOKEN=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $16 }')
+ADDR_DOMAIN_MARKET=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $4 }');
+ADDR_DOMAIN_PRICING=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $6 }');
+ADDR_DOMAIN_NAMES=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $8 }');
+ADDR_DOMAIN_NFT=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $10 }');
+ADDR_DOMAIN_STORAGE=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $12 }');
+ADDR_DOMAIN_REPOSITORY=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $14 }');
 
 echo "Parsed domain market address $ADDR_DOMAIN_MARKET";
 echo "Parsed domain pricing address $ADDR_DOMAIN_PRICING";
@@ -54,25 +59,13 @@ echo "Parsed domain names policy address $ADDR_DOMAIN_NAMES";
 echo "Parsed domain NFT address $ADDR_DOMAIN_NFT";
 echo "Parsed domain storage address $ADDR_DOMAIN_STORAGE";
 echo "Parsed domain repository address $ADDR_DOMAIN_REPOSITORY";
-echo "Parsed domain token address $ADDR_DOMAIN_TOKEN";
 
 RESULT="";
 CUR_COMMAND="";
 if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
-    CUR_COMMAND="npx truffle run verify BNSDomainNameMarket@$ADDR_DOMAIN_MARKET BNSMarketPricePolicy@$ADDR_DOMAIN_PRICING BNSNamesPolicy@$ADDR_DOMAIN_NAMES BNSNFT@$ADDR_DOMAIN_NFT BNSSimpleStorage@$ADDR_DOMAIN_STORAGE BNSRepository@$ADDR_DOMAIN_REPOSITORY BNSToken@$ADDR_DOMAIN_TOKEN --network $NETWORK";
+    CUR_COMMAND="npx truffle run verify BNSDomainNameMarket@$ADDR_DOMAIN_MARKET BNSMarketPricePolicy@$ADDR_DOMAIN_PRICING BNSNamesPolicy@$ADDR_DOMAIN_NAMES BNSNFT@$ADDR_DOMAIN_NFT BNSSimpleStorage@$ADDR_DOMAIN_STORAGE BNSRepository@$ADDR_DOMAIN_REPOSITORY --network $NETWORK";
 else
     CUR_COMMAND=$REPO_DUMMY_BNS_1_DEPLOY_CONTRACTS_VERIFY;
-fi
-echo $CUR_COMMAND;
-RESULT=$($CUR_COMMAND);
-echo "$RESULT";
-
-RESULT="";
-CUR_COMMAND="";
-if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
-    CUR_COMMAND="npx truffle exec scripts/bns/2_configure_contracts.js --market $ADDR_DOMAIN_MARKET --pricing $ADDR_DOMAIN_PRICING --names $ADDR_DOMAIN_NAMES --nft $ADDR_DOMAIN_NFT --storage $ADDR_DOMAIN_STORAGE --repository $ADDR_DOMAIN_REPOSITORY --token $ADDR_DOMAIN_TOKEN --network $NETWORK";
-else
-    CUR_COMMAND=$REPO_DUMMY_BNS_2_CONFIGURE_CONTRACTS;
 fi
 echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
@@ -89,10 +82,10 @@ echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
 echo "$RESULT";
 
-ADDR_INVESTING_MARKET=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $4 }')
-ADDR_INVESTING_PRICING=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $6 }')
-ADDR_INVESTING_NFT=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $8 }')
-ADDR_INVESTING_DIVIDENDS=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $10 }')
+ADDR_INVESTING_MARKET=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $4 }');
+ADDR_INVESTING_PRICING=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $6 }');
+ADDR_INVESTING_NFT=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $8 }');
+ADDR_INVESTING_DIVIDENDS=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $10 }');
 
 echo "Parsed domain investing market address $ADDR_INVESTING_MARKET";
 echo "Parsed domain investing pricing address $ADDR_INVESTING_PRICING";
@@ -113,10 +106,21 @@ echo "$RESULT";
 RESULT="";
 CUR_COMMAND="";
 if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
-    CUR_COMMAND="npx truffle exec scripts/investing/2_configure_contracts.js --market $ADDR_INVESTING_MARKET --pricing $ADDR_INVESTING_PRICING --nft $ADDR_INVESTING_NFT --dividends $ADDR_INVESTING_DIVIDENDS --usdt $ADDR_USDT --busd $ADDR_BUSD --network $NETWORK";
+    CUR_COMMAND="npx truffle exec scripts/bns/2_configure_contracts.js --market $ADDR_DOMAIN_MARKET --pricing $ADDR_DOMAIN_PRICING --names $ADDR_DOMAIN_NAMES --nft $ADDR_DOMAIN_NFT --storage $ADDR_DOMAIN_STORAGE --repository $ADDR_DOMAIN_REPOSITORY --dividends $ADDR_INVESTING_DIVIDENDS --usdt $ADDR_USDT --busd $ADDR_BUSD --network $NETWORK";
 else
-    CUR_COMMAND=$REPO_DUMMY_INVESTING_2_CONFIGURE_CONTRACTS;
+    CUR_COMMAND=$REPO_DUMMY_BNS_2_CONFIGURE_CONTRACTS;
 fi
+echo $CUR_COMMAND;
+RESULT=$($CUR_COMMAND);
+echo "$RESULT";
+
+RESULT="";
+CUR_COMMAND="";
+#if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
+    CUR_COMMAND="npx truffle exec scripts/investing/2_configure_contracts.js --market $ADDR_INVESTING_MARKET --pricing $ADDR_INVESTING_PRICING --nft $ADDR_INVESTING_NFT --dividends $ADDR_INVESTING_DIVIDENDS --usdt $ADDR_USDT --busd $ADDR_BUSD --devs $ADDR_DEVS --team $ADDR_TEAM --fund $ADDR_FUND --network $NETWORK";
+#else
+#    CUR_COMMAND=$REPO_DUMMY_INVESTING_2_CONFIGURE_CONTRACTS;
+#fi
 echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
 echo "$RESULT";

@@ -1,10 +1,9 @@
 #!/bin/bash
-echo "Using network 'bsctestnet_mnemonic'.
+echo "Using network 'bsctestnet_special'.
 
-Market deployed: https://etherscan.io/address/0xa961b300a0F846ecD0421657d63D846769DAbF64
-PricePolicy deployed: https://etherscan.io/address/0x69724c09e021226efa5A2b793649add742A659eE
-InvestNFT deployed: https://etherscan.io/address/0xF61E77dD54D13756Cb4A4253b56f833CdB67F435
-DividendManager deployed: https://etherscan.io/address/0xdcc9a53d4a86C64fc91b8af1D762d3fa7d44DDF3
-Configuration params: --market 0xa961b300a0F846ecD0421657d63D846769DAbF64 --pricing 0x69724c09e021226efa5A2b793649add742A659eE --nft 0xF61E77dD54D13756Cb4A4253b56f833CdB67F435 --dividends 0xdcc9a53d4a86C64fc91b8af1D762d3fa7d44DDF3
-Verification params: npx truffle run verify InvestNFTMarket@0xa961b300a0F846ecD0421657d63D846769DAbF64 InvestNFTMarketPricePolicy@0x69724c09e021226efa5A2b793649add742A659eE InvestNFT@0xF61E77dD54D13756Cb4A4253b56f833CdB67F435 DividendManager@0xdcc9a53d4a86C64fc91b8af1D762d3fa7d44DDF3
-success"
+NFT. Set DividendManager.
+Result: successful tx: https://etherscan.io/tx/0x8284da7864902070f04edb18169e635dc6b3030745aceb9c2e31ec5d51119998
+NFT. Grant minter role to Market.
+Result: successful tx: https://etherscan.io/tx/0x62a573771501039e073ff424458b3354399eec478ef4f7d26154244548e003ea
+NFT. Mint dev shares.";
+

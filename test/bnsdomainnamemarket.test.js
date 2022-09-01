@@ -7,7 +7,7 @@ const BNSDomainNameMarket = contract.fromArtifact('BNSDomainNameMarket');
 const BNSMarketPricePolicy = contract.fromArtifact('BNSMarketPricePolicy');
 const BNSNamesPolicy = contract.fromArtifact('BNSNamesPolicy');
 const BNSNFT = contract.fromArtifact('BNSNFT');
-const BNSToken = contract.fromArtifact('BNSToken');
+const DividendManager = contract.fromArtifact('DividendManager');
 const ERC20Mock = contract.fromArtifact('ERC20Mock');
 
 const SIZES = [1,2,3,4,5,6,7,8];
@@ -21,15 +21,15 @@ describe('BNSDomainNameMarket', function () {
   let names;
   let nft;
   let pricing;
-  let token;
+  let dividend;
   let tokens = { usdt: { id: 1, contract: undefined, key: 12345 }, busd: { id: 2, contract: undefined, key: 23456 }};
 
   beforeEach(async function () {
-    [ market, names, nft, token, pricing, tokens.busd.contract, tokens.usdt.contract ] = await Promise.all([
+    [ market, names, nft, dividend, pricing, tokens.busd.contract, tokens.usdt.contract ] = await Promise.all([
       BNSDomainNameMarket.new({ from: deployer }),
       BNSNamesPolicy.new({ from: deployer }),
       BNSNFT.new({ from: deployer }),
-      BNSToken.new({ from: deployer }),
+      DividendManager.new({ from: deployer }),
       BNSMarketPricePolicy.new({ from: deployer }),
       ERC20Mock.new('BUSD Mock Token', 'BUSD', deployer, ether('10000000'), { from: deployer }),
       ERC20Mock.new('USDT Mock Token', 'USDT', deployer, ether('10000000'), { from: deployer }),
@@ -54,16 +54,16 @@ describe('BNSDomainNameMarket', function () {
     });
   });
 
-  describe('setIDividendManager', function () {
+  describe('setDividendManager', function () {
     context('when called by admin', function () {
       it('should change address of the dividend manager', async function () {
-        await market.setIDividendManager(token.address, {from : deployer});
-        expect(await market.dividendManager()).to.be.equal(token.address);
+        await market.setDividendManager(dividend.address, {from : deployer});
+        expect(await market.dividendManager()).to.be.equal(dividend.address);
       });
     });
     context('when called not by admin', function () {
       it('revert', async function () {
-        await expectRevert.unspecified(market.setIDividendManager(token.address, {from : user}));
+        await expectRevert.unspecified(market.setDividendManager(dividend.address, {from : user}));
       });
     });
   });
@@ -129,14 +129,14 @@ describe('BNSDomainNameMarket', function () {
     beforeEach(async function () {
       await Promise.all([
         nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, { from: deployer }),
-        market.setDividendManager(token.address, { from: deployer }),
+        market.setDividendManager(dividend.address, { from: deployer }),
         market.setBNSNFT(nft.address, { from: deployer }),
         market.setPricePolicy(pricing.address, { from: deployer }),
         market.setNamesPolicy(names.address, { from: deployer}),
         market.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
         market.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
-        token.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
-        token.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
+        dividend.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
+        dividend.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
         pricing.setPrices(ether(BASE_PRICE_USDT.toString()), SIZES, PRICES_USDT.map(price => ether(price.toString())), { from: deployer })
       ])
     });
@@ -149,7 +149,7 @@ describe('BNSDomainNameMarket', function () {
     context('if domainName exists', function () {
       it('revert', async function () {
         await tokens.usdt.contract.approve(market.address, ether('250000'), {from: user});
-        await market.buy('aba', tokens.usdt.contract.address, {from: user});
+        await market.buy('aba', '', tokens.usdt.contract.address, {from: user});
         await expectRevert(market.getPrice('aba', tokens.usdt.contract.address, {from: user}),
             'Domain name already exists');
       });
@@ -160,14 +160,14 @@ describe('BNSDomainNameMarket', function () {
     beforeEach(async function () {
       await Promise.all([
         nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, { from: deployer }),
-        market.setDividendManager(token.address, { from: deployer }),
+        market.setDividendManager(dividend.address, { from: deployer }),
         market.setBNSNFT(nft.address, { from: deployer }),
         market.setPricePolicy(pricing.address, { from: deployer }),
         market.setNamesPolicy(names.address, { from: deployer}),
         market.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
         market.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
-        token.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
-        token.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
+        dividend.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
+        dividend.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
         pricing.setPrices(ether(BASE_PRICE_USDT.toString()), SIZES, PRICES_USDT.map(price => ether(price.toString())), { from: deployer })
       ])
     });
@@ -175,7 +175,7 @@ describe('BNSDomainNameMarket', function () {
     context('if domain doesn`t exist', function () {
       it('should transfer nft to buyer', async function () {
         await tokens.usdt.contract.approve(market.address, ether('250000'), { from: user });
-        const { tx } = await market.buy('ab', tokens.usdt.contract.address, { from: user });
+        const { tx } = await market.buy('ab', '', tokens.usdt.contract.address, { from: user });
         const [{ args: { from, to, tokenId }}] = await getEvents(tx, nft, 'Transfer', web3);
         expect(from).to.be.equal(constants.ZERO_ADDRESS);
         expect(to).to.be.equal(user);
@@ -183,7 +183,7 @@ describe('BNSDomainNameMarket', function () {
       });
       it('should transfer USD to fundraising wallet', async function () {
         await tokens.usdt.contract.approve(market.address, ether('250000'), { from: user });
-        const { tx } = await market.buy('ab', tokens.usdt.contract.address, { from: user });
+        const { tx } = await market.buy('ab', '', tokens.usdt.contract.address, { from: user });
         const res = await getEvents(tx, tokens.usdt.contract, 'Transfer', web3);
         const [, { args: { from, to, value }}] = await getEvents(tx, tokens.usdt.contract, 'Transfer', web3);
         expect(from).to.be.equal(market.address);
@@ -194,8 +194,8 @@ describe('BNSDomainNameMarket', function () {
     context('if domain exists', function () {
       it('revert', async function () {
         await tokens.usdt.contract.approve(market.address, ether('250000'), {from: user});
-        await market.buy('ab', tokens.usdt.contract.address, {from: user});
-        await expectRevert(market.buy('ab', tokens.usdt.contract.address, {from: user}),
+        await market.buy('ab', '', tokens.usdt.contract.address, {from: user});
+        await expectRevert(market.buy('ab', '', tokens.usdt.contract.address, {from: user}),
             'Domain name already exists');
       });
     });

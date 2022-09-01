@@ -11,8 +11,8 @@ ADDR_FUND=0xE694Ad76d68999Ca4f6777b100ceedbc73D6BAA3
 
 NETWORK=bsctestnet_special
 
-EXEC_TYPE_DUMMY=exec_type_dummy
-EXEC_TYPE_NORMAL=exec_type_normal
+EXEC_TYPE_DUMMY=dummy
+EXEC_TYPE_NORMAL=normal
 EXEC_TYPE=$EXEC_TYPE_NORMAL
 
 REPO_REL_PATH=scripts/integration
@@ -44,6 +44,8 @@ else
 fi
 echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
+echo "#!/bin/bash" > $REPO_DUMMY_BNS_1_DEPLOY_CONTRACTS;
+echo "echo \"$RESULT\";" >> $REPO_DUMMY_BNS_1_DEPLOY_CONTRACTS;
 echo "$RESULT";
 
 ADDR_DOMAIN_MARKET=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $4 }');
@@ -69,6 +71,8 @@ else
 fi
 echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
+echo "#!/bin/bash" > $REPO_DUMMY_BNS_1_DEPLOY_CONTRACTS_VERIFY;
+echo "echo \"$RESULT\";" >> $REPO_DUMMY_BNS_1_DEPLOY_CONTRACTS_VERIFY;
 echo "$RESULT";
 
 RESULT="";
@@ -80,6 +84,8 @@ else
 fi
 echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
+echo "#!/bin/bash" > $REPO_DUMMY_INVESTING_1_DEPLOY_CONTRACTS;
+echo "echo \"$RESULT\";" >> $REPO_DUMMY_INVESTING_1_DEPLOY_CONTRACTS;
 echo "$RESULT";
 
 ADDR_INVESTING_MARKET=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $4 }');
@@ -101,6 +107,8 @@ else
 fi
 echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
+echo "#!/bin/bash" > $REPO_DUMMY_INVESTING_1_DEPLOY_CONTRACTS_VERIFY;
+echo "echo \"$RESULT\";" >> $REPO_DUMMY_INVESTING_1_DEPLOY_CONTRACTS_VERIFY;
 echo "$RESULT";
 
 RESULT="";
@@ -112,6 +120,8 @@ else
 fi
 echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
+echo "#!/bin/bash" > $REPO_DUMMY_BNS_2_CONFIGURE_CONTRACTS;
+echo "echo \"$RESULT\";" >> $REPO_DUMMY_BNS_2_CONFIGURE_CONTRACTS;
 echo "$RESULT";
 
 RESULT="";
@@ -123,6 +133,8 @@ else
 fi
 echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
+echo "#!/bin/bash" > $REPO_DUMMY_INVESTING_2_CONFIGURE_CONTRACTS;
+echo "echo \"$RESULT\";" >> $REPO_DUMMY_INVESTING_2_CONFIGURE_CONTRACTS;
 echo "$RESULT";
 
 

@@ -1,10 +1,11 @@
 #!/bin/bash
 echo "Using network 'bsctestnet_special'.
 
-Market deployed: https://etherscan.io/address/0x4320e530416f31fa0A64563c16Dfac319B616F34
-PricePolicy deployed: https://etherscan.io/address/0x12729462F2a9bCED3453F6A840ABF05d2D2868F2
-InvestNFT deployed: https://etherscan.io/address/0x2628A6b91Aa4f4344C744C0C0e532814fAeFd150
-DividendManager deployed: https://etherscan.io/address/0xb9B8fCAb975Ab6eAf34ff1c36FB6102946492596
-Configuration params: --market 0x4320e530416f31fa0A64563c16Dfac319B616F34 --pricing 0x12729462F2a9bCED3453F6A840ABF05d2D2868F2 --nft 0x2628A6b91Aa4f4344C744C0C0e532814fAeFd150 --dividends 0xb9B8fCAb975Ab6eAf34ff1c36FB6102946492596
-Verification params: npx truffle run verify InvestNFTMarket@0x4320e530416f31fa0A64563c16Dfac319B616F34 InvestNFTMarketPricePolicy@0x12729462F2a9bCED3453F6A840ABF05d2D2868F2 InvestNFT@0x2628A6b91Aa4f4344C744C0C0e532814fAeFd150 DividendManager@0xb9B8fCAb975Ab6eAf34ff1c36FB6102946492596
+Market deployed: https://etherscan.io/address/0xB703D5b8a6Ca479c82F878c17a8f6bB125A7F3Ef
+PricePolicy deployed: https://etherscan.io/address/0x476Db2EFFf7336186b3df00a66cd21bFDd0fb482
+InvestNFT deployed: https://etherscan.io/address/0xFBEB5B5B63DBa8C7C923E675D2df308E4EA3f3a9
+DividendManager deployed: https://etherscan.io/address/0x6999714cBFb9eF0fA89F11E198D64495F4483a4c
+Configuration params: --market 0xB703D5b8a6Ca479c82F878c17a8f6bB125A7F3Ef --pricing 0x476Db2EFFf7336186b3df00a66cd21bFDd0fb482 --nft 0xFBEB5B5B63DBa8C7C923E675D2df308E4EA3f3a9 --dividends 0x6999714cBFb9eF0fA89F11E198D64495F4483a4c
+Verification params: npx truffle run verify InvestNFTMarket@0xB703D5b8a6Ca479c82F878c17a8f6bB125A7F3Ef InvestNFTMarketPricePolicy@0x476Db2EFFf7336186b3df00a66cd21bFDd0fb482 InvestNFT@0xFBEB5B5B63DBa8C7C923E675D2df308E4EA3f3a9 DividendManager@0x6999714cBFb9eF0fA89F11E198D64495F4483a4c
 success";
+

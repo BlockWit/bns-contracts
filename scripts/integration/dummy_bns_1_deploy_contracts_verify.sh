@@ -1,14 +1,14 @@
 #!/bin/bash
-echo "Verifying BNSDomainNameMarket@0xb4a81bF133428eAb5b69f3d7fe318A2216DEff92
-Pass - Verified: https://testnet.bscscan.com/address/0xb4a81bF133428eAb5b69f3d7fe318A2216DEff92#code
-Verifying BNSMarketPricePolicy@0x3CFA8fb7E356F7631D9Eb39ceFAa6140B7df39c4
-Pass - Verified: https://testnet.bscscan.com/address/0x3CFA8fb7E356F7631D9Eb39ceFAa6140B7df39c4#code
-Verifying BNSNamesPolicy@0x1f83F1d358C0ea577845FbaE5AFccecc4035bb17
-Already Verified: https://testnet.bscscan.com/address/0x1f83F1d358C0ea577845FbaE5AFccecc4035bb17#code
-Verifying BNSNFT@0xe16932964a3e2dd794F3c8b0f5c1e18CB592794E
-Already Verified: https://testnet.bscscan.com/address/0xe16932964a3e2dd794F3c8b0f5c1e18CB592794E#code
-Verifying BNSSimpleStorage@0x6a87D7a6AE5B66dd096DB0f3c51341874E30788f
-Already Verified: https://testnet.bscscan.com/address/0x6a87D7a6AE5B66dd096DB0f3c51341874E30788f#code
-Verifying BNSRepository@0x6bf3950fcdFbC81e823BE66899fEeD336470fF54
-Already Verified: https://testnet.bscscan.com/address/0x6bf3950fcdFbC81e823BE66899fEeD336470fF54#code
+echo "Verifying BNSDomainNameMarket@0xd8f9685175963F54d8400F66653c114389743266
+Pass - Verified: https://testnet.bscscan.com/address/0xd8f9685175963F54d8400F66653c114389743266#code
+Verifying BNSMarketPricePolicy@0xb75c1e4cc17DEaaF524C89F2F6385cC426D28E6A
+Already Verified: https://testnet.bscscan.com/address/0xb75c1e4cc17DEaaF524C89F2F6385cC426D28E6A#code
+Verifying BNSNamesPolicy@0x622d5BcadCa5542e8820d57707820CEa9fd95567
+Already Verified: https://testnet.bscscan.com/address/0x622d5BcadCa5542e8820d57707820CEa9fd95567#code
+Verifying BNSNFT@0x8fee4886fAff748674D0EeD4E178B8F5Ad6E0D8d
+Already Verified: https://testnet.bscscan.com/address/0x8fee4886fAff748674D0EeD4E178B8F5Ad6E0D8d#code
+Verifying BNSSimpleStorage@0x94F4EFF01e35fA3471DD60A7c3d7F212D4F6a2Be
+Already Verified: https://testnet.bscscan.com/address/0x94F4EFF01e35fA3471DD60A7c3d7F212D4F6a2Be#code
+Verifying BNSRepository@0x4D402885BFD60EF3121bF993c7e7020b14f44835
+Already Verified: https://testnet.bscscan.com/address/0x4D402885BFD60EF3121bF993c7e7020b14f44835#code
 Successfully verified 6 contract(s).";

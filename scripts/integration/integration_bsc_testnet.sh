@@ -13,7 +13,7 @@ NETWORK=bsctestnet_special
 
 EXEC_TYPE_DUMMY=exec_type_dummy
 EXEC_TYPE_NORMAL=exec_type_normal
-EXEC_TYPE=$EXEC_TYPE_DUMMY
+EXEC_TYPE=$EXEC_TYPE_NORMAL
 
 REPO_REL_PATH=scripts/integration
 REPO_DUMMY_BNS_1_DEPLOY_CONTRACTS=$REPO_REL_PATH/dummy_bns_1_deploy_contracts.sh

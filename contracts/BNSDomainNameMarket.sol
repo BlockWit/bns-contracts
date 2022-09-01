@@ -54,6 +54,10 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         return _removeAsset(key);
     }
 
+    function getPrice(string memory domainName, Assets.Key assetKey) public view returns(uint) {
+        return this.getPrice(domainName, "", assetKey);
+    }
+
     function getPrice(string memory domainName, string memory refererDomainName, Assets.Key assetKey) public view returns(uint) {
         require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
 
@@ -65,6 +69,10 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         domainName = namesPolicy.perform(domainName);
         namesPolicy.check(domainName);
         return pricePolicy.getPrice(domainName, assetKey, bytes(refererDomainName).length > 0);
+    }
+
+    function buy(string memory domainName, Assets.Key assetKey) external {
+        this.buy(domainName, "", assetKey);
     }
 
     function buy(string memory domainName, string memory refererDomainName, Assets.Key assetKey) whenNotPaused external {

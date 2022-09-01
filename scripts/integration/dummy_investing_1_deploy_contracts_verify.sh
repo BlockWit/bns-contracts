@@ -8,4 +8,3 @@ Already Verified: https://testnet.bscscan.com/address/0xFBEB5B5B63DBa8C7C923E675
 Verifying DividendManager@0x6999714cBFb9eF0fA89F11E198D64495F4483a4c
 Already Verified: https://testnet.bscscan.com/address/0x6999714cBFb9eF0fA89F11E198D64495F4483a4c#code
 Successfully verified 4 contract(s).";
-

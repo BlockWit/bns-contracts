@@ -18,4 +18,3 @@ Result: successful tx: https://etherscan.io/tx/0x44294abf7f71e439110b43205af549f
 PricingController. Set prices.
 Result: successful tx: https://etherscan.io/tx/0xa7c61a5cf90bfda9d385ce42e3a846c9ea1529f990846e3fd01b346f035dc171
 success";
-

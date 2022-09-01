@@ -2,19 +2,19 @@
 echo "Using network 'bsctestnet_special'.
 
 NFT. Grant minter role to Market.
-Result: successful tx: https://etherscan.io/tx/0xbd23be2d1f72acba26c570a9e1b6446976d1dde956ef7909fa03fa323f8e8586
+Result: successful tx: https://etherscan.io/tx/0x1a2e06e3f46fe2f4fc96f0b0fc020a536a71dee38d36a8674e1de713df9908cc
 Market. Set NFT.
-Result: successful tx: https://etherscan.io/tx/0x4e53f8a55737438f89d292511794fd548f8cf3330b1c263207989047ee4fea3c
+Result: successful tx: https://etherscan.io/tx/0x834f42564a667089267eb3e1f51813b972ee27554cbddcb6bc82aa90463813f0
 Market. Set PricingController.
-Result: successful tx: https://etherscan.io/tx/0x81e40a892a452644eccd522f9f3e6e66b206a776a6df2d45899ccc2d992ca284
+Result: successful tx: https://etherscan.io/tx/0x0a5c0e5a81b16e811930f60c1757b8500fc7d724eb218f3c910c304045f64ee8
 Market. Set DomainNamesController.
-Result: successful tx: https://etherscan.io/tx/0x6a939ada135a2d28ae232dff728da4227e2eda0f5bca17d63cb99dde8e07c507
+Result: successful tx: https://etherscan.io/tx/0x6202f4f784f913157b61aacc2814ce7a2088603ca3c2483fcd13abddf30839a2
 Market. Set BUSD.
-Result: successful tx: https://etherscan.io/tx/0xa7e3efb5effa2a9f0fe0d21d8c479f6384ed1e8feeafbc98d92d86ad3309ef47
+Result: successful tx: https://etherscan.io/tx/0x60e60725eb54f6724a2a5a98350454d91a01737bfa06554112718b2761648954
 Market. Set USDT.
-Result: successful tx: https://etherscan.io/tx/0xcd7ca979c55e486058f2be557e4cd3112745707dcad8d61421d7fc558f08086f
+Result: successful tx: https://etherscan.io/tx/0x20f7b5edfaa006c1783f6e2d9bb2bf40907de6b64800ce1b7b18f6df003a0a01
 Market. Set fundraising wallet.
-Result: successful tx: https://etherscan.io/tx/0x44294abf7f71e439110b43205af549ffdb3b3c26354f6467be7df477761c171b
+Result: successful tx: https://etherscan.io/tx/0x45a16e499a164a9aa9d61a532ab9ab2dfc271b8abc010caa4b1ce0a7b23a4756
 PricingController. Set prices.
-Result: successful tx: https://etherscan.io/tx/0xa7c61a5cf90bfda9d385ce42e3a846c9ea1529f990846e3fd01b346f035dc171
+Result: successful tx: https://etherscan.io/tx/0x7d16067a62be296d0873ef5ab648c755ebea96ac1541393aa0830f01fa39c212
 success";

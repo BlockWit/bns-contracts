@@ -116,11 +116,11 @@ echo "$RESULT";
 
 RESULT="";
 CUR_COMMAND="";
-#if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
+if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
     CUR_COMMAND="npx truffle exec scripts/investing/2_configure_contracts.js --market $ADDR_INVESTING_MARKET --pricing $ADDR_INVESTING_PRICING --nft $ADDR_INVESTING_NFT --dividends $ADDR_INVESTING_DIVIDENDS --usdt $ADDR_USDT --busd $ADDR_BUSD --devs $ADDR_DEVS --team $ADDR_TEAM --fund $ADDR_FUND --network $NETWORK";
-#else
-#    CUR_COMMAND=$REPO_DUMMY_INVESTING_2_CONFIGURE_CONTRACTS;
-#fi
+else
+    CUR_COMMAND=$REPO_DUMMY_INVESTING_2_CONFIGURE_CONTRACTS;
+fi
 echo $CUR_COMMAND;
 RESULT=$($CUR_COMMAND);
 echo "$RESULT";

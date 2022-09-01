@@ -1,0 +1,14 @@
+#!/bin/bash
+echo "Using network 'bsctestnet_mnemonic'.
+
+Market deployed: https://etherscan.io/address/0x331c6Cd63Bc55a375351C8f7a9c35B8C1ccC791F
+PricingController deployed: https://etherscan.io/address/0xA7E3e04ADCf0351C148F91a02F81e06FA6093F25
+DomainNamesController deployed: https://etherscan.io/address/0xd3959241E186eAEf79e12Fe65530Bf7760A4F590
+NFT deployed: https://etherscan.io/address/0xb3333c208aC1a5D417f4981BAEDc863c756224eB
+BNSSimpleStorage deployed: https://etherscan.io/address/0x86eBAd117c2C35C6e0b206aCA88f84b85F0C4eEd
+BNSRepository deployed: https://etherscan.io/address/0xF9Da17987a699f10f0cAF310BA3b54f36964cA79
+BNSToken deployed: https://etherscan.io/address/0xF9Da17987a699f10f0cAF310BA3b54f36964cA79
+Configuration params: --market 0x331c6Cd63Bc55a375351C8f7a9c35B8C1ccC791F --pricing 0xA7E3e04ADCf0351C148F91a02F81e06FA6093F25 --names 0xd3959241E186eAEf79e12Fe65530Bf7760A4F590 --nft 0xb3333c208aC1a5D417f4981BAEDc863c756224eB --storage 0x86eBAd117c2C35C6e0b206aCA88f84b85F0C4eEd --repository 0xF9Da17987a699f10f0cAF310BA3b54f36964cA79 --token 0xfB8EaAb65463a4Ac2bCc9a5A9c0Cc23CBaED66D6
+Verification params: npx truffle run verify BNSDomainNameMarket@0x331c6Cd63Bc55a375351C8f7a9c35B8C1ccC791F BNSMarketPricePolicy@0xA7E3e04ADCf0351C148F91a02F81e06FA6093F25 BNSNamesPolicy@0xd3959241E186eAEf79e12Fe65530Bf7760A4F590 BNSNFT@0xb3333c208aC1a5D417f4981BAEDc863c756224eB BNSSimpleStorage@0x86eBAd117c2C35C6e0b206aCA88f84b85F0C4eEd BNSRepository@0xF9Da17987a699f10f0cAF310BA3b54f36964cA79 BNSToken@0xfB8EaAb65463a4Ac2bCc9a5A9c0Cc23CBaED66D6
+success";
+

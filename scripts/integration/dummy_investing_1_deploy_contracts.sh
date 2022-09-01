@@ -1,0 +1,10 @@
+#!/bin/bash
+echo "Using network 'bsctestnet_mnemonic'.
+
+Market deployed: https://etherscan.io/address/0xa961b300a0F846ecD0421657d63D846769DAbF64
+PricePolicy deployed: https://etherscan.io/address/0x69724c09e021226efa5A2b793649add742A659eE
+InvestNFT deployed: https://etherscan.io/address/0xF61E77dD54D13756Cb4A4253b56f833CdB67F435
+DividendManager deployed: https://etherscan.io/address/0xdcc9a53d4a86C64fc91b8af1D762d3fa7d44DDF3
+Configuration params: --market 0xa961b300a0F846ecD0421657d63D846769DAbF64 --pricing 0x69724c09e021226efa5A2b793649add742A659eE --nft 0xF61E77dD54D13756Cb4A4253b56f833CdB67F435 --dividends 0xdcc9a53d4a86C64fc91b8af1D762d3fa7d44DDF3
+Verification params: npx truffle run verify InvestNFTMarket@0xa961b300a0F846ecD0421657d63D846769DAbF64 InvestNFTMarketPricePolicy@0x69724c09e021226efa5A2b793649add742A659eE InvestNFT@0xF61E77dD54D13756Cb4A4253b56f833CdB67F435 DividendManager@0xdcc9a53d4a86C64fc91b8af1D762d3fa7d44DDF3
+success"

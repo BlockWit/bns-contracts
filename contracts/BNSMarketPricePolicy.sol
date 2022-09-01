@@ -18,13 +18,13 @@ contract BNSMarketPricePolicy is Ownable, DiscountCalculator, RecoverableFunds {
 
     uint public defaultPrice;
 
-    function getPriceForPremiumDomain(string memory domainName) public view returns(uint) {
+    function getPriceForPremiumDomain(string memory domainName) external view returns(uint) {
         uint price = premiumDomainPrices[keccak256(abi.encodePacked(domainName))];
         require(price > 0, "Domain not in premium list");
         return price;
     }
 
-    function getPrice(string memory domainName, Assets.Key assetKey, bool hasReferer) public view returns(uint) {
+    function getPrice(string memory domainName, Assets.Key assetKey, bool hasReferer) external view returns(uint) {
         uint price = premiumDomainPrices[keccak256(abi.encodePacked(domainName))];
         if(price == 0) {
             price = pricePerNameLength[domainName.length()];

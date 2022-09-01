@@ -56,7 +56,7 @@ describe('Integration test', async () => {
       bnsMarket = market;
       await Promise.all([
         await market.setBNSNFT(nft.address, {from : deployer}),
-        await market.setIDividendManager(dividendManager.address, {from : deployer}),
+        await market.setDividendManager(dividendManager.address, {from : deployer}),
         await market.setPricePolicy(pricing.address, {from : deployer}),
         await market.setNamesPolicy(names.address, {from : deployer}),
         await market.setAsset(usdt.address, 'USDT', 1, {from : deployer}),
@@ -72,9 +72,14 @@ describe('Integration test', async () => {
       await usdt.approve(market.address, PRICE.mul(share), { from: account1 });
       await market.buyExactShares(share, usdt.address, { from: account1 });
     });
-    it('should work as intended', async function () {
+    it('should work as intended full buy', async function () {
       await usdt.approve(bnsMarket.address, ether('250000'), { from: account1 });
       await bnsMarket.buy('ab', '', usdt.address, { from: account1 });
+      await nft.withdrawDividend({from: account1});
+    });
+    it('should work as intended short buy', async function () {
+      await usdt.approve(bnsMarket.address, ether('250000'), { from: account1 });
+      await bnsMarket.buyWithoutReferer('ab', usdt.address, { from: account1 });
       await nft.withdrawDividend({from: account1});
     });
   });

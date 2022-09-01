@@ -31,23 +31,23 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         _grantRole(MINTER_ROLE, msg.sender);
     }
 
-    function isDomainNameExists(string memory domainName) public view returns (bool) {
+    function isDomainNameExists(string memory domainName) external view returns (bool) {
         return domainNameExists[keccak256(abi.encodePacked(domainName))];
     }
 
-    function getTokenIdByDomainName(string calldata domainName) public view returns (uint256)  {
+    function getTokenIdByDomainName(string calldata domainName) external view returns (uint256)  {
         bytes32 domainNameHash = keccak256(abi.encodePacked(domainName));
         require(domainNameExists[domainNameHash], "BNSNFT: Domain name not exists");
         return domainNamesToTokenId[domainNameHash];
     }
 
-    function getContent(uint256 tokenId, string memory relativePath) public view returns (IContentRouter.ContentType contentType, string memory)  {
+    function getContent(uint256 tokenId, string memory relativePath) external view returns (IContentRouter.ContentType contentType, string memory)  {
         require(_exists(tokenId), "BNSNFT: Content query for nonexistent token");
         string memory domainName = tokenIdToDomainNames[tokenId];
-        return getContent(domainName, relativePath);
+        return contentRouter.getContentOrAddress(domainName, relativePath);
     }
 
-    function getContent(string memory domainName, string memory relativePath) public view returns (IContentRouter.ContentType contentType, string memory)  {
+    function getContent(string memory domainName, string memory relativePath) external view returns (IContentRouter.ContentType contentType, string memory)  {
         return contentRouter.getContentOrAddress(domainName, relativePath);
     }
 
@@ -87,11 +87,12 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
 
     function safeBatchMint(address to, string[] calldata domainNames) public onlyRole(DEFAULT_ADMIN_ROLE) {
         for(uint i = 0; i < domainNames.length; i++) {
-            if(!isDomainNameExists(domainNames[i])){
+            bytes32 domainNameHash = keccak256(abi.encodePacked(domainNames[i]));
+            if(!domainNameExists[domainNameHash]){
                 uint256 tokenId = _tokenIdCounter.current();
                 _tokenIdCounter.increment();
                 _safeMint(to, tokenId);
-                domainNameExists[keccak256(abi.encodePacked(domainNames[i]))] = true;
+                domainNameExists[domainNameHash] = true;
             }
         }
     }

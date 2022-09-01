@@ -54,8 +54,8 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         return _removeAsset(key);
     }
 
-    function getPrice(string memory domainName, Assets.Key assetKey) public view returns(uint) {
-        return this.getPrice(domainName, "", assetKey);
+    function getPriceWithoutReferer(string memory domainName, Assets.Key assetKey) public view returns(uint) {
+        return getPrice(domainName, "", assetKey);
     }
 
     function getPrice(string memory domainName, string memory refererDomainName, Assets.Key assetKey) public view returns(uint) {
@@ -71,8 +71,19 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         return pricePolicy.getPrice(domainName, assetKey, bytes(refererDomainName).length > 0);
     }
 
-    function buy(string memory domainName, Assets.Key assetKey) external {
-        this.buy(domainName, "", assetKey);
+    function buyWithoutReferer(string memory domainName, Assets.Key assetKey) external {
+        domainName = namesPolicy.perform(domainName);
+        require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
+        uint256 price = pricePolicy.getPrice(domainName, assetKey, false);
+
+        // charge payment
+        _transferAssetFrom(msg.sender, address(this), price, assetKey);
+
+        _approveAsset(address(dividendManager), price, assetKey);
+        dividendManager.distributeDividends(price, assetKey);
+
+        // mint NFT
+        bnsnft.safeMint(msg.sender, domainName);
     }
 
     function buy(string memory domainName, string memory refererDomainName, Assets.Key assetKey) whenNotPaused external {

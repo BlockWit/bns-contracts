@@ -54,7 +54,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         return _removeAsset(key);
     }
 
-    function getPrice(string memory domainName, string memory refererDomainName, Assets.Key assetKey) private view returns(uint) {
+    function getPrice(string memory domainName, string memory refererDomainName, Assets.Key assetKey) public view returns(uint) {
         require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
 
         if (bytes(refererDomainName).length > 0) {

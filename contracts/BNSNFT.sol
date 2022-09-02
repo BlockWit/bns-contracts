@@ -61,11 +61,34 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         return contentRouter.getContentOrAddress(domainName, "");
     }
 
-    function setContentOrAddress(uint tokenId, string memory relativePath, string memory content, IContentRouter.ContentType contentType, address contentProvider) external {
+    function setRelativeContentOrAddressByTokenId(uint tokenId, string memory relativePath, string memory content, IContentRouter.ContentType contentType, address contentProvider) external {
         require(msg.sender == ownerOf(tokenId) || hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "BNSNFT: Only admin or token owner can set content");
         require(_exists(tokenId), "BNSNFT: Content query for nonexistent token");
         string memory domainName = tokenIdToDomainNames[tokenId];
-	    contentRouter.setContentOrAddress(domainName, relativePath, content, contentType, contentProvider);
+        contentRouter.setContentOrAddress(domainName, relativePath, content, contentType, contentProvider);
+    }
+
+    function setContentOrAddressByTokenId(uint tokenId, string memory content, IContentRouter.ContentType contentType, address contentProvider) external {
+        require(msg.sender == ownerOf(tokenId) || hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "BNSNFT: Only admin or token owner can set content");
+        require(_exists(tokenId), "BNSNFT: Content query for nonexistent token");
+        string memory domainName = tokenIdToDomainNames[tokenId];
+	    contentRouter.setContentOrAddress(domainName, "", content, contentType, contentProvider);
+    }
+
+    function setContentOrAddressByDomainName(string memory domainName, string memory content, IContentRouter.ContentType contentType, address contentProvider) external {
+        bytes32 domainNameHash = keccak256(abi.encodePacked(domainName));
+        uint tokenId = domainNamesToTokenId[domainNameHash];
+        require(msg.sender == ownerOf(tokenId) || hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "BNSNFT: Only admin or token owner can set content");
+        require(_exists(tokenId), "BNSNFT: Content query for nonexistent token");
+        contentRouter.setContentOrAddress(domainName, "", content, contentType, contentProvider);
+    }
+
+    function setRelativeContentOrAddressByDomainName(string memory domainName, string memory relativePath, string memory content, IContentRouter.ContentType contentType, address contentProvider) external {
+        bytes32 domainNameHash = keccak256(abi.encodePacked(domainName));
+        uint tokenId = domainNamesToTokenId[domainNameHash];
+        require(msg.sender == ownerOf(tokenId) || hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "BNSNFT: Only admin or token owner can set content");
+        require(_exists(tokenId), "BNSNFT: Content query for nonexistent token");
+        contentRouter.setContentOrAddress(domainName, relativePath, content, contentType, contentProvider);
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {

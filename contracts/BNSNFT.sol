@@ -41,14 +41,24 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         return domainNamesToTokenId[domainNameHash];
     }
 
-    function getContent(uint256 tokenId, string memory relativePath) external view returns (IContentRouter.ContentType contentType, string memory)  {
+    function getRelativeContentByTokenId(uint256 tokenId, string memory relativePath) external view returns (IContentRouter.ContentType contentType, string memory)  {
         require(_exists(tokenId), "BNSNFT: Content query for nonexistent token");
         string memory domainName = tokenIdToDomainNames[tokenId];
         return contentRouter.getContentOrAddress(domainName, relativePath);
     }
 
-    function getContent(string memory domainName, string memory relativePath) external view returns (IContentRouter.ContentType contentType, string memory)  {
+    function getContentByTokenId(uint256 tokenId) external view returns (IContentRouter.ContentType contentType, string memory)  {
+        require(_exists(tokenId), "BNSNFT: Content query for nonexistent token");
+        string memory domainName = tokenIdToDomainNames[tokenId];
+        return contentRouter.getContentOrAddress(domainName, "");
+    }
+
+    function getRelativeContentByDomainName(string memory domainName, string memory relativePath) external view returns (IContentRouter.ContentType contentType, string memory)  {
         return contentRouter.getContentOrAddress(domainName, relativePath);
+    }
+
+    function getContentByDomainName(string memory domainName) external view returns (IContentRouter.ContentType contentType, string memory)  {
+        return contentRouter.getContentOrAddress(domainName, "");
     }
 
     function setContentOrAddress(uint tokenId, string memory relativePath, string memory content, IContentRouter.ContentType contentType, address contentProvider) external {

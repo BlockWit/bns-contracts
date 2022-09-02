@@ -2,8 +2,8 @@ const BNSDomainNameMarket = artifacts.require('BNSDomainNameMarket');
 const BNSMarketPricePolicy = artifacts.require('BNSMarketPricePolicy');
 const BNSNamesPolicy = artifacts.require('BNSNamesPolicy');
 const BNSNFT = artifacts.require('BNSNFT');
-const BNSRepository = artifacts.require('BNSRepository');
-const BNSSimpleStorage = artifacts.require('BNSSimpleStorage');
+const BNSContentRouter = artifacts.require('BNSContentRouter');
+const BNSSimpleContentProvider = artifacts.require('BNSSimpleContentProvider');
 const { logger } = require('../util');
 
 async function deploy () {
@@ -22,22 +22,22 @@ async function deploy () {
   const nft = await BNSNFT.new({ from: deployer });
   log(`NFT deployed: @address{${nft.address}}`);
 
-  const storage = await BNSSimpleStorage.new({ from: deployer });
-  log(`BNSSimpleStorage deployed: @address{${storage.address}}`);
+  const router = await BNSContentRouter.new({ from: deployer });
+  log(`BNSContentRouter deployed: @address{${router.address}}`);
 
-  const repository = await BNSRepository.new({ from: deployer });
-  log(`BNSRepository deployed: @address{${repository.address}}`);
+  const provider = await BNSSimpleContentProvider.new({ from: deployer });
+  log(`BNSSimpleContentProvider deployed: @address{${provider.address}}`);
 
   const contracts = [
     { contract: market, name: 'BNSDomainNameMarket' },
     { contract: pricing, name: 'BNSMarketPricePolicy' },
     { contract: names, name: 'BNSNamesPolicy' },
     { contract: nft, name: 'BNSNFT' },
-    { contract: storage, name: 'BNSSimpleStorage' },
-    { contract: repository, name: 'BNSRepository' },
+    { contract: router, name: 'BNSContentRouter' },
+    { contract: provider, name: 'BNSSimpleContentProvider' },
   ]
 
-  log(Object.entries({ market, pricing, names, nft, storage, repository }).reduce((result, [key, contract]) => {
+  log(Object.entries({ market, pricing, names, nft, router, provider }).reduce((result, [key, contract]) => {
     return `${result} --${key} ${contract.address}`
   }, 'Configuration params:'));
 

@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.14;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./lib/StringUtils.sol";
 import "./RecoverableFunds.sol";
 
-contract BNSNamesPolicy is AccessControl, RecoverableFunds {
+contract BNSNamesPolicy is Ownable, RecoverableFunds {
 
     using StringUtils for string;
 
@@ -14,15 +14,11 @@ contract BNSNamesPolicy is AccessControl, RecoverableFunds {
 
     uint256 public maxNameSizeLimit = 100;
 
-    constructor() {
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-    }
-
-    function setForbiddenSymbols(string calldata symbols) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setForbiddenSymbols(string calldata symbols) external onlyOwner {
         forbiddenSymbols = symbols;
     }
 
-    function setMaxNameSizeLimit(uint256 limit) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setMaxNameSizeLimit(uint256 limit) external onlyOwner {
         maxNameSizeLimit = limit;
     }
 
@@ -47,11 +43,11 @@ contract BNSNamesPolicy is AccessControl, RecoverableFunds {
         if (domainName.containsAnyOf(forbiddenSymbols)) revert("Domain name contains forbidden symbol");
     }
 
-    function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function retrieveTokens(address recipient, address tokenAddress) external onlyOwner {
         _retrieveTokens(recipient, tokenAddress);
     }
 
-    function retrieveETH(address payable recipient) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function retrieveETH(address payable recipient) external onlyOwner {
         _retrieveETH(recipient);
     }
 

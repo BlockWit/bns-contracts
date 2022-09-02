@@ -15,6 +15,7 @@ contract BNSContentRouter is IContentRouter, RecoverableFunds, AccessControl {
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(CONTENT_MANAGER, msg.sender);
     }
 
     function setDefaultContentProvider(address newDefaultContentProvider) external onlyRole(DEFAULT_ADMIN_ROLE) {

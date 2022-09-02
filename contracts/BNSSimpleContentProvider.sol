@@ -14,6 +14,7 @@ contract BNSSimpleContentProvider is IContentProvider, RecoverableFunds, AccessC
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(CONTENT_MANAGER, msg.sender);
     }
 
     function setContent(string memory name, string memory relativePath, string memory content) override public onlyRole(CONTENT_MANAGER) {

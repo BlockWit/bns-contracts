@@ -35,6 +35,10 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         return domainNameExists[keccak256(abi.encodePacked(domainName))];
     }
 
+    function setContentRouter(address newContentRouter) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        contentRouter = IContentRouter(newContentRouter);
+    }
+
     function getTokenIdByDomainName(string calldata domainName) external view returns (uint256)  {
         bytes32 domainNameHash = keccak256(abi.encodePacked(domainName));
         require(domainNameExists[domainNameHash], "BNSNFT: Domain name not exists");

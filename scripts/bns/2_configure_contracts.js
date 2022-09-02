@@ -1,6 +1,8 @@
 const BNSDomainNamesMarket = artifacts.require('BNSDomainNameMarket');
 const BNSMarketPricePolicy = artifacts.require('BNSMarketPricePolicy');
 const BNSNFT = artifacts.require('BNSNFT');
+const BNSContentRouter = artifacts.require('BNSContentRouter');
+const BNSSimpleContentProvider = artifacts.require('BNSSimpleContentProvider');
 const { logger } = require('../util');
 const { ether, time, BN} = require('@openzeppelin/test-helpers');
 
@@ -14,7 +16,9 @@ async function deploy () {
   const MARKET_ADDRESS = args[args.findIndex(argName => argName === '--market') + 1];
   const NFT_ADDRESS = args[args.findIndex(argName => argName === '--nft') + 1];
   const PRICING_CONTROLLER_ADDRESS = args[args.findIndex(argName => argName === '--pricing') + 1];
-  const TOKEN_ADDRESS = args[args.findIndex(argName => argName === '--dividends') + 1];
+  const ROUTER_ADDRESS = args[args.findIndex(argName => argName === '--router') + 1];
+  const PROVIDER_ADDRESS = args[args.findIndex(argName => argName === '--provider') + 1];
+  const DIVIDENDS_ADDRESS = args[args.findIndex(argName => argName === '--dividends') + 1];
   const BUSD_ADDRESS = args[args.findIndex(argName => argName === '--busd') + 1];
   const USDT_ADDRESS = args[args.findIndex(argName => argName === '--usdt') + 1];
   const { log } = logger(await web3.eth.net.getNetworkType());
@@ -23,10 +27,32 @@ async function deploy () {
   const nft = await BNSNFT.at(NFT_ADDRESS);
   const market = await BNSDomainNamesMarket.at(MARKET_ADDRESS);
   const pricingController = await BNSMarketPricePolicy.at(PRICING_CONTROLLER_ADDRESS);
+  const contentRouter = await BNSContentRouter.at(ROUTER_ADDRESS);
+  const contentProvider = await BNSSimpleContentProvider.at(PROVIDER_ADDRESS);
 
   {
     log(`NFT. Grant minter role to Market.`);
     const tx = await nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, { from: deployer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`NFT. Set content router.`);
+    const tx = await nft.setContentRouter(ROUTER_ADDRESS, {from: deployer});
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`ContentRouter. Grant content manager role to NFT.`);
+    const tx = await contentRouter.grantRole(web3.utils.keccak256('CONTENT_MANAGER'), nft.address, { from: deployer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`ContentRouter. Set content provider.`);
+    const tx = await contentRouter.setDefaultContentProvider(PROVIDER_ADDRESS, {from: deployer});
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`ContentProvider. Grant content manager role to ContentRouter.`);
+    const tx = await contentProvider.grantRole(web3.utils.keccak256('CONTENT_MANAGER'), contentRouter.address, { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {
@@ -56,7 +82,7 @@ async function deploy () {
   }
   {
     log(`Market. Set fundraising wallet.`);
-    const tx = await market.setDividendManager(TOKEN_ADDRESS, { from: deployer });
+    const tx = await market.setDividendManager(DIVIDENDS_ADDRESS, { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {

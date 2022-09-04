@@ -77,17 +77,17 @@ async function deploy () {
   }
   {
     log(`NFT. Mint dev shares.`);
-    const tx = await nft.safeMint(DEV_ADDRESS, ether('300000'), { from: deployer });
+    const tx = await nft.safeMint(DEV_ADDRESS, ether('0.000000000000300000'), { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {
     log(`NFT. Mint team shares.`);
-    const tx = await nft.safeMint(TEAM_ADDRESS, ether('300000'), { from: deployer });
+    const tx = await nft.safeMint(TEAM_ADDRESS, ether('0.000000000000300000'), { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {
     log(`NFT. Mint fund shares.`);
-    const tx = await nft.safeMint(FUND_ADDRESS, ether('200000'), { from: deployer });
+    const tx = await nft.safeMint(FUND_ADDRESS, ether('0.000000000000200000'), { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
 }

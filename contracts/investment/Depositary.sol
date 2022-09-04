@@ -7,7 +7,7 @@ import "../interfaces/IDepositary.sol";
 
 abstract contract Depositary is IDepositary {
 
-    uint256 constant internal MAX_SUPPLY = 1_000_000 ether;
+    uint256 constant internal MAX_SUPPLY = 1_000_000;
 
     mapping(uint256 => uint256) internal _shares;
     uint256 internal _issuedShares;

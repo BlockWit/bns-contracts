@@ -1,14 +1,14 @@
 #!/bin/bash
-echo "Verifying BNSDomainNameMarket@0x03192Ef9b5AffE5195140b0D5437d56651a5fB7f
-Pass - Verified: https://testnet.bscscan.com/address/0x03192Ef9b5AffE5195140b0D5437d56651a5fB7f#code
-Verifying BNSMarketPricePolicy@0x1db2D79FC9D17B335a0C6ed12c80AA93cc72985b
-Already Verified: https://testnet.bscscan.com/address/0x1db2D79FC9D17B335a0C6ed12c80AA93cc72985b#code
-Verifying BNSNamesPolicy@0x74EC5618F7F3bC8D579c763bBEf7e233116318CF
-Pass - Verified: https://testnet.bscscan.com/address/0x74EC5618F7F3bC8D579c763bBEf7e233116318CF#code
-Verifying BNSNFT@0x350A9b130782Dd61f491D8ce05060049676aB7dE
-Pass - Verified: https://testnet.bscscan.com/address/0x350A9b130782Dd61f491D8ce05060049676aB7dE#code
-Verifying BNSContentRouter@0x570E0c28E27233ea63a3d3a7528a42eAd3674868
-Pass - Verified: https://testnet.bscscan.com/address/0x570E0c28E27233ea63a3d3a7528a42eAd3674868#code
-Verifying BNSSimpleContentProvider@0x2a507628EE432148F8e583142E7B65Eb8018Bc86
-Pass - Verified: https://testnet.bscscan.com/address/0x2a507628EE432148F8e583142E7B65Eb8018Bc86#code
+echo "Verifying BNSDomainNameMarket@0xD41474FD77e299B1617196B006aeD5B2a18dB601
+Already Verified: https://testnet.bscscan.com/address/0xD41474FD77e299B1617196B006aeD5B2a18dB601#code
+Verifying BNSMarketPricePolicy@0x6fbFc3ffc2430fa889922A90DBD4bd5d1cb7E857
+Already Verified: https://testnet.bscscan.com/address/0x6fbFc3ffc2430fa889922A90DBD4bd5d1cb7E857#code
+Verifying BNSNamesPolicy@0xAE14d09166ffd7B5e43eE9a5afa5C38700c88375
+Already Verified: https://testnet.bscscan.com/address/0xAE14d09166ffd7B5e43eE9a5afa5C38700c88375#code
+Verifying BNSNFT@0x8f76317FD6607f1E59bd1eE4FeceB4Fd0FA7C290
+Already Verified: https://testnet.bscscan.com/address/0x8f76317FD6607f1E59bd1eE4FeceB4Fd0FA7C290#code
+Verifying BNSContentRouter@0x52e2d2ab27DBb1B350b4A49EE20f0e0952C46ed7
+Already Verified: https://testnet.bscscan.com/address/0x52e2d2ab27DBb1B350b4A49EE20f0e0952C46ed7#code
+Verifying BNSSimpleContentProvider@0xE45c88FB74c3CbaC6499a832424B427fA0Aa75cA
+Already Verified: https://testnet.bscscan.com/address/0xE45c88FB74c3CbaC6499a832424B427fA0Aa75cA#code
 Successfully verified 6 contract(s).";

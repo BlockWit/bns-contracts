@@ -52,8 +52,9 @@ contract DividendManager is IDividendManager, AssetHandler, AccessControl {
     }
 
     function withdrawableDividendOf(AccountId account) override public view returns(Dividend[] memory) {
-        Dividend[] memory dividends;
-        for (uint256 i = 0; i < assetsLength(); i++) {
+        uint256 length = assetsLength();
+        Dividend[] memory dividends = new Dividend[](length);
+        for (uint256 i = 0; i < length; i++) {
             (Assets.Key assetKey, Assets.Asset memory asset) = getAssetAt(i);
             dividends[i] = Dividend(assetKey, asset.assetTicker, withdrawableDividendOf(account, assetKey));
         }
@@ -61,8 +62,9 @@ contract DividendManager is IDividendManager, AssetHandler, AccessControl {
     }
 
     function withdrawnDividendOf(AccountId account) override public view returns(Dividend[] memory) {
-        Dividend[] memory dividends;
-        for (uint256 i = 0; i < assetsLength(); i++) {
+        uint256 length = assetsLength();
+        Dividend[] memory dividends = new Dividend[](length);
+        for (uint256 i = 0; i < length; i++) {
             (Assets.Key assetKey, Assets.Asset memory asset) = getAssetAt(i);
             dividends[i] = Dividend(assetKey, asset.assetTicker, withdrawnDividendOf(account, assetKey));
         }
@@ -70,8 +72,9 @@ contract DividendManager is IDividendManager, AssetHandler, AccessControl {
     }
 
     function accumulativeDividendOf(AccountId account) override public view returns(Dividend[] memory) {
-        Dividend[] memory dividends;
-        for (uint256 i = 0; i < assetsLength(); i++) {
+        uint256 length = assetsLength();
+        Dividend[] memory dividends = new Dividend[](length);
+        for (uint256 i = 0; i < length; i++) {
             (Assets.Key assetKey, Assets.Asset memory asset) = getAssetAt(i);
             dividends[i] = Dividend(assetKey, asset.assetTicker, accumulativeDividendOf(account, assetKey));
         }

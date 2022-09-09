@@ -7,7 +7,7 @@ const BNSDomainNameMarket = contract.fromArtifact('BNSDomainNameMarket');
 const BNSMarketPricePolicy = contract.fromArtifact('BNSMarketPricePolicy');
 const BNSNamesPolicy = contract.fromArtifact('BNSNamesPolicy');
 const BNSNFT = contract.fromArtifact('BNSNFT');
-const BNSToken = contract.fromArtifact('BNSToken');
+const DividendManager = contract.fromArtifact('DividendManager');
 const ERC20Mock = contract.fromArtifact('ERC20Mock');
 
 const SIZES = [1,2,3,4,5,6,7,8,9,10,11];
@@ -21,15 +21,15 @@ describe('Gas', function () {
     let names;
     let bnsnft;
     let pricing;
-    let token;
+    let dividend;
     let tokens = {usdt: {id: 1, contract: undefined, key: 12345}, busd: {id: 2, contract: undefined, key: 23456}};
 
     beforeEach(async function () {
-        [market, names, bnsnft, token, pricing, tokens.busd.contract, tokens.usdt.contract] = await Promise.all([
+        [market, names, bnsnft, dividend, pricing, tokens.busd.contract, tokens.usdt.contract] = await Promise.all([
             BNSDomainNameMarket.new({from: deployer}),
             BNSNamesPolicy.new({from: deployer}),
             BNSNFT.new({from: deployer}),
-            BNSToken.new({from: deployer}),
+            DividendManager.new({from: deployer}),
             BNSMarketPricePolicy.new({from: deployer}),
             ERC20Mock.new('BUSD Mock Token', 'BUSD', deployer, ether('100000000'), {from: deployer}),
             ERC20Mock.new('USDT Mock Token', 'USDT', deployer, ether('100000000'), {from: deployer}),
@@ -46,14 +46,14 @@ describe('Gas', function () {
         beforeEach(async function () {
             await Promise.all([
                 bnsnft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, { from: deployer }),
-                market.setIDividendManager(token.address, { from: deployer }),
+                market.setDividendManager(dividend.address, { from: deployer }),
                 market.setBNSNFT(bnsnft.address, { from: deployer }),
                 market.setPricePolicy(pricing.address, { from: deployer }),
                 market.setNamesPolicy(names.address, { from: deployer}),
                 market.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
                 market.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
-                token.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
-                token.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
+                dividend.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer}),
+                dividend.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : deployer}),
                 pricing.setPrices(ether(BASE_PRICE_USDT.toString()), SIZES, PRICES_USDT.map(price => ether(price.toString())), { from: deployer }),
                 tokens.usdt.contract.approve(market.address, ether('250000'), { from: user }),
                 tokens.usdt.contract.approve(market.address, ether('250000'), { from: account1 })

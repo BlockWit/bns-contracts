@@ -20,6 +20,7 @@ const BASE_PRICE_USDT = 100;
 const [ deployer, user ] = accounts;
 
 describe('BNSDomainNameMarket', function () {
+  this.timeout(0);
   let market;
   let names;
   let nft;

@@ -55,10 +55,6 @@ contract BNSMarketPricePolicy is Ownable, DiscountCalculator, RecoverableFunds {
         defaultPrice = price;
     }
 
-    function setDefaultPriceForSymbolsWithinRange(uint price) public onlyOwner {
-        defaultPriceForSymbolsWithinRange = price;
-    }
-
     function setDiscount(Discount[] calldata discounts) external onlyOwner {
         _setDiscount(discounts);
     }
@@ -71,8 +67,11 @@ contract BNSMarketPricePolicy is Ownable, DiscountCalculator, RecoverableFunds {
         pricePerNameLengthForSymbolsWithinRange[size] = price;
     }
 
-    function addUTF8Range(bytes4 first, bytes4 last) external onlyOwner {
-        utf8ranges.push(UTF8Range(first, last));
+    function addUTF8Ranges(UTF8Range[] calldata ranges) external onlyOwner {
+        for (uint256 i; i < ranges.length; i++) {
+            utf8ranges.push(ranges[i]);
+        }
+
     }
 
     function removeUTF8Range(uint256 index) external onlyOwner {
@@ -89,7 +88,7 @@ contract BNSMarketPricePolicy is Ownable, DiscountCalculator, RecoverableFunds {
     /**
     * Domain names must be sanitized prior to calling this method
     **/
-    function unsafeSetPremiumDomainPrices(string[] memory domainNames, uint[] memory prices) public onlyOwner {
+    function unsafeSetPremiumDomainPrices(string[] calldata domainNames, uint[] calldata prices) public onlyOwner {
         require(domainNames.length == prices.length, "Count of domain names and prices must be equals!");
         for(uint i = 0; i < domainNames.length; i++) {
            premiumDomainPrices[keccak256(abi.encodePacked(domainNames[i]))] = prices[i];
@@ -99,7 +98,7 @@ contract BNSMarketPricePolicy is Ownable, DiscountCalculator, RecoverableFunds {
     /**
     * Domain name must be sanitized prior to calling this method
     **/
-    function unsafeSetPremiumDomainPrice(string memory domainName, uint price) public onlyOwner {
+    function unsafeSetPremiumDomainPrice(string calldata domainName, uint price) public onlyOwner {
        premiumDomainPrices[keccak256(abi.encodePacked(domainName))] = price;
     }
 
@@ -108,6 +107,14 @@ contract BNSMarketPricePolicy is Ownable, DiscountCalculator, RecoverableFunds {
         defaultPrice = newDefaultPrice;
         for(uint i = 0; i<sizes.length; i++) {
             pricePerNameLength[sizes[i]] = prices[i];
+        }
+    }
+
+    function setPricesForSymbolsWithinRange(uint newDefaultPrice, uint[] calldata sizes, uint[] calldata prices) public onlyOwner {
+        require(sizes.length == prices.length, "Size and price arrays must have the same length");
+        defaultPriceForSymbolsWithinRange = newDefaultPrice;
+        for(uint i = 0; i < sizes.length; i++) {
+            pricePerNameLengthForSymbolsWithinRange[sizes[i]] = prices[i];
         }
     }
 

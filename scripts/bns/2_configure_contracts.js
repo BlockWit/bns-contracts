@@ -8,7 +8,24 @@ const { ether, time, BN} = require('@openzeppelin/test-helpers');
 
 const SIZES = [1,2,3,4,5,6,7,8];
 const PRICES_USDT = [300000,250000,200000,100000,50000,10000,1000,100];
-
+const SPECIAL_PRICES_USDT = [300001,250001,200001,100001,50001,10001,1001,101];
+const UTF8_RANGES = [
+  ['4E00', '62FF'], ['6300', '77FF'], ['7800', '8CFF'], ['8D00', '9FFF'], // (CJK Unified Ideographs https://en.wikipedia.org/wiki/CJK_Unified_Ideographs)
+  ['3400', '4DBF'], //  (CJK Unified Ideographs Extension A)
+  ['20000', '215FF'], ['21600', '230FF'], ['23100', '245FF'], ['24600', '260FF'], ['26100', '275FF'], ['27600', '290FF'], ['29100', '2A6DF'], //  (CJK Unified Ideographs Extension B)
+  ['2A700', '2B73F'], //  (CJK Unified Ideographs Extension C)
+  ['2B740', '2B81F'], //  (CJK Unified Ideographs Extension D)
+  ['2B820', '2CEAF'], //  (CJK Unified Ideographs Extension E)
+  ['2CEB0', '2EBEF'], //  (CJK Unified Ideographs Extension F)
+  ['30000', '3134F'], //  (CJK Unified Ideographs Extension G)
+  ['F900', 'FAFF'], //  (CJK Compatibility Ideographs)
+  ['0600', '06FF'], //  (Arabic https://en.wikipedia.org/wiki/Arabic_script_in_Unicode)
+  ['0750', '077F'], //  (Arabic Supplement)
+  ['08A0', '08FF'], //  (Arabic Extended-A)
+  ['0870', '089F'], //  (Arabic Extended-B)
+  ['FB50', 'FDFF'], //  (Arabic Presentation Forms-A)
+  ['FE70', 'FEFF'], //  (Arabic Presentation Forms-B)
+]
 
 async function deploy () {
   const args = process.argv.slice(2);
@@ -90,6 +107,36 @@ async function deploy () {
     const tx = await pricingController.setPrices(ether('30'), SIZES, PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
+  {
+    log(`PricingController. Set prices for symbols within special range.`);
+    const tx = await pricingController.setPriceForSymbolsWithinRange(ether('31'), SIZES, SPECIAL_PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`PricingController. Set UTF8 ranges.`);
+    const tx = await pricingController.setUTF8Ranges(optimizeRanges(UTF8_RANGES), {from: deployer});
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+}
+
+function optimizeRanges(ranges) {
+  ranges = ranges.map(range => range.map(num => parseInt(num, 16)));
+  ranges.sort((a, b) => a[0] - b[0]);
+  let result = [];
+  for (const range of ranges) {
+    const [first, last] = range;
+    let doesExtend = false;
+    for (let i = 0; i < result.length; i++) {
+      if (first === result[i][1] + 1) {
+        result[i][1] = last;
+        doesExtend = true;
+        break;
+      }
+    }
+    if (!doesExtend) result.push([first, last]);
+  }
+  result = result.map(range => range.map(num => num.toString(16).padStart(8, '0')));
+  return result;
 }
 
 module.exports = async function main (callback) {

@@ -1,4 +1,4 @@
-const BNSDomainNamesMarket = artifacts.require('BNSDomainNameMarket');
+const BNSDomainNameMarket = artifacts.require('BNSDomainNameMarket');
 const BNSMarketPricePolicy = artifacts.require('BNSMarketPricePolicy');
 const BNSNFT = artifacts.require('BNSNFT');
 const BNSContentRouter = artifacts.require('BNSContentRouter');
@@ -28,21 +28,32 @@ const UTF8_RANGES = [
 ]
 
 async function deploy () {
-  const args = process.argv.slice(2);
-  const DOMAIN_NAMES_CONTROLLER_ADDRESS = args[args.findIndex(argName => argName === '--names') + 1];
-  const MARKET_ADDRESS = args[args.findIndex(argName => argName === '--market') + 1];
-  const NFT_ADDRESS = args[args.findIndex(argName => argName === '--nft') + 1];
-  const PRICING_CONTROLLER_ADDRESS = args[args.findIndex(argName => argName === '--pricing') + 1];
-  const ROUTER_ADDRESS = args[args.findIndex(argName => argName === '--router') + 1];
-  const PROVIDER_ADDRESS = args[args.findIndex(argName => argName === '--provider') + 1];
-  const DIVIDENDS_ADDRESS = args[args.findIndex(argName => argName === '--dividends') + 1];
-  const BUSD_ADDRESS = args[args.findIndex(argName => argName === '--busd') + 1];
-  const USDT_ADDRESS = args[args.findIndex(argName => argName === '--usdt') + 1];
-  const { log } = logger(await web3.eth.net.getNetworkType());
+  const { addresses, log } = logger(await web3.eth.net.getNetworkType());
+  const {
+    BNSNFT: NFT_ADDRESS,
+    BNSDomainNameMarket: MARKET_ADDRESS,
+    BNSMarketPricePolicy: PRICING_CONTROLLER_ADDRESS,
+    BNSNamesPolicy: DOMAIN_NAMES_CONTROLLER_ADDRESS,
+    BNSContentRouter: ROUTER_ADDRESS,
+    BNSSimpleContentProvider: PROVIDER_ADDRESS,
+    DividendManager: DIVIDENDS_ADDRESS,
+    BUSD: BUSD_ADDRESS,
+    USDT: USDT_ADDRESS,
+  } = addresses.claim([
+    'BNSNFT',
+    'BNSDomainNameMarket',
+    'BNSMarketPricePolicy',
+    'BNSNamesPolicy',
+    'BNSContentRouter',
+    'BNSSimpleContentProvider',
+    'DividendManager',
+    'BUSD',
+    'USDT'
+  ])
   const [deployer] = await web3.eth.getAccounts();
 
   const nft = await BNSNFT.at(NFT_ADDRESS);
-  const market = await BNSDomainNamesMarket.at(MARKET_ADDRESS);
+  const market = await BNSDomainNameMarket.at(MARKET_ADDRESS);
   const pricingController = await BNSMarketPricePolicy.at(PRICING_CONTROLLER_ADDRESS);
   const contentRouter = await BNSContentRouter.at(ROUTER_ADDRESS);
   const contentProvider = await BNSSimpleContentProvider.at(PROVIDER_ADDRESS);
@@ -109,12 +120,12 @@ async function deploy () {
   }
   {
     log(`PricingController. Set prices for symbols within special range.`);
-    const tx = await pricingController.setPriceForSymbolsWithinRange(ether('31'), SIZES, SPECIAL_PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
+    const tx = await pricingController.setPricesForSymbolsWithinRange(ether('31'), SIZES, SPECIAL_PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {
     log(`PricingController. Set UTF8 ranges.`);
-    const tx = await pricingController.setUTF8Ranges(optimizeRanges(UTF8_RANGES), {from: deployer});
+    const tx = await pricingController.addUTF8Ranges(optimizeRanges(UTF8_RANGES).map(range => range.map(border => `0x${border}`)), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
 }

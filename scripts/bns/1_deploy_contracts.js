@@ -7,26 +7,32 @@ const BNSSimpleContentProvider = artifacts.require('BNSSimpleContentProvider');
 const { logger } = require('../util');
 
 async function deploy () {
-  const { log } = logger(await web3.eth.net.getNetworkType());
+  const { log, logAddress } = logger(await web3.eth.net.getNetworkType());
   const [deployer] = await web3.eth.getAccounts();
 
   const market = await BNSDomainNameMarket.new({ from: deployer });
-  log(`Market deployed: @address{${market.address}}`);
+  log(`BNSDomainNameMarket deployed: @address{${market.address}}`);
+  logAddress('BNSDomainNameMarket', market.address);
 
   const pricing = await BNSMarketPricePolicy.new({ from: deployer });
-  log(`PricingController deployed: @address{${pricing.address}}`);
+  log(`BNSMarketPricePolicy deployed: @address{${pricing.address}}`);
+  logAddress('BNSMarketPricePolicy', pricing.address);
 
   const names = await BNSNamesPolicy.new({ from: deployer });
-  log(`DomainNamesController deployed: @address{${names.address}}`);
+  log(`BNSNamesPolicy deployed: @address{${names.address}}`);
+  logAddress('BNSNamesPolicy', names.address);
 
   const nft = await BNSNFT.new({ from: deployer });
-  log(`NFT deployed: @address{${nft.address}}`);
+  log(`BNSNFT deployed: @address{${nft.address}}`);
+  logAddress('BNSNFT', nft.address);
 
   const router = await BNSContentRouter.new({ from: deployer });
   log(`BNSContentRouter deployed: @address{${router.address}}`);
+  logAddress('BNSContentRouter', router.address);
 
   const provider = await BNSSimpleContentProvider.new({ from: deployer });
   log(`BNSSimpleContentProvider deployed: @address{${provider.address}}`);
+  logAddress('BNSSimpleContentProvider', provider.address);
 
   const contracts = [
     { contract: market, name: 'BNSDomainNameMarket' },

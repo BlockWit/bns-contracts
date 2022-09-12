@@ -71,7 +71,6 @@ contract BNSMarketPricePolicy is Ownable, DiscountCalculator, RecoverableFunds {
         for (uint256 i; i < ranges.length; i++) {
             utf8ranges.push(ranges[i]);
         }
-
     }
 
     function removeUTF8Range(uint256 index) external onlyOwner {

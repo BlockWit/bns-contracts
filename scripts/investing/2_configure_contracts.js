@@ -7,18 +7,29 @@ const { ether, time, BN} = require('@openzeppelin/test-helpers');
 
 
 async function deploy () {
-  const args = process.argv.slice(2);
-  const MARKET_ADDRESS = args[args.findIndex(argName => argName === '--market') + 1];
-  const NFT_ADDRESS = args[args.findIndex(argName => argName === '--nft') + 1];
-  const PRICING_POLICY_ADDRESS = args[args.findIndex(argName => argName === '--pricing') + 1];
-  const DIVIDEND_MANAGER_ADDRESS = args[args.findIndex(argName => argName === '--dividends') + 1];
-  const BUSD_ADDRESS = args[args.findIndex(argName => argName === '--busd') + 1];
-  const USDT_ADDRESS = args[args.findIndex(argName => argName === '--usdt') + 1];
-  const DEV_ADDRESS = args[args.findIndex(argName => argName === '--devs') + 1];
-  const TEAM_ADDRESS = args[args.findIndex(argName => argName === '--team') + 1];
-  const FUND_ADDRESS = args[args.findIndex(argName => argName === '--fund') + 1];
-  const { log } = logger(await web3.eth.net.getNetworkType());
-  const [deployer] = await web3.eth.getAccounts();
+  const { addresses, log } = logger(await web3.eth.net.getNetworkType());
+  const {
+    InvestNFTMarket: MARKET_ADDRESS,
+    InvestNFT: NFT_ADDRESS,
+    InvestNFTMarketPricePolicy: PRICING_POLICY_ADDRESS,
+    DividendManager: DIVIDEND_MANAGER_ADDRESS,
+    BUSD: BUSD_ADDRESS,
+    USDT: USDT_ADDRESS,
+    devs: DEV_ADDRESS,
+    team: TEAM_ADDRESS,
+    fund: FUND_ADDRESS
+  } = addresses.claim([
+    'InvestNFTMarket',
+    'InvestNFT',
+    'InvestNFTMarketPricePolicy',
+    'DividendManager',
+    'BUSD',
+    'USDT',
+    'devs',
+    'team',
+    'fund'
+  ]);
+  const [ deployer ] = await web3.eth.getAccounts();
 
   const nft = await InvestNFT.at(NFT_ADDRESS);
   const market = await InvestNFTMarket.at(MARKET_ADDRESS);

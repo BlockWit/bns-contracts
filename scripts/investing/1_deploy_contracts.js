@@ -5,20 +5,24 @@ const DividendManager = artifacts.require('DividendManager');
 const { logger } = require('../util');
 
 async function deploy () {
-  const { log } = logger(await web3.eth.net.getNetworkType());
+  const { log, logAddress } = logger(await web3.eth.net.getNetworkType());
   const [deployer] = await web3.eth.getAccounts();
 
   const market = await InvestNFTMarket.new({ from: deployer });
-  log(`Market deployed: @address{${market.address}}`);
+  log(`InvestNFTMarket deployed: @address{${market.address}}`);
+  logAddress('InvestNFTMarket', market.address);
 
   const pricing = await InvestNFTMarketPricePolicy.new({ from: deployer });
-  log(`PricePolicy deployed: @address{${pricing.address}}`);
+  log(`InvestNFTMarketPricePolicy deployed: @address{${pricing.address}}`);
+  logAddress('InvestNFTMarketPricePolicy', pricing.address);
 
   const nft = await InvestNFT.new({ from: deployer });
   log(`InvestNFT deployed: @address{${nft.address}}`);
+  logAddress('InvestNFT', nft.address)
 
   const dividends = await DividendManager.new({ from: deployer });
   log(`DividendManager deployed: @address{${dividends.address}}`);
+  logAddress('DividendManager', dividends.address);
 
   const contracts = [
     { contract: market, name: 'InvestNFTMarket' },

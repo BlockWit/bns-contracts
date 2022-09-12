@@ -18,6 +18,10 @@ function logger (network) {
     fs.appendFileSync(`report.${network}.log`, `${result}\n`);
   };
 
+  const logAddress = (name, address) => {
+    fs.appendFileSync(`addresses.${network}.log`, `${name} ${address}\n`);
+  }
+
   const logRevert = async (tryBlock, catchBlock) => {
     try {
       await tryBlock();
@@ -40,7 +44,32 @@ function logger (network) {
     }
   };
 
-  return { log, logRevert };
+  const addresses = {
+    claim: (names) => {
+      const file = fs.readFileSync(`addresses.${network}.log`, 'utf-8');
+      const lines = file.split(/\r\n|\n/).filter(s => s);
+      const addresses = lines.reduce((result, line) => {
+        const [name, address] = line.split(' ');
+        result[name] = address;
+        return result;
+      }, {});
+      const result = {};
+      const missing = [];
+      for (const name of names) {
+        if (typeof addresses[name] === 'undefined') missing.push(name);
+        else result[name] = addresses[name];
+      }
+      if (missing.length) throw new Error(`Invalid address list. Missing: ${missing.join(', ')}`)
+      return new Proxy(result, {
+        get: function(result, prop) {
+          if ( prop in result ) return result[prop];
+          else throw new Error(`Address "${prop}" not found`);
+        }
+      });
+    },
+  }
+
+  return { addresses, log, logAddress, logRevert };
 }
 
 async function timeout (ms) {

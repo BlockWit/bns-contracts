@@ -28,7 +28,7 @@ const UTF8_RANGES = [
 ]
 
 async function deploy () {
-  const { addresses, log } = logger(await web3.eth.net.getNetworkType());
+  const { addresses, log } = logger(config.network);
   const {
     BNSNFT: NFT_ADDRESS,
     BNSDomainNameMarket: MARKET_ADDRESS,

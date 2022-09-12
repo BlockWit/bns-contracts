@@ -7,7 +7,7 @@ const BNSSimpleContentProvider = artifacts.require('BNSSimpleContentProvider');
 const { logger } = require('../util');
 
 async function deploy () {
-  const { log, logAddress } = logger(await web3.eth.net.getNetworkType());
+  const { log, logAddress } = logger(config.network);
   const [deployer] = await web3.eth.getAccounts();
 
   const market = await BNSDomainNameMarket.new({ from: deployer });

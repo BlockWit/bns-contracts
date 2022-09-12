@@ -3,7 +3,7 @@ const path = require('path');
 
 function logger (network) {
   let prefix;
-
+  console.log('network is ', network)
   switch (network) {
   case 'kovan': prefix = 'https://kovan.etherscan.io'; break;
   case 'ropsten': prefix = 'https://ropsten.etherscan.io'; break;
@@ -48,7 +48,7 @@ function logger (network) {
 
   const addresses = {
     claim: (names) => {
-      const file = fs.readFileSync(`addresses.${network}.log`, 'utf-8');
+      const file = fs.readFileSync(path.join('logs', `addresses.${network}.log`), 'utf-8');
       const lines = file.split(/\r\n|\n/).filter(s => s);
       const addresses = lines.reduce((result, line) => {
         const [name, address] = line.split(' ');

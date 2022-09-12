@@ -7,7 +7,7 @@ const { ether, time, BN} = require('@openzeppelin/test-helpers');
 
 
 async function deploy () {
-  const { addresses, log } = logger(await web3.eth.net.getNetworkType());
+  const { addresses, log } = logger(config.network);
   const {
     InvestNFTMarket: MARKET_ADDRESS,
     InvestNFT: NFT_ADDRESS,

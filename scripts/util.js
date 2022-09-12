@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 function logger (network) {
   let prefix;
@@ -15,11 +16,12 @@ function logger (network) {
       .replace(/@token{(.+?)}/g, `${prefix}/address/$1`)
       .replace(/@tx{(.+?)}/g, `${prefix}/tx/$1`);
     console.log(result);
-    fs.appendFileSync(`report.${network}.log`, `${result}\n`);
+    if (!fs.existsSync('logs')) fs.mkdirSync('logs');
+    fs.appendFileSync(path.join('logs', `report.${network}.log`), `${result}\n`);
   };
 
   const logAddress = (name, address) => {
-    fs.appendFileSync(`addresses.${network}.log`, `${name} ${address}\n`);
+    fs.appendFileSync(path.join('logs', `addresses.${network}.log`), `${name} ${address}\n`);
   }
 
   const logRevert = async (tryBlock, catchBlock) => {

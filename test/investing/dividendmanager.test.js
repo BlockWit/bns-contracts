@@ -10,6 +10,7 @@ const ERC20Mock = contract.fromArtifact('ERC20Mock');
 const [ owner, account1, account2 ] = accounts;
 
 describe('DividendManager', function () {
+    this.timeout(0);
     let dividendManager;
     let investnft;
     let token;
@@ -229,7 +230,7 @@ describe('DividendManager', function () {
             it('revert', async function () {
                 await dividendManager.excludeFromDividends(0, {from: owner});
                 await expectRevert(dividendManager.excludeFromDividends(0, {from: owner}),
-                    'DivManager: the specified account is already excluded from dividends"');
+                    'DivManager: the specified account is already excluded from dividends');
             });
         });
         context('if account not excluded', function () {

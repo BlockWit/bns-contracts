@@ -1,7 +1,7 @@
 const { accounts, contract, web3 } = require('@openzeppelin/test-environment');
 const { balance, BN, constants, ether, expectEvent, expectRevert, time } = require('@openzeppelin/test-helpers');
 const { assert, expect } = require('chai');
-const { getEvents } = require("./util");
+const { getEvents } = require("../util");
 
 const InvestNFTMarketPricePolicy = contract.fromArtifact('InvestNFTMarketPricePolicy');
 const ERC20Mock = contract.fromArtifact('ERC20Mock');

@@ -14,7 +14,7 @@ const BNSNamesPolicy = contract.fromArtifact('BNSNamesPolicy');
 const BNSNFT = contract.fromArtifact('BNSNFT');
 
 
-const [ deployer, account1, account2 ] = accounts;
+const [ deployer, account1, holder1, holder2, holder3 ] = accounts;
 const PRICE = ether('0.000000000000000001');
 const SIZES = [1,2,3,4,5,6,7,8];
 const PRICES_USDT = [300000,250000,200000,100000,50000,10000,1000,100];
@@ -71,43 +71,54 @@ describe('Integration test', function () {
   });
 
   describe('BNSDOMainNameMarket', function () {
-    const share = ether('123');
+    const share = ether('0.0000000000001');
     beforeEach(async () => {
+      await nft.safeMint(holder1, ether('0.0000000000003'), {from : deployer});
+      await nft.safeMint(holder2, ether('0.0000000000003'), {from : deployer});
+      await nft.safeMint(holder3, ether('0.0000000000002'), {from : deployer});
       await usdt.approve(market.address, PRICE.mul(share), { from: account1 });
       await market.buyExactShares(share, usdt.address, { from: account1 });
+
     });
     describe('buy', function () {
       it('should transfer nft to buyer', async function () {
-        await usdt.approve(bnsMarket.address, ether('250000'), { from: account1 });
+        const temp =  await market.getAvailableShares();
+        console.log("Available: " + temp.toString());
+        const temp1 =  await nft.issuedShares();
+        console.log("Issued: " + temp1.toString());
+        const temp2 = await nft.totalShares();
+        console.log("Max: " + temp2.toString());
+
+        await usdt.approve(bnsMarket.address, ether('100000'), { from: account1 });
         expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('0');
-        await bnsMarket.buy('ab', '', usdt.address, { from: account1 });
+        await bnsMarket.buy('abab', '', usdt.address, { from: account1 });
         expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('1');
       });
       it('should transfer usd to dividend manager and distribute between share holders', async function () {
-        expect(await dividendManager.withdrawableDividendOf(0, usdt.address)).to.be.bignumber.equal('0');
-        await usdt.approve(bnsMarket.address, ether('250000'), { from: account1 });
-        await bnsMarket.buy('ab', '', usdt.address, { from: account1 });
-        expect(await dividendManager.withdrawableDividendOf(0, usdt.address)).to.be.bignumber.equal(ether('250000'));
-        expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1749999999999999999000000');
+        expect(await dividendManager.withdrawableDividendOf(3, usdt.address)).to.be.bignumber.equal('0');
+        await usdt.approve(bnsMarket.address, ether('100000'), { from: account1 });
+        await bnsMarket.buy('abab', '', usdt.address, { from: account1 });
+        expect(await dividendManager.withdrawableDividendOf(3, usdt.address)).to.be.bignumber.equal('11111111111111111111111');
+        expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1899999999999999999900000');
         await nft.withdrawDividend({from: account1});
-        expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1999999999999999999000000');
+        expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1911111111111111111011111');
       });
     });
     describe('buyWithoutReferer', function () {
       it('should transfer nft to buyer', async function () {
         await usdt.approve(bnsMarket.address, ether('250000'), { from: account1 });
         expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('0');
-        await bnsMarket.buyWithoutReferer('ab', usdt.address, { from: account1 });
+        await bnsMarket.buyWithoutReferer('abab', usdt.address, { from: account1 });
         expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('1');
       });
       it('should transfer usd to dividend manager and distribute between share holders', async function () {
-        expect(await dividendManager.withdrawableDividendOf(0, usdt.address)).to.be.bignumber.equal('0');
-        await usdt.approve(bnsMarket.address, ether('250000'), { from: account1 });
-        await bnsMarket.buyWithoutReferer('ab', usdt.address, { from: account1 });
-        expect(await dividendManager.withdrawableDividendOf(0, usdt.address)).to.be.bignumber.equal(ether('250000'));
-        expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1749999999999999999000000');
+        expect(await dividendManager.withdrawableDividendOf(3, usdt.address)).to.be.bignumber.equal('0');
+        await usdt.approve(bnsMarket.address, ether('100000'), { from: account1 });
+        await bnsMarket.buyWithoutReferer('abab', usdt.address, { from: account1 });
+        expect(await dividendManager.withdrawableDividendOf(3, usdt.address)).to.be.bignumber.equal('11111111111111111111111');
+        expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1899999999999999999900000');
         await nft.withdrawDividend({from: account1});
-        expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1999999999999999999000000');
+        expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1911111111111111111011111');
       });
     });
   });

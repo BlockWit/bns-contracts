@@ -30,7 +30,7 @@ describe('InvestNFT', async () => {
 
   describe('safeMint', function () {
     it('should mint token to specified address', async () => {
-      const share = ether('1000');
+      const share = '1000';
       await nft.safeMint(account1, share, { from: deployer });
       expect(await nft.balanceOf(account1)).to.be.bignumber.equal(new BN('1'));
       expect(await nft.shareOf(0)).to.be.bignumber.equal(share);
@@ -40,10 +40,12 @@ describe('InvestNFT', async () => {
 
   describe('burn', function () {
     beforeEach(async () => {
-      await nft.safeMint(account1, ether('1000'), { from: deployer });
+      await nft.safeMint(account1, '1000', { from: deployer });
     });
 
     it('should burn the specified token and share', async () => {
+      expect(await nft.balanceOf(account1)).to.be.bignumber.equal(new BN('1'));
+      expect(await nft.shareOf(0)).to.be.bignumber.equal(new BN('1000'));
       await nft.burn(0, { from: account1 });
       expect(await nft.balanceOf(account1)).to.be.bignumber.equal(new BN('0'));
       expect(await nft.shareOf(0)).to.be.bignumber.equal(new BN('0'));

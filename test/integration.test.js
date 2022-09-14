@@ -19,6 +19,7 @@ const PRICE = ether('0.000000000000000001');
 const SIZES = [1,2,3,4,5,6,7,8];
 const PRICES_USDT = [300000,250000,200000,100000,50000,10000,1000,100];
 const BASE_PRICE_USDT = 100;
+const domainNames = ['a', 'ab', 'abc', 'abcd', 'abcde'];
 
 describe('Integration test', function () {
   this.timeout(0);
@@ -31,41 +32,41 @@ describe('Integration test', function () {
   let bnsNFT;
 
   beforeEach(async function () {
-    [ nft, dividendManager, market, pricing, usdt ] = await Promise.all([
-      InvestNFT.new({ from: deployer }),
-      DividendManager.new({ from: deployer }),
-      InvestNFTMarket.new({ from: deployer }),
-      InvestNFTMarketPricePolicy.new({ from: deployer }),
-      ERC20Mock.new('USDT Pegged Token', 'USDT', account1, ether('2000000'), { from: deployer }),
+    [nft, dividendManager, market, pricing, usdt] = await Promise.all([
+      InvestNFT.new({from: deployer}),
+      DividendManager.new({from: deployer}),
+      InvestNFTMarket.new({from: deployer}),
+      InvestNFTMarketPricePolicy.new({from: deployer}),
+      ERC20Mock.new('USDT Pegged Token', 'USDT', account1, ether('2000000'), {from: deployer}),
 
     ]);
     await Promise.all([
-      nft.setDividendManager(dividendManager.address, { from: deployer }),
-      nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, { from: deployer }),
-      dividendManager.setDepositary(nft.address, { from: deployer }),
-      dividendManager.setAsset(usdt.address, 'USDT', 1, { from: deployer }),
-      market.setInvestNFT(nft.address, { from: deployer }),
-      market.setPricePolicy(pricing.address, { from: deployer }),
-      market.setAsset(usdt.address, 'USDT', 1, { from: deployer }),
-      pricing.setPrice(PRICE, { from: deployer })
+      nft.setDividendManager(dividendManager.address, {from: deployer}),
+      nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, {from: deployer}),
+      dividendManager.setDepositary(nft.address, {from: deployer}),
+      dividendManager.setAsset(usdt.address, 'USDT', 1, {from: deployer}),
+      market.setInvestNFT(nft.address, {from: deployer}),
+      market.setPricePolicy(pricing.address, {from: deployer}),
+      market.setAsset(usdt.address, 'USDT', 1, {from: deployer}),
+      pricing.setPrice(PRICE, {from: deployer})
     ]);
     {
-      const [ market, names, nft, pricing ] = await Promise.all([
-        BNSDomainNameMarket.new({ from: deployer }),
-        BNSNamesPolicy.new({ from: deployer }),
-        BNSNFT.new({ from: deployer }),
-        BNSMarketPricePolicy.new({ from: deployer }),
+      const [market, names, nft, pricing] = await Promise.all([
+        BNSDomainNameMarket.new({from: deployer}),
+        BNSNamesPolicy.new({from: deployer}),
+        BNSNFT.new({from: deployer}),
+        BNSMarketPricePolicy.new({from: deployer}),
       ]);
       bnsMarket = market;
       bnsNFT = nft;
       await Promise.all([
-        await market.setBNSNFT(nft.address, {from : deployer}),
-        await market.setDividendManager(dividendManager.address, {from : deployer}),
-        await market.setPricePolicy(pricing.address, {from : deployer}),
-        await market.setNamesPolicy(names.address, {from : deployer}),
-        await market.setAsset(usdt.address, 'USDT', 1, {from : deployer}),
-        await nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, { from: deployer }),
-        pricing.setPrices(ether(BASE_PRICE_USDT.toString()), SIZES, PRICES_USDT.map(price => ether(price.toString())), { from: deployer })
+        await market.setBNSNFT(nft.address, {from: deployer}),
+        await market.setDividendManager(dividendManager.address, {from: deployer}),
+        await market.setPricePolicy(pricing.address, {from: deployer}),
+        await market.setNamesPolicy(names.address, {from: deployer}),
+        await market.setAsset(usdt.address, 'USDT', 1, {from: deployer}),
+        await nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, {from: deployer}),
+        pricing.setPrices(ether(BASE_PRICE_USDT.toString()), SIZES, PRICES_USDT.map(price => ether(price.toString())), {from: deployer})
       ])
     }
   });
@@ -73,52 +74,75 @@ describe('Integration test', function () {
   describe('BNSDOMainNameMarket', function () {
     const share = ether('0.0000000000001');
     beforeEach(async () => {
-      await nft.safeMint(holder1, ether('0.0000000000003'), {from : deployer});
-      await nft.safeMint(holder2, ether('0.0000000000003'), {from : deployer});
-      await nft.safeMint(holder3, ether('0.0000000000002'), {from : deployer});
-      await usdt.approve(market.address, PRICE.mul(share), { from: account1 });
-      await market.buyExactShares(share, usdt.address, { from: account1 });
+      await nft.safeMint(holder1, ether('0.0000000000003'), {from: deployer});
+      await nft.safeMint(holder2, ether('0.0000000000003'), {from: deployer});
+      await nft.safeMint(holder3, ether('0.0000000000002'), {from: deployer});
+      await usdt.approve(market.address, PRICE.mul(share), {from: account1});
+      await market.buyExactShares(share, usdt.address, {from: account1});
 
     });
+
     describe('buy', function () {
       it('should transfer nft to buyer', async function () {
-        const temp =  await market.getAvailableShares();
+        const temp = await market.getAvailableShares();
         console.log("Available: " + temp.toString());
-        const temp1 =  await nft.issuedShares();
+        const temp1 = await nft.issuedShares();
         console.log("Issued: " + temp1.toString());
         const temp2 = await nft.totalShares();
         console.log("Max: " + temp2.toString());
 
-        await usdt.approve(bnsMarket.address, ether('100000'), { from: account1 });
+        await usdt.approve(bnsMarket.address, ether('100000'), {from: account1});
         expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('0');
-        await bnsMarket.buy('abab', '', usdt.address, { from: account1 });
+        await bnsMarket.buy('abab', '', usdt.address, {from: account1});
         expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('1');
       });
+
       it('should transfer usd to dividend manager and distribute between share holders', async function () {
         expect(await dividendManager.withdrawableDividendOf(3, usdt.address)).to.be.bignumber.equal('0');
-        await usdt.approve(bnsMarket.address, ether('100000'), { from: account1 });
-        await bnsMarket.buy('abab', '', usdt.address, { from: account1 });
+        await usdt.approve(bnsMarket.address, ether('100000'), {from: account1});
+        await bnsMarket.buy('abab', '', usdt.address, {from: account1});
         expect(await dividendManager.withdrawableDividendOf(3, usdt.address)).to.be.bignumber.equal('11111111111111111111111');
         expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1899999999999999999900000');
         await nft.withdrawDividend({from: account1});
         expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1911111111111111111011111');
       });
     });
+
     describe('buyWithoutReferer', function () {
       it('should transfer nft to buyer', async function () {
-        await usdt.approve(bnsMarket.address, ether('250000'), { from: account1 });
+        await usdt.approve(bnsMarket.address, ether('100000'), {from: account1});
         expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('0');
-        await bnsMarket.buyWithoutReferer('abab', usdt.address, { from: account1 });
+        await bnsMarket.buyWithoutReferer('abab', usdt.address, {from: account1});
         expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('1');
       });
+
       it('should transfer usd to dividend manager and distribute between share holders', async function () {
         expect(await dividendManager.withdrawableDividendOf(3, usdt.address)).to.be.bignumber.equal('0');
-        await usdt.approve(bnsMarket.address, ether('100000'), { from: account1 });
-        await bnsMarket.buyWithoutReferer('abab', usdt.address, { from: account1 });
+        await usdt.approve(bnsMarket.address, ether('100000'), {from: account1});
+        await bnsMarket.buyWithoutReferer('abab', usdt.address, {from: account1});
         expect(await dividendManager.withdrawableDividendOf(3, usdt.address)).to.be.bignumber.equal('11111111111111111111111');
         expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1899999999999999999900000');
         await nft.withdrawDividend({from: account1});
         expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1911111111111111111011111');
+      });
+    });
+
+    describe('buyBulk', function () {
+      it('should transfer all nft to buyer', async function () {
+        await usdt.approve(bnsMarket.address, ether('900000'), {from: account1});
+        expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('0');
+        await bnsMarket.buyBulk(domainNames, '', usdt.address, {from: account1});
+        expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('5');
+      });
+
+      it('should transfer usd to dividend manager and distribute between share holders', async function () {
+        expect(await dividendManager.withdrawableDividendOf(3, usdt.address)).to.be.bignumber.equal('0');
+        await usdt.approve(bnsMarket.address, ether('900000'), {from: account1});
+        await bnsMarket.buyBulk(domainNames, '', usdt.address, {from: account1});
+        expect(await dividendManager.withdrawableDividendOf(3, usdt.address)).to.be.bignumber.equal('100000000000000000000000');
+        expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1099999999999999999900000');
+        await nft.withdrawDividend({from: account1});
+        expect(await usdt.balanceOf(account1)).to.be.bignumber.equal('1199999999999999999900000');
       });
     });
   });

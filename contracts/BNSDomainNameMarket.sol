@@ -120,6 +120,44 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         bnsnft.safeMint(msg.sender, domainName);
     }
 
+    function buyBulk(string[] memory domainNames, string memory refererDomainName, Assets.Key assetKey) whenNotPaused external {
+        uint refererTokenId;
+        address refererAddress;
+        bool hasReferer;
+        if (bytes(refererDomainName).length > 0) {
+            refererDomainName = namesPolicy.perform(refererDomainName);
+            refererTokenId = bnsnft.getTokenIdByDomainName(refererDomainName);
+            refererAddress = bnsnft.ownerOf(refererTokenId);
+            hasReferer = true;
+        }
+
+        // sanitize domain names and calculate overall price
+        uint256 price = 0;
+        for(uint i = 0; i < domainNames.length; i++ ) {
+            domainNames[i] = namesPolicy.perform(domainNames[i]);
+            require(!bnsnft.isDomainNameExists(domainNames[i]), "Domain name already exists");
+            price = price + pricePolicy.getPrice(domainNames[i], assetKey, hasReferer);
+        }
+
+        // charge payment
+        _transferAssetFrom(msg.sender, address(this), price, assetKey);
+
+        uint256 refererBonus;
+        uint256 dividends = price;
+        if (hasReferer) {
+            refererBonus = refererBonusDenominator > 0 ? price * refererBonusNumerator / refererBonusDenominator : 0;
+        }
+        if (refererBonus > 0) {
+            dividends = dividends - refererBonus;
+            _transferAsset(refererAddress, refererBonus, assetKey);
+        }
+        _approveAsset(address(dividendManager), dividends, assetKey);
+        dividendManager.distributeDividends(price - refererBonus, assetKey);
+
+        // mint all NFT
+        bnsnft.safeBatchMint(msg.sender, domainNames);
+    }
+
     function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
         _retrieveTokens(recipient, tokenAddress);
     }

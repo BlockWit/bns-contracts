@@ -40,7 +40,7 @@ describe('InvestMarket', async () => {
   });
 
   describe('buyExactShares', function () {
-    const share = ether('123');
+    const share = ether('0.0000000000001');
     beforeEach(async () => {
       await usdt.approve(market.address, PRICE.mul(share), { from: account1 });
     });

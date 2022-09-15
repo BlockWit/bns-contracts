@@ -3,7 +3,6 @@ const path = require('path');
 
 function logger (network) {
   let prefix;
-  console.log('network is ', network)
   switch (network) {
   case 'kovan': prefix = 'https://kovan.etherscan.io'; break;
   case 'ropsten': prefix = 'https://ropsten.etherscan.io'; break;

@@ -17,6 +17,11 @@ describe('BNSMarketPricePolicy', function () {
     const prices1 = [100, 200];
     const discounts = [['1', '2', '1693415398'],['3', '4' ,'1693415398'],['9', '10', '1693415398']];
     const domainNames = ['block', 'site', 'lol'];
+    const UTF8_RANGES = [
+        ['0x00004E00', '0x000062FF'],
+        ['0x00006300', '0x000077FF'],
+        ['0x00000600', '0x000006FF']
+    ]
 
     beforeEach(async function () {
         contract = await BNSMarketPricePolicy.new({from: owner});
@@ -178,6 +183,97 @@ describe('BNSMarketPricePolicy', function () {
         });
     });
 
+    describe('setPriceForSymbolsWithinRange', function () {
+        context('when called by owner', function () {
+            it('should change pricePerNameLengthForSymbolsWithinRange', async function () {
+                await contract.setPriceForSymbolsWithinRange(10, 212, {from : owner});
+                expect(await contract.pricePerNameLengthForSymbolsWithinRange(10)).to.be.bignumber.equal("212");
+            });
+        });
+        context('when called not by owner', function () {
+            it('revert', async function () {
+                await expectRevert(contract.setPriceForSymbolsWithinRange(5, 2222, {from : account1}),
+                    "Ownable: caller is not the owner");
+            });
+        });
+    });
+
+    describe('addUTF8Ranges', function () {
+        context('when called by owner', function () {
+            it('should add utf8ranges to array', async function () {
+                await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
+                let temp = await contract.utf8ranges(0);
+                expect(await temp[0]).to.be.equal('0x00004e00');
+                expect(await temp[1]).to.be.equal('0x000062ff');
+                temp = await contract.utf8ranges(1);
+                expect(await temp[0]).to.be.equal('0x00006300');
+                expect(await temp[1]).to.be.equal('0x000077ff');
+                temp = await contract.utf8ranges(2);
+                expect(await temp[0]).to.be.equal('0x00000600');
+                expect(await temp[1]).to.be.equal('0x000006ff');
+            });
+        });
+        context('when called not by owner', function () {
+            it('revert', async function () {
+                await expectRevert(contract.addUTF8Ranges(UTF8_RANGES, {from : account1}),
+                    "Ownable: caller is not the owner");
+            });
+        });
+    });
+
+    describe('removeUTF8Range', function () {
+        context('when called by owner', function () {
+            it('should delete range at specified index', async function () {
+                await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
+
+                await contract.removeUTF8Range(0, {from : owner});
+                let temp = await contract.utf8ranges(0);
+                expect(await temp[0]).to.be.equal('0x00006300');
+                expect(await temp[1]).to.be.equal('0x000077ff');
+                temp = await contract.utf8ranges(1);
+                expect(await temp[0]).to.be.equal('0x00000600');
+                expect(await temp[1]).to.be.equal('0x000006ff');
+                await expectRevert.unspecified(contract.utf8ranges(2));
+
+                await contract.removeUTF8Range(1, {from : owner});
+                temp = await contract.utf8ranges(0);
+                expect(await temp[0]).to.be.equal('0x00006300');
+                expect(await temp[1]).to.be.equal('0x000077ff');
+                await expectRevert.unspecified(contract.utf8ranges(1));
+            });
+        });
+        context('when called not by owner', function () {
+            it('revert', async function () {
+                await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
+                await expectRevert(contract.removeUTF8Range(0, {from : account1}),
+                    "Ownable: caller is not the owner");
+            });
+        });
+    });
+
+    describe('setUTF8Range', function () {
+        context('when called by owner', function () {
+            it('should change range at specified index', async function () {
+                await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
+                let temp = await contract.utf8ranges(1);
+                expect(await temp[0]).to.be.equal('0x00006300');
+                expect(await temp[1]).to.be.equal('0x000077ff');
+
+                await contract.setUTF8Range('0x00000600', '0x000006ff', 1, {from : owner});
+                temp = await contract.utf8ranges(1);
+                expect(await temp[0]).to.be.equal('0x00000600');
+                expect(await temp[1]).to.be.equal('0x000006ff');
+            });
+        });
+        context('when called not by owner', function () {
+            it('revert', async function () {
+                await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
+                await expectRevert(contract.setUTF8Range('0x00000600', '0x000006ff', 1, {from : account1}),
+                    "Ownable: caller is not the owner");
+            });
+        });
+    });
+
     describe('unsafeSetPremiumDomainPrices', function () {
         context('when called by owner', function () {
             context('if domainNames.length == prices.length', function () {
@@ -240,6 +336,47 @@ describe('BNSMarketPricePolicy', function () {
             it('revert', async function () {
                 await expectRevert(contract.setPrices(2222, sizes, prices, {from : account1}),
                     "Ownable: caller is not the owner");
+            });
+        });
+    });
+
+    describe('setPricesForSymbolsWithinRange', function () {
+        context('when called by owner', function () {
+            context('if sizes.length == prices.length', function () {
+                it('should change defaultPriceForSymbolsWithinRange and pricePerNameLengthForSymbolsWithinRange', async function () {
+                    await contract.setPricesForSymbolsWithinRange(1111, sizes, prices, {from: owner});
+                    expect(await contract.defaultPriceForSymbolsWithinRange()).to.be.bignumber.equal("1111");
+                    expect(await contract.pricePerNameLengthForSymbolsWithinRange(1)).to.be.bignumber.equal("100");
+                    expect(await contract.pricePerNameLengthForSymbolsWithinRange(2)).to.be.bignumber.equal("200");
+                    expect(await contract.pricePerNameLengthForSymbolsWithinRange(3)).to.be.bignumber.equal("300");
+                });
+            });
+            context('if sizes.length != prices.length', function () {
+                it('revert', async function () {
+                    await expectRevert(contract.setPricesForSymbolsWithinRange(2222, sizes1, prices1, {from : owner}),
+                        "Size and price arrays must have the same length");
+                });
+            });
+        });
+        context('when called not by owner', function () {
+            it('revert', async function () {
+                await expectRevert(contract.setPricesForSymbolsWithinRange(2222, sizes, prices, {from : account1}),
+                    "Ownable: caller is not the owner");
+            });
+        });
+    });
+
+    describe('isWithinRange', function () {
+        context('if domainName`s first symbol in range', function () {
+            it('return true ', async function () {
+                await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
+                expect(await contract.isWithinRange('ۿ')).to.be.equal(true);
+            });
+        });
+        context('if domainName`s first symbol not in range', function () {
+            it('return false', async function () {
+                await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
+                expect(await contract.isWithinRange('hah')).to.be.equal(false);
             });
         });
     });

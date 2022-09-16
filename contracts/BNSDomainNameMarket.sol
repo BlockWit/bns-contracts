@@ -73,6 +73,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
 
     function buyWithoutReferer(string memory domainName, Assets.Key assetKey) external {
         domainName = namesPolicy.perform(domainName);
+        namesPolicy.check(domainName);
         require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
         uint256 price = pricePolicy.getPrice(domainName, assetKey, false);
 
@@ -98,6 +99,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         }
         // sanitize domain name and calculate price
         domainName = namesPolicy.perform(domainName);
+        namesPolicy.check(domainName);
         require(!bnsnft.isDomainNameExists(domainName), "Domain name already exists");
         uint256 price = pricePolicy.getPrice(domainName, assetKey, hasReferer);
 
@@ -135,6 +137,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         uint256 price = 0;
         for(uint i = 0; i < domainNames.length; i++ ) {
             domainNames[i] = namesPolicy.perform(domainNames[i]);
+            namesPolicy.check(domainNames[i]);
             require(!bnsnft.isDomainNameExists(domainNames[i]), "Domain name already exists");
             price = price + pricePolicy.getPrice(domainNames[i], assetKey, hasReferer);
         }

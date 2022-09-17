@@ -9,7 +9,7 @@ const { ether, time, BN} = require('@openzeppelin/test-helpers');
 const SIZES = [1,2,3,4,5,6,7,8];
 const PRICES_USDT = [300000,250000,200000,100000,50000,10000,1000,100];
 const SPECIAL_PRICES_USDT = [300001,250001,200001,100001,50001,10001,1001,101];
-const UTF8_RANGES = [
+let UTF8_RANGES = [
   ['4E00', '62FF'], ['6300', '77FF'], ['7800', '8CFF'], ['8D00', '9FFF'], // (CJK Unified Ideographs https://en.wikipedia.org/wiki/CJK_Unified_Ideographs)
   ['3400', '4DBF'], //  (CJK Unified Ideographs Extension A)
   ['20000', '215FF'], ['21600', '230FF'], ['23100', '245FF'], ['24600', '260FF'], ['26100', '275FF'], ['27600', '290FF'], ['29100', '2A6DF'], //  (CJK Unified Ideographs Extension B)
@@ -125,9 +125,21 @@ async function deploy () {
   }
   {
     log(`PricingController. Set UTF8 ranges.`);
-    const tx = await pricingController.addUTF8Ranges(optimizeRanges(UTF8_RANGES).map(range => range.map(border => `0x${border}`)), {from: deployer});
+    const tx = await pricingController.addUTF8Ranges(optimizeRanges(codesToHexes(UTF8_RANGES)).map(range => range.map(border => `0x${border}`)), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
+}
+
+function codesToHexes(ranges) {
+  ranges.forEach((range) => {
+    range.forEach((code) => {
+      code = unescape(encodeURIComponent(String.fromCharCode(parseInt(code, 16))))
+          .split('')
+          .map(v => { return v.charCodeAt(0).toString(16);})
+          .join('');
+    })
+  })
+  return ranges;
 }
 
 function optimizeRanges(ranges) {

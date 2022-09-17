@@ -18,9 +18,9 @@ describe('BNSMarketPricePolicy', function () {
     const discounts = [['1', '2', '1693415398'],['3', '4' ,'1693415398'],['9', '10', '1693415398']];
     const domainNames = ['block', 'site', 'lol'];
     const UTF8_RANGES = [
-        ['0x00004E00', '0x000062FF'],
-        ['0x00006300', '0x000077FF'],
-        ['0x00000600', '0x000006FF']
+        ['0x00e4b880', '0x00e68bbf'],
+        ['0x00e68c80', '0x00e79fbf'],
+        ['0x0000d880', '0x0000dbbf']
     ]
 
     beforeEach(async function () {
@@ -370,13 +370,19 @@ describe('BNSMarketPricePolicy', function () {
         context('if domainName`s first symbol in range', function () {
             it('return true ', async function () {
                 await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
+                expect(await contract.isWithinRange('一')).to.be.equal(true);
+                expect(await contract.isWithinRange('拿sdf')).to.be.equal(true);
+                expect(await contract.isWithinRange('挀as')).to.be.equal(true);
+                expect(await contract.isWithinRange('矿')).to.be.equal(true);
+                expect(await contract.isWithinRange('؀df')).to.be.equal(true);
                 expect(await contract.isWithinRange('ۿ')).to.be.equal(true);
+
             });
         });
         context('if domainName`s first symbol not in range', function () {
             it('return false', async function () {
                 await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
-                expect(await contract.isWithinRange('hah')).to.be.equal(false);
+                expect(await contract.isWithinRange('h挀ah挀')).to.be.equal(false);
             });
         });
     });

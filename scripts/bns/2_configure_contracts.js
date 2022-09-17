@@ -131,14 +131,14 @@ async function deploy () {
 }
 
 function codesToHexes(ranges) {
-  ranges.forEach((range) => {
-    range.forEach((code) => {
-      code = unescape(encodeURIComponent(String.fromCharCode(parseInt(code, 16))))
+  for(let i = 0; i < ranges.length; i++){
+    for(let j = 0; j < ranges[i].length; j++){
+      ranges[i][j] = unescape(encodeURIComponent(String.fromCharCode(parseInt(ranges[i][j], 16))))
           .split('')
           .map(v => { return v.charCodeAt(0).toString(16);})
           .join('');
-    })
-  })
+    }
+  }
   return ranges;
 }
 

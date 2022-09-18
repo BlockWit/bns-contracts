@@ -9,7 +9,7 @@ const { ether, time, BN} = require('@openzeppelin/test-helpers');
 const SIZES = [1,2,3,4,5,6,7,8];
 const PRICES_USDT = [300000,250000,200000,100000,50000,10000,1000,100];
 const SPECIAL_PRICES_USDT = [300001,250001,200001,100001,50001,10001,1001,101];
-let UTF8_RANGES = [
+const UTF8_RANGES = [
   ['4E00', '62FF'], ['6300', '77FF'], ['7800', '8CFF'], ['8D00', '9FFF'], // (CJK Unified Ideographs https://en.wikipedia.org/wiki/CJK_Unified_Ideographs)
   ['3400', '4DBF'], //  (CJK Unified Ideographs Extension A)
   ['20000', '215FF'], ['21600', '230FF'], ['23100', '245FF'], ['24600', '260FF'], ['26100', '275FF'], ['27600', '290FF'], ['29100', '2A6DF'], //  (CJK Unified Ideographs Extension B)
@@ -25,6 +25,19 @@ let UTF8_RANGES = [
   ['0870', '089F'], //  (Arabic Extended-B)
   ['FB50', 'FDFF'], //  (Arabic Presentation Forms-A)
   ['FE70', 'FEFF'], //  (Arabic Presentation Forms-B)
+]
+const UTF8_RANGES_BYTES = [
+  [ '0x0000D880', '0x0000DBBF' ],
+  [ '0x0000DD90', '0x0000DDBF' ],
+  [ '0x00E0A1B0', '0x00E0A3BF' ],
+  [ '0x00E39080', '0x00E4B6BF' ],
+  [ '0x00E4B880', '0x00E9BFBF' ],
+  [ '0x00EFA480', '0x00EFABBF' ],
+  [ '0x00EFAD90', '0x00EFB7BF' ],
+  [ '0x00EFB9B0', '0x00EFBBBF' ],
+  [ '0xF0A08080', '0xF0AA9B9F' ],
+  [ '0xF0AA9C80', '0xF0AEAFAF' ],
+  [ '0xF0B08080', '0xF0B18D8F' ]
 ]
 
 async function deploy () {
@@ -125,9 +138,14 @@ async function deploy () {
   }
   {
     log(`PricingController. Set UTF8 ranges.`);
-    const tx = await pricingController.addUTF8Ranges(optimizeRanges(codesToHexes(UTF8_RANGES)).map(range => range.map(border => `0x${border}`)), {from: deployer});
+    const tx = await pricingController.addUTF8Ranges(UTF8_RANGES_BYTES, {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
+  // {
+  //   log(`PricingController. Set UTF8 ranges.`);
+  //   const tx = await pricingController.addUTF8Ranges(optimizeRanges(codesToHexes(UTF8_RANGES)).map(range => range.map(border => `0x${border}`)), {from: deployer});
+  //   log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  // }
 }
 
 function codesToHexes(ranges) {

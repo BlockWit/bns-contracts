@@ -11,8 +11,8 @@ const [account1, owner ] = accounts;
 describe('BNSMarketPricePolicy', function () {
     let contract;
     let asset;
-    const sizes = [1, 2, 3];
-    const prices = [100, 200, 300];
+    const sizes = [1, 2, 3, 4, 5, 6];
+    const prices = [100, 200, 300, 400, 500, 600];
     const sizes1 = [1, 2, 3];
     const prices1 = [100, 200];
     const discounts = [['1', '2', '1693415398'],['3', '4' ,'1693415398'],['9', '10', '1693415398']];
@@ -65,6 +65,33 @@ describe('BNSMarketPricePolicy', function () {
                 it('should return pricePerNameLength', async function () {
                     await contract.setPrice(4, 300, {from : owner});
                     expect(await contract.getPrice("haha", asset.address, false)).to.be.bignumber.equal("300");
+                });
+            });
+            context('if pricePerNameLength is not set', function () {
+                it('should return defaultPrice', async function () {
+                    await contract.setDefaultPrice(300, {from : owner});
+                    expect(await contract.getPrice("haha", asset.address, false)).to.be.bignumber.equal("300");
+                });
+            });
+            context('if hasReferer is true', function () {
+                it('should return discounted price', async function () {
+                    await contract.setPrice(4, 300, {from : owner});
+                    await contract.setDiscount(discounts, { from: owner });
+                    expect(await contract.getPrice("haha", asset.address, true)).to.be.bignumber.equal("150");
+                });
+            });
+        });
+        context('when domainName starts with symbol in range', function () {
+            context('if pricePerNameLengthForSymbolsWithinRange is set', function () {
+                it('should return pricePerNameLengthForSymbolsWithinRange', async function () {
+                    await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
+                    await contract.setPriceForSymbolsWithinRange(1, 900, {from : owner});
+                    await contract.setPriceForSymbolsWithinRange(2, 800, {from : owner});
+                    await contract.setPriceForSymbolsWithinRange(3, 700, {from : owner});
+                    await contract.setPriceForSymbolsWithinRange(4, 600, {from : owner});
+                    await contract.setPriceForSymbolsWithinRange(5, 500, {from : owner});
+                    await contract.setPriceForSymbolsWithinRange(6, 400, {from : owner});
+                    expect(await contract.getPrice("一dfd", asset.address, false)).to.be.bignumber.equal("600");
                 });
             });
             context('if pricePerNameLength is not set', function () {
@@ -203,14 +230,14 @@ describe('BNSMarketPricePolicy', function () {
             it('should add utf8ranges to array', async function () {
                 await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
                 let temp = await contract.utf8ranges(0);
-                expect(await temp[0]).to.be.equal('0x00004e00');
-                expect(await temp[1]).to.be.equal('0x000062ff');
+                expect(await temp[0]).to.be.equal('0x00e4b880');
+                expect(await temp[1]).to.be.equal('0x00e68bbf');
                 temp = await contract.utf8ranges(1);
-                expect(await temp[0]).to.be.equal('0x00006300');
-                expect(await temp[1]).to.be.equal('0x000077ff');
+                expect(await temp[0]).to.be.equal('0x00e68c80');
+                expect(await temp[1]).to.be.equal('0x00e79fbf');
                 temp = await contract.utf8ranges(2);
-                expect(await temp[0]).to.be.equal('0x00000600');
-                expect(await temp[1]).to.be.equal('0x000006ff');
+                expect(await temp[0]).to.be.equal('0x0000d880');
+                expect(await temp[1]).to.be.equal('0x0000dbbf');
             });
         });
         context('when called not by owner', function () {
@@ -228,17 +255,17 @@ describe('BNSMarketPricePolicy', function () {
 
                 await contract.removeUTF8Range(0, {from : owner});
                 let temp = await contract.utf8ranges(0);
-                expect(await temp[0]).to.be.equal('0x00006300');
-                expect(await temp[1]).to.be.equal('0x000077ff');
+                expect(await temp[0]).to.be.equal('0x00e68c80');
+                expect(await temp[1]).to.be.equal('0x00e79fbf');
                 temp = await contract.utf8ranges(1);
-                expect(await temp[0]).to.be.equal('0x00000600');
-                expect(await temp[1]).to.be.equal('0x000006ff');
+                expect(await temp[0]).to.be.equal('0x0000d880');
+                expect(await temp[1]).to.be.equal('0x0000dbbf');
                 await expectRevert.unspecified(contract.utf8ranges(2));
 
                 await contract.removeUTF8Range(1, {from : owner});
                 temp = await contract.utf8ranges(0);
-                expect(await temp[0]).to.be.equal('0x00006300');
-                expect(await temp[1]).to.be.equal('0x000077ff');
+                expect(await temp[0]).to.be.equal('0x00e68c80');
+                expect(await temp[1]).to.be.equal('0x00e79fbf');
                 await expectRevert.unspecified(contract.utf8ranges(1));
             });
         });
@@ -256,13 +283,13 @@ describe('BNSMarketPricePolicy', function () {
             it('should change range at specified index', async function () {
                 await contract.addUTF8Ranges(UTF8_RANGES, {from : owner});
                 let temp = await contract.utf8ranges(1);
-                expect(await temp[0]).to.be.equal('0x00006300');
-                expect(await temp[1]).to.be.equal('0x000077ff');
+                expect(await temp[0]).to.be.equal('0x00e68c80');
+                expect(await temp[1]).to.be.equal('0x00e79fbf');
 
-                await contract.setUTF8Range('0x00000600', '0x000006ff', 1, {from : owner});
+                await contract.setUTF8Range('0x00e4b880', '0x00e68bbf', 1, {from : owner});
                 temp = await contract.utf8ranges(1);
-                expect(await temp[0]).to.be.equal('0x00000600');
-                expect(await temp[1]).to.be.equal('0x000006ff');
+                expect(await temp[0]).to.be.equal('0x00e4b880');
+                expect(await temp[1]).to.be.equal('0x00e68bbf');
             });
         });
         context('when called not by owner', function () {

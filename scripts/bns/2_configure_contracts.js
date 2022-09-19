@@ -6,9 +6,12 @@ const BNSSimpleContentProvider = artifacts.require('BNSSimpleContentProvider');
 const { logger } = require('../util');
 const { ether, time, BN} = require('@openzeppelin/test-helpers');
 
-const SIZES = [1,2,3,4,5,6,7,8];
-const PRICES_USDT = [300000,250000,200000,100000,50000,10000,1000,100];
-const SPECIAL_PRICES_USDT = [300001,250001,200001,100001,50001,10001,1001,101];
+const SIZES       = [     1,     2,   3,   4,   5,  6,  7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
+const PRICES_USDT = [200000,100000,5000,2500,1000,200,100,40,30,30,30,25,25,25,25,25,25,25,25,15,15,15,15,15,15,15,15,15,15, 5];
+
+const SPECIAL_SIZES       = [   1,   2,  3,  4, 5, 6, 7, 8, 9];
+const SPECIAL_PRICES_USDT = [6888,3888,888,555,88,58,38,28,18];
+
 const UTF8_RANGES = [
   ['4E00', '62FF'], ['6300', '77FF'], ['7800', '8CFF'], ['8D00', '9FFF'], // (CJK Unified Ideographs https://en.wikipedia.org/wiki/CJK_Unified_Ideographs)
   ['3400', '4DBF'], //  (CJK Unified Ideographs Extension A)
@@ -136,7 +139,7 @@ async function deploy () {
   }
   {
     log(`PricingController. Set prices for symbols within special range.`);
-    const tx = await pricingController.setPricesForSymbolsWithinRange(ether('31'), SIZES, SPECIAL_PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
+    const tx = await pricingController.setPricesForSymbolsWithinRange(ether('31'), SPECIAL_SIZES, SPECIAL_PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {

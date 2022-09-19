@@ -136,12 +136,7 @@ async function deploy () {
   }
   {
     log(`PricingController. Set prices.`);
-    const tx = await pricingController.setPrices(ether('30'), SIZES, PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
-    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
-  }
-  {
-    log(`PricingController. Set prices.`);
-    const tx = await pricingController.setDefaultPrice(ether(DEFAULT_PRICE.toString()), {from: deployer});
+    const tx = await pricingController.setPrices(ether(DEFAULT_PRICE.toString()), SIZES, PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {
@@ -159,11 +154,11 @@ async function deploy () {
     const tx = await pricingController.setDiscount(DISCOUNTS, {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
-  // {
-  //   log(`PricingController. Set UTF8 ranges.`);
-  //   const tx = await pricingController.addUTF8Ranges(optimizeRanges(codesToHexes(UTF8_RANGES)).map(range => range.map(border => `0x${border}`)), {from: deployer});
-  //   log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
-  // }
+  {
+    log(`PricingController. Set UTF8 ranges.`);
+    const tx = await pricingController.addUTF8Ranges(optimizeRanges(codesToHexes(UTF8_RANGES)).map(range => range.map(border => `0x${border}`)), {from: deployer});
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
 }
 
 function codesToHexes(ranges) {

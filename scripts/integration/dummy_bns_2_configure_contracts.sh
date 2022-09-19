@@ -1,28 +1,31 @@
-#!/bin/bash
 echo "Using network 'bsctestnet_special'.
 
 NFT. Grant minter role to Market.
-Result: successful tx: https://etherscan.io/tx/0x6394194d3e34a749da91194be1f4eddd387c2a74bc43f5fcc9cc093d9f3bc3cc
+Result: successful tx: https://etherscan.io/tx/0x72cb2b10be97f947f314a1875e71f55505050312c68fa1c0e1781fcde1b3addc
 NFT. Set content router.
-Result: successful tx: https://etherscan.io/tx/0x38b0a2e1a76dd9ebe015b314e4c7542c2d375e7ee697f6c92102d7d6c9d58201
+Result: successful tx: https://etherscan.io/tx/0xd5c3d802862bc0b58cc884cb7576198581d944ce4a237cf238dbca93442bd30d
 ContentRouter. Grant content manager role to NFT.
-Result: successful tx: https://etherscan.io/tx/0x0abcee5fb5311d30bff993a30b2fbd681962e5b98e0b263f36476e666c11bd46
+Result: successful tx: https://etherscan.io/tx/0x0ddcee64c948e342a2b67341c046bc102f2bab4534864ec57b4ab66e2627f27d
 ContentRouter. Set content provider.
-Result: successful tx: https://etherscan.io/tx/0x7af898425da83bc8ff3bce4f59d0105c7d7fb71f43c2fa1bbf9b7934fa94ff0f
+Result: successful tx: https://etherscan.io/tx/0x9cbf9398e227278a0d0da759efa80c0314dbef79735ade4665d0d3a2ee475739
 ContentProvider. Grant content manager role to ContentRouter.
-Result: successful tx: https://etherscan.io/tx/0x18b4558d834f738ddc43a26b50cf5b8c82b75e46e51351b07040d185fcd3ac4e
+Result: successful tx: https://etherscan.io/tx/0x103d2771c62a77e6db55cb8c906f84f6d2feabea1e12a5d77369a41f73b7c015
 Market. Set NFT.
-Result: successful tx: https://etherscan.io/tx/0xd9837eebdc20b5e73f03f2a2d01fb5eb07a4ca7a6efe9bc206b2071ea0e522ee
+Result: successful tx: https://etherscan.io/tx/0x1bf3569bfd97d97627a9f1fc8d04b4e1a52ab4b681a86a90d19f0eac951ae3f3
 Market. Set PricingController.
-Result: successful tx: https://etherscan.io/tx/0xb723e377b9e92b0d5a4c36877df76274853118164d521618636191dd371b5399
+Result: successful tx: https://etherscan.io/tx/0xdcfe994b8b26338fc7b6873753e5b4c030ca2dc508b3690c902970bb36e273f4
 Market. Set DomainNamesController.
-Result: successful tx: https://etherscan.io/tx/0x90ee217018e95c9a5e571e792c6b2853bc78c7e4f31c1a0d6b9f19cbbd66f498
+Result: successful tx: https://etherscan.io/tx/0x9e8350acf69b3b1ab66b474c063078963884ecd330357a1b629763dd6dd25a4b
 Market. Set BUSD.
-Result: successful tx: https://etherscan.io/tx/0x0573a0d23513cf79be857c81b8e5ef1818bbcb72f1924a51e3a2e269bf03dd45
+Result: successful tx: https://etherscan.io/tx/0x65d9c5bf6a8980ada56b7fc7f994c874396a1d9930d9eff399340e86ebce499d
 Market. Set USDT.
-Result: successful tx: https://etherscan.io/tx/0xc9003da01cd6bf53a53820a561226104520bd9c06e310ad0749d3aa7678cf941
+Result: successful tx: https://etherscan.io/tx/0x68ccd11ba525e8ea22a800f4d599255c7169d7f3dfd9e9631343fc2a1e6f8778
 Market. Set fundraising wallet.
-Result: successful tx: https://etherscan.io/tx/0xd701e308b7709d349a4721302d00913b3364de0d3d0d77e64b6cfe637fa8fec7
+Result: successful tx: https://etherscan.io/tx/0xa6d569a1b002b18230b9bf1c74a33b179d6dbfede3dae7aad53aca76b3fb388b
 PricingController. Set prices.
-Result: successful tx: https://etherscan.io/tx/0xc407b3771229e44212219a33dae4c8e251528dfbd7b8befc2a2f1775532632cd
+Result: successful tx: https://etherscan.io/tx/0x4b69531cdd4c2640233e59669a07821c15198dff7e37e82cd6410d378a255463
+PricingController. Set prices for symbols within special range.
+Result: successful tx: https://etherscan.io/tx/0x4e979517fe44db8bb4291f76c6005bacdcccb68161ae47e63b8abb4fb0486f0c
+PricingController. Set UTF8 ranges.
+Result: successful tx: https://etherscan.io/tx/0x3572693d875f5c56c4594fd5e8dc855bfb3b9a716eef3428080c3749bc85e3ec
 success";

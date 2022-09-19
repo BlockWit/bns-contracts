@@ -23,6 +23,8 @@ REPO_DUMMY_INVESTING_1_DEPLOY_CONTRACTS=$REPO_REL_PATH/dummy_investing_1_deploy_
 REPO_DUMMY_INVESTING_1_DEPLOY_CONTRACTS_VERIFY=$REPO_REL_PATH/dummy_investing_1_deploy_contracts_verify.sh
 REPO_DUMMY_INVESTING_2_CONFIGURE_CONTRACTS=$REPO_REL_PATH/dummy_investing_2_configure_contracts.sh
 
+LOGS_PARAMS_FILE=logs/addresses.bsctestnet_special.log
+
 cd ../../
 
 if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
@@ -61,6 +63,12 @@ echo "Parsed domain names policy address $ADDR_DOMAIN_NAMES";
 echo "Parsed domain NFT address $ADDR_DOMAIN_NFT";
 echo "Parsed domain content router address $ADDR_DOMAIN_ROUTER";
 echo "Parsed domain simple content provider address $ADDR_DOMAIN_PROVIDER";
+
+echo "BUSD $ADDR_BUSD" >> $LOGS_PARAMS_FILE;
+echo "USDT $ADDR_USDT" >> $LOGS_PARAMS_FILE;
+echo "devs $ADDR_DEVS" >> $LOGS_PARAMS_FILE;
+echo "team $ADDR_TEAM" >> $LOGS_PARAMS_FILE;
+echo "fund $ADDR_FUND" >> $LOGS_PARAMS_FILE;
 
 RESULT="";
 CUR_COMMAND="";

@@ -12,6 +12,7 @@ const DEFAULT_PRICE = 5;
 
 const SPECIAL_SIZES       = [   1,   2,  3,  4, 5, 6, 7, 8, 9];
 const SPECIAL_PRICES_USDT = [6888,3888,888,555,88,58,38,28,18];
+const SPECIAL_DEFAULT_PRICE = 18;
 
 const UTF8_RANGES = [
   ['4E00', '62FF'], ['6300', '77FF'], ['7800', '8CFF'], ['8D00', '9FFF'], // (CJK Unified Ideographs https://en.wikipedia.org/wiki/CJK_Unified_Ideographs)
@@ -146,6 +147,11 @@ async function deploy () {
   {
     log(`PricingController. Set prices for symbols within special range.`);
     const tx = await pricingController.setPricesForSymbolsWithinRange(ether('31'), SPECIAL_SIZES, SPECIAL_PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`PricingController. Set prices.`);
+    const tx = await pricingController.setPriceForSymbolsWithinRange(ether(SPECIAL_DEFAULT_PRICE.toString()), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {

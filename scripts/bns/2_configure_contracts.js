@@ -39,6 +39,9 @@ const UTF8_RANGES_BYTES = [
   [ '0xF0AA9C80', '0xF0AEAFAF' ],
   [ '0xF0B08080', '0xF0B18D8F' ]
 ]
+const DISCOUNTS = [
+    [ 10, 100, (new Date('Dec 31 2022 23:55:00')).getTime() / 1000 ]
+]
 
 async function deploy () {
   const { addresses, log } = logger(config.network);
@@ -139,6 +142,11 @@ async function deploy () {
   {
     log(`PricingController. Set UTF8 ranges.`);
     const tx = await pricingController.addUTF8Ranges(UTF8_RANGES_BYTES, {from: deployer});
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`PricingController. Set discounts.`);
+    const tx = await pricingController.setDiscount(DISCOUNTS, {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   // {

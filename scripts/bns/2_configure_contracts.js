@@ -8,6 +8,7 @@ const { ether, time, BN} = require('@openzeppelin/test-helpers');
 
 const SIZES       = [     1,     2,   3,   4,   5,  6,  7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30];
 const PRICES_USDT = [200000,100000,5000,2500,1000,200,100,40,30,30,30,25,25,25,25,25,25,25,25,15,15,15,15,15,15,15,15,15,15, 5];
+const DEFAULT_PRICE = 5;
 
 const SPECIAL_SIZES       = [   1,   2,  3,  4, 5, 6, 7, 8, 9];
 const SPECIAL_PRICES_USDT = [6888,3888,888,555,88,58,38,28,18];
@@ -135,6 +136,11 @@ async function deploy () {
   {
     log(`PricingController. Set prices.`);
     const tx = await pricingController.setPrices(ether('30'), SIZES, PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`PricingController. Set prices.`);
+    const tx = await pricingController.setDefaultPrice(ether(DEFAULT_PRICE.toString()), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {

@@ -21,6 +21,14 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     uint256 public refererBonusNumerator = 10;
     uint256 public refererBonusDenominator = 100;
 
+    struct DomainInfo {
+        string name;
+        uint256 fullPrice;
+        uint256 discountedPrice;
+        bool isAvailable;
+        address owner;
+}
+
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
@@ -70,6 +78,47 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         namesPolicy.check(domainName);
         return pricePolicy.getPrice(domainName, assetKey, bytes(refererDomainName).length > 0);
     }
+
+    function getDomainInfo(string[] calldata domainNames, string memory refererDomainName, Assets.Key assetKey) external view returns (DomainInfo[] memory) {
+        DomainInfo[] memory domainsInfo;
+        DomainInfo memory domainInfo;
+
+        if (bytes(refererDomainName).length > 0) {
+            refererDomainName = namesPolicy.perform(refererDomainName);
+            require(bnsnft.isDomainNameExists(refererDomainName), "Referer domain name must exists");
+        }
+
+        for(uint i = 0; i < domainNames.length; i++ ) {
+            string memory domainName = domainNames[i];
+            domainName = namesPolicy.perform(domainName);
+            namesPolicy.check(domainName);
+
+            //set name
+            domainInfo.name = domainName;
+
+            //set isAvailable and owner
+            if (bnsnft.isDomainNameExists(domainName)) {
+                domainInfo.isAvailable = false;
+                domainInfo.owner = bnsnft.ownerOf(bnsnft.getTokenIdByDomainName(domainName));
+            } else {
+                domainInfo.isAvailable = true;
+            }
+
+            //set fullPrice and discountedPrice
+            if (bytes(refererDomainName).length > 0) {
+                domainInfo.fullPrice = pricePolicy.getPrice(domainName, assetKey, false);
+                domainInfo.discountedPrice = pricePolicy.getPrice(domainName, assetKey, true);
+            } else {
+                domainInfo.fullPrice = pricePolicy.getPrice(domainName, assetKey, false);
+                domainInfo.discountedPrice = domainInfo.fullPrice;
+            }
+
+            domainsInfo[i].push(domainInfo);
+        }
+
+        return domainsInfo;
+    }
+
 
     function buyWithoutReferer(string memory domainName, Assets.Key assetKey) external {
         domainName = namesPolicy.perform(domainName);

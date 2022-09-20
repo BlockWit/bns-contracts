@@ -100,6 +100,13 @@ describe('Integration test', function () {
     describe('buy', function () {
       context('if buy regular domainName', function () {
         it('should transfer nft to buyer', async function () {
+
+          expect(await bnsMarket.getPriceWithoutReferer('名', usdt.address)).to.be.bignumber.equal(ether('300000'));
+
+
+
+
+
           await usdt.approve(bnsMarket.address, ether('100000'), {from: account1});
           expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('0');
           await bnsMarket.buy('abab', '', usdt.address, {from: account1});

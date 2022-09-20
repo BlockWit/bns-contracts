@@ -32,6 +32,7 @@ const UTF8_RANGES = [
   ['FE70', 'FEFF'], //  (Arabic Presentation Forms-B)
 ]
 const UTF8_RANGES_BYTES = [
+  [ '0x00000030', '0x00000039' ],
   [ '0x0000D880', '0x0000DBBF' ],
   [ '0x0000DD90', '0x0000DDBF' ],
   [ '0x00E0A1B0', '0x00E0A3BF' ],
@@ -154,11 +155,11 @@ async function deploy () {
     const tx = await pricingController.setDiscount(DISCOUNTS, {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
-  {
-    log(`PricingController. Set UTF8 ranges.`);
-    const tx = await pricingController.addUTF8Ranges(optimizeRanges(codesToHexes(UTF8_RANGES)).map(range => range.map(border => `0x${border}`)), {from: deployer});
-    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
-  }
+  // {
+  //   log(`PricingController. Set UTF8 ranges.`);
+  //   const tx = await pricingController.addUTF8Ranges(optimizeRanges(codesToHexes(UTF8_RANGES)).map(range => range.map(border => `0x${border}`)), {from: deployer});
+  //   log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  // }
 }
 
 function codesToHexes(ranges) {

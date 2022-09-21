@@ -27,7 +27,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         uint256 discountedPrice;
         bool isAvailable;
         address owner;
-}
+    }
 
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -79,9 +79,9 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         return pricePolicy.getPrice(domainName, assetKey, bytes(refererDomainName).length > 0);
     }
 
+    //!!!!!!! NOT TESTED  !!!!!!!!
     function getDomainInfo(string[] calldata domainNames, string memory refererDomainName, Assets.Key assetKey) external view returns (DomainInfo[] memory) {
-        DomainInfo[] memory domainsInfo;
-        DomainInfo memory domainInfo;
+        DomainInfo[] memory domainsInfo = new DomainInfo[](domainNames.length);
 
         if (bytes(refererDomainName).length > 0) {
             refererDomainName = namesPolicy.perform(refererDomainName);
@@ -89,6 +89,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         }
 
         for(uint i = 0; i < domainNames.length; i++ ) {
+            DomainInfo memory domainInfo;
             string memory domainName = domainNames[i];
             domainName = namesPolicy.perform(domainName);
             namesPolicy.check(domainName);
@@ -113,7 +114,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
                 domainInfo.discountedPrice = domainInfo.fullPrice;
             }
 
-            domainsInfo[i].push(domainInfo);
+            domainsInfo[i] = domainInfo;
         }
 
         return domainsInfo;

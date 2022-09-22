@@ -83,7 +83,7 @@ async function deploy () {
   }
   {
     log(`PricingPolicy. Set price.`);
-    const tx = await pricing.setPrice(ether('0.000000000000000001'), {from: deployer});
+    const tx = await pricing.setPrice(ether('5'), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {

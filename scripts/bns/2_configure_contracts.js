@@ -143,7 +143,7 @@ async function deploy () {
   }
   {
     log(`PricingController. Set prices for symbols within special range.`);
-    const tx = await pricingController.setPricesForSymbolsWithinRange(ether(SPECIAL_DEFAULT_PRICE.toString()), SPECIAL_SIZES, SPECIAL_PRICES_USDT.map(price => ether(price.toString())), {from: deployer});
+    const tx = await pricingController.setPricesForSymbolsWithinRange(ether(SPECIAL_DEFAULT_PRICE.toString()), SPECIAL_SIZES, SPECIAL_PRICES_USDT.map(price => ether((price*3).toString())), {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {

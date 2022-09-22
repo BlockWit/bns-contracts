@@ -22,6 +22,7 @@ const PRICES_FOR_SYMBOLS = [400000,350000,300000,200000,100000,50000,2000,200];
 const BASE_PRICE_USDT = 100;
 const domainNames = ['a', 'ab', 'abc', 'abcd', 'abcde'];
 const UTF8_RANGES_BYTES = [
+  [ '0x00000030', '0x00000039' ],
   [ '0x0000D880', '0x0000DBBF' ],
   [ '0x0000DD90', '0x0000DDBF' ],
   [ '0x00E0A1B0', '0x00E0A3BF' ],
@@ -33,7 +34,7 @@ const UTF8_RANGES_BYTES = [
   [ '0xF0A08080', '0xF0AA9B9F' ],
   [ '0xF0AA9C80', '0xF0AEAFAF' ],
   [ '0xF0B08080', '0xF0B18D8F' ]
-];
+]
 
 describe('Integration test', function () {
   this.timeout(0);
@@ -100,13 +101,7 @@ describe('Integration test', function () {
     describe('buy', function () {
       context('if buy regular domainName', function () {
         it('should transfer nft to buyer', async function () {
-
           expect(await bnsMarket.getPriceWithoutReferer('名', usdt.address)).to.be.bignumber.equal(ether('300000'));
-
-
-
-
-
           await usdt.approve(bnsMarket.address, ether('100000'), {from: account1});
           expect(await bnsNFT.balanceOf(account1)).to.be.bignumber.equal('0');
           await bnsMarket.buy('abab', '', usdt.address, {from: account1});

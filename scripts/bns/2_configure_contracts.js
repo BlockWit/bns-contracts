@@ -30,6 +30,7 @@ const UTF8_RANGES = [
   ['0870', '089F'], //  (Arabic Extended-B)
   ['FB50', 'FDFF'], //  (Arabic Presentation Forms-A)
   ['FE70', 'FEFF'], //  (Arabic Presentation Forms-B)
+  ['0030', '0039'], //  (numbers 0-9)
 ]
 const UTF8_RANGES_BYTES = [
   [ '0x00000030', '0x00000039' ],

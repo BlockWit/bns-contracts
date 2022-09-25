@@ -51,15 +51,11 @@ echo "echo \"$RESULT\";" >> $REPO_DUMMY_BNS_1_DEPLOY_CONTRACTS;
 echo "$RESULT";
 
 ADDR_DOMAIN_MARKET=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $4 }');
-ADDR_DOMAIN_PRICING=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $6 }');
-ADDR_DOMAIN_NAMES=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $8 }');
-ADDR_DOMAIN_NFT=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $10 }');
-ADDR_DOMAIN_ROUTER=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $12 }');
-ADDR_DOMAIN_PROVIDER=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $14 }');
+ADDR_DOMAIN_NFT=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $6 }');
+ADDR_DOMAIN_ROUTER=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $8 }');
+ADDR_DOMAIN_PROVIDER=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $10 }');
 
 echo "Parsed domain market address $ADDR_DOMAIN_MARKET";
-echo "Parsed domain pricing address $ADDR_DOMAIN_PRICING";
-echo "Parsed domain names policy address $ADDR_DOMAIN_NAMES";
 echo "Parsed domain NFT address $ADDR_DOMAIN_NFT";
 echo "Parsed domain content router address $ADDR_DOMAIN_ROUTER";
 echo "Parsed domain simple content provider address $ADDR_DOMAIN_PROVIDER";
@@ -73,7 +69,7 @@ echo "fund $ADDR_FUND" >> $LOGS_PARAMS_FILE;
 RESULT="";
 CUR_COMMAND="";
 if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
-    CUR_COMMAND="npx truffle run verify BNSDomainNameMarket@$ADDR_DOMAIN_MARKET BNSMarketPricePolicy@$ADDR_DOMAIN_PRICING BNSNamesPolicy@$ADDR_DOMAIN_NAMES BNSNFT@$ADDR_DOMAIN_NFT BNSContentRouter@$ADDR_DOMAIN_ROUTER BNSSimpleContentProvider@$ADDR_DOMAIN_PROVIDER --network $NETWORK";
+    CUR_COMMAND="npx truffle run verify BNSDomainNameMarket@$ADDR_DOMAIN_MARKET BNSNFT@$ADDR_DOMAIN_NFT BNSContentRouter@$ADDR_DOMAIN_ROUTER BNSSimpleContentProvider@$ADDR_DOMAIN_PROVIDER --network $NETWORK";
 else
     CUR_COMMAND=$REPO_DUMMY_BNS_1_DEPLOY_CONTRACTS_VERIFY;
 fi
@@ -122,7 +118,7 @@ echo "$RESULT";
 RESULT="";
 CUR_COMMAND="";
 if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
-    CUR_COMMAND="npx truffle exec scripts/bns/2_configure_contracts.js --market $ADDR_DOMAIN_MARKET --pricing $ADDR_DOMAIN_PRICING --names $ADDR_DOMAIN_NAMES --nft $ADDR_DOMAIN_NFT --router $ADDR_DOMAIN_ROUTER --provider $ADDR_DOMAIN_PROVIDER --dividends $ADDR_INVESTING_DIVIDENDS --usdt $ADDR_USDT --busd $ADDR_BUSD --network $NETWORK";
+    CUR_COMMAND="npx truffle exec scripts/bns/2_configure_contracts.js --market $ADDR_DOMAIN_MARKET --nft $ADDR_DOMAIN_NFT --router $ADDR_DOMAIN_ROUTER --provider $ADDR_DOMAIN_PROVIDER --dividends $ADDR_INVESTING_DIVIDENDS --usdt $ADDR_USDT --busd $ADDR_BUSD --network $NETWORK";
 else
     CUR_COMMAND=$REPO_DUMMY_BNS_2_CONFIGURE_CONTRACTS;
 fi

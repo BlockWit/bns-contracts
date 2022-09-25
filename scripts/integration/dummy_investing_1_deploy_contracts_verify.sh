@@ -1,10 +1,10 @@
 #!/bin/bash
-echo "Verifying InvestNFTMarket@0x7214E1E9AAb96521c231bfcfB05D783d340Fb19b
-Already Verified: https://testnet.bscscan.com/address/0x7214E1E9AAb96521c231bfcfB05D783d340Fb19b#code
-Verifying InvestNFTMarketPricePolicy@0xdc712B73876c1FaB9E928fD2405852d2474C9e16
-Already Verified: https://testnet.bscscan.com/address/0xdc712B73876c1FaB9E928fD2405852d2474C9e16#code
-Verifying InvestNFT@0x290B3ceeB478C98786852d36ffcaB8D9c915F185
-Already Verified: https://testnet.bscscan.com/address/0x290B3ceeB478C98786852d36ffcaB8D9c915F185#code
-Verifying DividendManager@0x6Df0458442938451cA7ceD65B178497d1ED5208c
-Already Verified: https://testnet.bscscan.com/address/0x6Df0458442938451cA7ceD65B178497d1ED5208c#code
+echo "Verifying InvestNFTMarket@0xFdDF307cf6B7281D1641ef799B66523f29Fcec19
+Already Verified: https://testnet.bscscan.com/address/0xFdDF307cf6B7281D1641ef799B66523f29Fcec19#code
+Verifying InvestNFTMarketPricePolicy@0x8cBF3a8f41410AD71c985bC622F2AAB00920Ace7
+Already Verified: https://testnet.bscscan.com/address/0x8cBF3a8f41410AD71c985bC622F2AAB00920Ace7#code
+Verifying InvestNFT@0x31a76b84D3c10ac9Dd6b3A63D5E857EcfCc1E274
+Already Verified: https://testnet.bscscan.com/address/0x31a76b84D3c10ac9Dd6b3A63D5E857EcfCc1E274#code
+Verifying DividendManager@0xa5670Bc93596278217Aa0cb14d7d6f032C4D9957
+Already Verified: https://testnet.bscscan.com/address/0xa5670Bc93596278217Aa0cb14d7d6f032C4D9957#code
 Successfully verified 4 contract(s).";

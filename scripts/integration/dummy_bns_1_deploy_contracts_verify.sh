@@ -1,14 +1,10 @@
 #!/bin/bash
-echo "Verifying BNSDomainNameMarket@0x5FbcB3EABb378AC090f3E92a8D21eF802c82aac1
-Pass - Verified: https://testnet.bscscan.com/address/0x5FbcB3EABb378AC090f3E92a8D21eF802c82aac1#code
-Verifying BNSMarketPricePolicy@0xcD2893010d50FEa0acD6CdF103e44D72e120015e
-Already Verified: https://testnet.bscscan.com/address/0xcD2893010d50FEa0acD6CdF103e44D72e120015e#code
-Verifying BNSNamesPolicy@0x858D63E6b822FEcBE7f5450Da6dcc3E35C5F8eef
-Already Verified: https://testnet.bscscan.com/address/0x858D63E6b822FEcBE7f5450Da6dcc3E35C5F8eef#code
-Verifying BNSNFT@0x2db2Dd6724D6FB3a8b0eeaeC5c1f2A811269051F
-Already Verified: https://testnet.bscscan.com/address/0x2db2Dd6724D6FB3a8b0eeaeC5c1f2A811269051F#code
-Verifying BNSContentRouter@0xc37c91742f9B3da4C6d8B78FcCA0d2f005b12439
-Already Verified: https://testnet.bscscan.com/address/0xc37c91742f9B3da4C6d8B78FcCA0d2f005b12439#code
-Verifying BNSSimpleContentProvider@0x5eBa70945FA434b17D5D64A1E1256395E9768cC4
-Already Verified: https://testnet.bscscan.com/address/0x5eBa70945FA434b17D5D64A1E1256395E9768cC4#code
-Successfully verified 6 contract(s).";
+echo "Verifying BNSDomainNameMarket@0x945ec6415E41D71542e4e3D52e26aBB7B9a5a753
+Already Verified: https://testnet.bscscan.com/address/0x945ec6415E41D71542e4e3D52e26aBB7B9a5a753#code
+Verifying BNSNFT@0xaa28Ada3554467Bcb8264B49aAdF66dBEB1f5089
+Already Verified: https://testnet.bscscan.com/address/0xaa28Ada3554467Bcb8264B49aAdF66dBEB1f5089#code
+Verifying BNSContentRouter@0x37b0a15b2d90487Be310D0bed2655089D3BD20E4
+Already Verified: https://testnet.bscscan.com/address/0x37b0a15b2d90487Be310D0bed2655089D3BD20E4#code
+Verifying BNSSimpleContentProvider@0x7f3dD6A3855E57c7c70c720AA1B1cC53f82d2f15
+Already Verified: https://testnet.bscscan.com/address/0x7f3dD6A3855E57c7c70c720AA1B1cC53f82d2f15#code
+Successfully verified 4 contract(s).";

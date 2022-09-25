@@ -3,7 +3,7 @@ const InvestNFTMarket = artifacts.require('InvestNFTMarket');
 const InvestNFTMarketPricePolicy = artifacts.require('InvestNFTMarketPricePolicy');
 const DividendManager = artifacts.require('DividendManager');
 const { logger } = require('../util');
-const { ether, time, BN} = require('@openzeppelin/test-helpers');
+const { ether } = require('@openzeppelin/test-helpers');
 
 
 async function deploy () {

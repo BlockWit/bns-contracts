@@ -2,6 +2,7 @@ const BNSDomainNameMarket = artifacts.require('BNSDomainNameMarket');
 const BNSNFT = artifacts.require('BNSNFT');
 const BNSContentRouter = artifacts.require('BNSContentRouter');
 const BNSSimpleContentProvider = artifacts.require('BNSSimpleContentProvider');
+const BNSContentProvider = artifacts.require('BNSContentProvider');
 const { logger } = require('../util');
 
 async function deploy () {
@@ -24,14 +25,19 @@ async function deploy () {
   log(`BNSSimpleContentProvider deployed: @address{${provider.address}}`);
   logAddress('BNSSimpleContentProvider', provider.address);
 
+  const provider1 = await BNSContentProvider.new({ from: deployer });
+  log(`BNSContentProvider deployed: @address{${provider1.address}}`);
+  logAddress('BNSContentProvider', provider.address);
+
   const contracts = [
     { contract: market, name: 'BNSDomainNameMarket' },
     { contract: nft, name: 'BNSNFT' },
     { contract: router, name: 'BNSContentRouter' },
     { contract: provider, name: 'BNSSimpleContentProvider' },
+    { contract: provider1, name: 'BNSContentProvider' }
   ]
 
-  log(Object.entries({ market, nft, router, provider }).reduce((result, [key, contract]) => {
+  log(Object.entries({ market, nft, router, provider, provider1 }).reduce((result, [key, contract]) => {
     return `${result} --${key} ${contract.address}`
   }, 'Configuration params:'));
 

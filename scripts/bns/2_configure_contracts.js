@@ -2,6 +2,7 @@ const BNSDomainNameMarket = artifacts.require('BNSDomainNameMarket');
 const BNSNFT = artifacts.require('BNSNFT');
 const BNSContentRouter = artifacts.require('BNSContentRouter');
 const BNSSimpleContentProvider = artifacts.require('BNSSimpleContentProvider');
+const BNSContentProvider = artifacts.require('BNSContentProvider');
 const { logger } = require('../util');
 
 async function deploy () {
@@ -11,6 +12,7 @@ async function deploy () {
     BNSDomainNameMarket: MARKET_ADDRESS,
     BNSContentRouter: ROUTER_ADDRESS,
     BNSSimpleContentProvider: PROVIDER_ADDRESS,
+    BNSContentProvider: PROVIDER1_ADDRESS,
     DividendManager: DIVIDENDS_ADDRESS,
     BUSD: BUSD_ADDRESS,
     USDT: USDT_ADDRESS,
@@ -19,6 +21,7 @@ async function deploy () {
     'BNSDomainNameMarket',
     'BNSContentRouter',
     'BNSSimpleContentProvider',
+    'BNSContentProvider',
     'DividendManager',
     'BUSD',
     'USDT'
@@ -29,6 +32,7 @@ async function deploy () {
   const market = await BNSDomainNameMarket.at(MARKET_ADDRESS);
   const contentRouter = await BNSContentRouter.at(ROUTER_ADDRESS);
   const contentProvider = await BNSSimpleContentProvider.at(PROVIDER_ADDRESS);
+  const contentProvider1 = await BNSContentProvider.at(PROVIDER1_ADDRESS);
 
   {
     log(`NFT. Grant minter role to Market.`);
@@ -73,6 +77,16 @@ async function deploy () {
   {
     log(`Market. Set fundraising wallet.`);
     const tx = await market.setDividendManager(DIVIDENDS_ADDRESS, { from: deployer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`ContentProvider1. Grant content manager role to ContentRouter.`);
+    const tx = await contentProvider1.grantRole(web3.utils.keccak256('ADMIN'), contentRouter.address, { from: deployer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`Provider1. Set NFT.`);
+    const tx = await contentProvider1.setNFT(NFT_ADDRESS, {from: deployer});
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
 }

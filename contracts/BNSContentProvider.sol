@@ -8,7 +8,7 @@ import "./token/ERC721/ERC721.sol";
 contract BNSContentProvider is AccessControl {
     type tokenId is uint256;
     IERC721 public NFT;
-    mapping(tokenId => bytes32) public content;
+    mapping(tokenId => bytes) public content;
 
     bytes32 public constant ADMIN = keccak256("ADMIN");
 
@@ -23,11 +23,11 @@ contract BNSContentProvider is AccessControl {
 
     function setContent(tokenId id, string memory newContent) public {
         require(msg.sender == NFT.ownerOf(tokenId.unwrap(id)), "Only token owner can set content");
-        bytes32 newContentBytes = keccak256(abi.encodePacked(newContent));
-        content[id] = newContentBytes;
+        bytes memory _content = bytes(newContent);
+        content[id] = _content;
     }
 
-    function getContent(tokenId id) public view returns (bytes32) {
+    function getContent(tokenId id) public view returns (bytes memory) {
         return content[id];
     }
 

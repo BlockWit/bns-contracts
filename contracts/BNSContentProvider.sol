@@ -21,10 +21,15 @@ contract BNSContentProvider is AccessControl {
         NFT = IERC721(newERC721);
     }
 
-    function setContent(tokenId id, string memory newContent) public {
+    function setContentAsString(tokenId id, string memory newContent) public {
         require(msg.sender == NFT.ownerOf(tokenId.unwrap(id)), "Only token owner can set content");
         bytes memory _content = bytes(newContent);
         content[id] = _content;
+    }
+
+    function setContentAsBytes(tokenId id, bytes memory newContent) public {
+        require(msg.sender == NFT.ownerOf(tokenId.unwrap(id)), "Only token owner can set content");
+        content[id] = newContent;
     }
 
     function getContent(tokenId id) public view returns (bytes memory) {

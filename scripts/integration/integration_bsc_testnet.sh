@@ -54,11 +54,13 @@ ADDR_DOMAIN_MARKET=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ prin
 ADDR_DOMAIN_NFT=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $6 }');
 ADDR_DOMAIN_ROUTER=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $8 }');
 ADDR_DOMAIN_PROVIDER=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $10 }');
+ADDR_CONTENT_PROVIDER=$(echo "$RESULT" | grep 'Configuration params:' | awk '{ print $12 }');
 
 echo "Parsed domain market address $ADDR_DOMAIN_MARKET";
 echo "Parsed domain NFT address $ADDR_DOMAIN_NFT";
 echo "Parsed domain content router address $ADDR_DOMAIN_ROUTER";
 echo "Parsed domain simple content provider address $ADDR_DOMAIN_PROVIDER";
+echo "Parsed domain special content provider address $ADDR_CONTENT_PROVIDER";
 
 echo "BUSD $ADDR_BUSD" >> $LOGS_PARAMS_FILE;
 echo "USDT $ADDR_USDT" >> $LOGS_PARAMS_FILE;
@@ -69,7 +71,7 @@ echo "fund $ADDR_FUND" >> $LOGS_PARAMS_FILE;
 RESULT="";
 CUR_COMMAND="";
 if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
-    CUR_COMMAND="npx truffle run verify BNSDomainNameMarket@$ADDR_DOMAIN_MARKET BNSNFT@$ADDR_DOMAIN_NFT BNSContentRouter@$ADDR_DOMAIN_ROUTER BNSSimpleContentProvider@$ADDR_DOMAIN_PROVIDER --network $NETWORK";
+    CUR_COMMAND="npx truffle run verify BNSDomainNameMarket@$ADDR_DOMAIN_MARKET BNSNFT@$ADDR_DOMAIN_NFT BNSContentRouter@$ADDR_DOMAIN_ROUTER BNSSimpleContentProvider@$ADDR_DOMAIN_PROVIDER BNSContentProvider@$ADDR_CONTENT_PROVIDER --network $NETWORK";
 else
     CUR_COMMAND=$REPO_DUMMY_BNS_1_DEPLOY_CONTRACTS_VERIFY;
 fi
@@ -118,7 +120,7 @@ echo "$RESULT";
 RESULT="";
 CUR_COMMAND="";
 if [ $EXEC_TYPE == $EXEC_TYPE_NORMAL ]; then
-    CUR_COMMAND="npx truffle exec scripts/bns/2_configure_contracts.js --market $ADDR_DOMAIN_MARKET --nft $ADDR_DOMAIN_NFT --router $ADDR_DOMAIN_ROUTER --provider $ADDR_DOMAIN_PROVIDER --dividends $ADDR_INVESTING_DIVIDENDS --usdt $ADDR_USDT --busd $ADDR_BUSD --network $NETWORK";
+    CUR_COMMAND="npx truffle exec scripts/bns/2_configure_contracts.js --market $ADDR_DOMAIN_MARKET --nft $ADDR_DOMAIN_NFT --router $ADDR_DOMAIN_ROUTER --provider $ADDR_DOMAIN_PROVIDER --provider1 $ADDR_CONTENT_PROVIDER --dividends $ADDR_INVESTING_DIVIDENDS --usdt $ADDR_USDT --busd $ADDR_BUSD --network $NETWORK";
 else
     CUR_COMMAND=$REPO_DUMMY_BNS_2_CONFIGURE_CONTRACTS;
 fi

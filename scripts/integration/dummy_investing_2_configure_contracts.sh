@@ -2,29 +2,29 @@
 echo "Using network 'bsctestnet_special'.
 
 NFT. Set DividendManager.
-Result: successful tx: https://etherscan.io/tx/0x40c50ffcc0064702cef45bf033ed4c6876b4737418b5b75fa2ccbebadad4b77d
+Result: successful tx: https://etherscan.io/tx/0xf818a60fe19a72cbae0bdbd6bfe662932dc19bf3fdf948ad7c69c0455b81bcf4
 NFT. Grant minter role to Market.
-Result: successful tx: https://etherscan.io/tx/0xa1086a9e35a538a22db1ecfc2f170c81267aad09c50c51f2266d91442164b0ce
+Result: successful tx: https://etherscan.io/tx/0x66e89b7ec98d89cee1a0351ac2b96cc1fde3971ee92bd2907e5a024b26beb181
 Market. Set NFT.
-Result: successful tx: https://etherscan.io/tx/0xd8361add976235a39fa2311d9faece559c9ed5e2c58a0ffdd2c70059f6fb100c
+Result: successful tx: https://etherscan.io/tx/0x355319bc2ef90fbce59df5423aff03d31eb589e63bba9dcef1588a863d08e735
 Market. Set PricingPolicy.
-Result: successful tx: https://etherscan.io/tx/0x92aa88e3fcf12726746d389fe4a8d19586636f4554fb19f2c670e49e295b9efc
+Result: successful tx: https://etherscan.io/tx/0xec38e828261763cb99f9932f0b884679331f73643cf8933691a79832ec606f42
 Market. Set BUSD.
-Result: successful tx: https://etherscan.io/tx/0x661a251de94bfc011f2b3548de3e23805a64f0538535e1d768a5dbc7fa4b924e
+Result: successful tx: https://etherscan.io/tx/0x265d19d220ea8c55787de299a3e23f08c00fd11fcb85f4eced26849874ca1159
 Market. Set USDT.
-Result: successful tx: https://etherscan.io/tx/0x211d65ed1991c4cdff47277a5acaac0901b3d78a267c693412c3db6849655d35
+Result: successful tx: https://etherscan.io/tx/0xb7d7f7c9a15dfa5feced58c42c0d3c7a7a16f7fc011e055300d7d2d227ee4e16
 DividendManager. Set depositary.
-Result: successful tx: https://etherscan.io/tx/0x2c95d284cec1bae4d996705b4c65056ad984168d160a26a45f10626763b1d271
+Result: successful tx: https://etherscan.io/tx/0x7a53229b692d46d7f8f539b3f133268c405b8cb27664658029137e090ab8e997
 DividendManager. Set BUSD.
-Result: successful tx: https://etherscan.io/tx/0xed96f8d81f1f030675115b009b247ba5edb5a17f48a63a9aa8a96be4bc80cef9
+Result: successful tx: https://etherscan.io/tx/0x4d7e52cd37442006d820f50fefe79dc49439b659137b0eee9de4894fc86f1ce6
 DividendManager. Set USDT.
-Result: successful tx: https://etherscan.io/tx/0x5b282ec9ffd56a7f81a2d723314d0d3a9a53eaf3d936c5284b298b7e691d5e05
+Result: successful tx: https://etherscan.io/tx/0x14ddc10d932fb6319f70c53e738f1b7957bd096ab67dad93505d92d3f7ef6ad7
 PricingPolicy. Set price.
-Result: successful tx: https://etherscan.io/tx/0x4247147f10a50083ac09ed8f7744f5cc6202323b5c91f24cf4f2ab1508cd85c4
+Result: successful tx: https://etherscan.io/tx/0x4231ffb5be23844fdc0ccc858d4cef6ac3d5acbb22bf40dbdf5cd5d19c75f0aa
 NFT. Mint dev shares.
-Result: successful tx: https://etherscan.io/tx/0xb48c07aeca36a802841ec5ba6d2c83fc827143f7106f30b39a91033bda2bc417
+Result: successful tx: https://etherscan.io/tx/0x0afec1372192f5283d422431ad7c3748bc8beaf532ce2117ceef7cb7169db913
 NFT. Mint team shares.
-Result: successful tx: https://etherscan.io/tx/0xb3f33ab48212cfb4c6a83e74adc9560f3bab9b366f422e60f6bcccdff1919e80
+Result: successful tx: https://etherscan.io/tx/0x3cd7a6ed7e5cbf34d52583e1fbd05f67fca0b6f10c5556ae188c7e79360bd272
 NFT. Mint fund shares.
-Result: successful tx: https://etherscan.io/tx/0x78bd0ff5a117340ca6383d28f0265849b60d9fc102b3e0f380c56dbc43e2c74c
+Result: successful tx: https://etherscan.io/tx/0x5c511726b78af0085a49f83a003d761b1678b70dd05298c5e6bbae3a216ee76a
 success";

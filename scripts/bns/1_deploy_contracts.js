@@ -27,7 +27,7 @@ async function deploy () {
 
   const provider1 = await BNSContentProvider.new({ from: deployer });
   log(`BNSContentProvider deployed: @address{${provider1.address}}`);
-  logAddress('BNSContentProvider', provider.address);
+  logAddress('BNSContentProvider', provider1.address);
 
   const contracts = [
     { contract: market, name: 'BNSDomainNameMarket' },

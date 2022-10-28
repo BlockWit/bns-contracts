@@ -24,35 +24,35 @@ describe('BNSDomainNameMarket', function () {
   let investnft;
   let investnftmarket;
   let investpricing;
-  let tokens = { usdt: { id: 1, contract: undefined, key: 12345 }, busd: { id: 2, contract: undefined, key: 23456 }};
+  let tokens = {usdt: {id: 1, contract: undefined, key: 12345}, busd: {id: 2, contract: undefined, key: 23456}};
 
   beforeEach(async function () {
-    [ investnft, investnftmarket, investpricing, market, nft, dividend, tokens.busd.contract, tokens.usdt.contract ] = await Promise.all([
+    [investnft, investnftmarket, investpricing, market, nft, dividend, tokens.busd.contract, tokens.usdt.contract] = await Promise.all([
       InvestNFT.new({from: deployer}),
       InvestNFTMarket.new({from: deployer}),
       InvestNFTMarketPricePolicy.new({from: deployer}),
-      BNSDomainNameMarket.new({ from: deployer }),
-      BNSNFT.new({ from: deployer }),
-      DividendManager.new({ from: deployer }),
-      ERC20Mock.new('BUSD Mock Token', 'BUSD', deployer, ether('10000000'), { from: deployer }),
-      ERC20Mock.new('USDT Mock Token', 'USDT', deployer, ether('10000000'), { from: deployer }),
+      BNSDomainNameMarket.new({from: deployer}),
+      BNSNFT.new({from: deployer}),
+      DividendManager.new({from: deployer}),
+      ERC20Mock.new('BUSD Mock Token', 'BUSD', deployer, ether('10000000'), {from: deployer}),
+      ERC20Mock.new('USDT Mock Token', 'USDT', deployer, ether('10000000'), {from: deployer}),
     ]);
     await Promise.all([
-      tokens.busd.contract.transfer(user, ether('5000000'), { from: deployer}),
-      tokens.usdt.contract.transfer(user, ether('5000000'), { from: deployer})
+      tokens.busd.contract.transfer(user, ether('5000000'), {from: deployer}),
+      tokens.usdt.contract.transfer(user, ether('5000000'), {from: deployer})
     ])
   });
 
   describe('setBNSNFT', function () {
     context('when called by admin', function () {
       it('should change bnsnft', async function () {
-        await market.setBNSNFT(nft.address, {from : deployer});
+        await market.setBNSNFT(nft.address, {from: deployer});
         expect(await market.bnsnft()).to.be.equal(nft.address);
       });
     });
     context('when called not by admin', function () {
       it('revert', async function () {
-        await expectRevert.unspecified(market.setBNSNFT(nft.address, {from : user}));
+        await expectRevert.unspecified(market.setBNSNFT(nft.address, {from: user}));
       });
     });
   });
@@ -60,13 +60,13 @@ describe('BNSDomainNameMarket', function () {
   describe('setDividendManager', function () {
     context('when called by admin', function () {
       it('should change address of the dividend manager', async function () {
-        await market.setDividendManager(dividend.address, {from : deployer});
+        await market.setDividendManager(dividend.address, {from: deployer});
         expect(await market.dividendManager()).to.be.equal(dividend.address);
       });
     });
     context('when called not by admin', function () {
       it('revert', async function () {
-        await expectRevert.unspecified(market.setDividendManager(dividend.address, {from : user}));
+        await expectRevert.unspecified(market.setDividendManager(dividend.address, {from: user}));
       });
     });
   });
@@ -74,7 +74,7 @@ describe('BNSDomainNameMarket', function () {
   describe('setAsset', function () {
     context('when called by admin', function () {
       it('should add specified asset to assets.map', async function () {
-        await market.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer});
+        await market.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from: deployer});
         const [ticker, type] = await market.getAsset(tokens.usdt.contract.address);
         expect(ticker).to.be.equal('USDT');
         expect(type).to.be.equal('1');
@@ -82,7 +82,7 @@ describe('BNSDomainNameMarket', function () {
     });
     context('when called not by admin', function () {
       it('revert', async function () {
-        await expectRevert.unspecified(market.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from : user}));
+        await expectRevert.unspecified(market.setAsset(tokens.busd.contract.address, 'BUSD', 1, {from: user}));
       });
     });
   });
@@ -90,11 +90,11 @@ describe('BNSDomainNameMarket', function () {
   describe('removeAsset', function () {
     context('if asset is added', function () {
       it('should remove specified asset', async function () {
-        await market.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from : deployer});
+        await market.setAsset(tokens.usdt.contract.address, 'USDT', 1, {from: deployer});
         const [ticker, type] = await market.getAsset(tokens.usdt.contract.address);
         expect(ticker).to.be.equal('USDT');
         expect(type).to.be.equal('1');
-        await market.removeAsset(tokens.usdt.contract.address, {from : deployer});
+        await market.removeAsset(tokens.usdt.contract.address, {from: deployer});
         await expectRevert(market.getAsset(tokens.usdt.contract.address), 'Assets.Map: nonexistent key');
       });
     });
@@ -149,7 +149,7 @@ describe('BNSDomainNameMarket', function () {
     context('if has referer', function () {
       it('should mint nft`s, transfer bonus to referer, distribute dividends', async function () {
         await usdt.approve(bnsMarket.address, ether('100000'), {from: user});
-        await bnsMarket.buy(domainNames, ether('100000'), user, referer, ether('10000'), usdt.address, {from: seller});
+        await bnsMarket.buy(domainNames, ether('100000'), user, referer, ether('10000'), usdt.address, false, {from: seller});
         expect(await bnsNFT.balanceOf(user)).to.be.bignumber.equal('5');
         expect(await usdt.balanceOf(referer)).to.be.bignumber.equal(ether('10000'));
         expect(await dividendManager.withdrawableDividendOf(0, usdt.address)).to.be.bignumber.equal(ether('90000'));
@@ -158,7 +158,7 @@ describe('BNSDomainNameMarket', function () {
     context('if no referer ', async function () {
       it('should mint nft`s, distribute dividends', async function () {
         await usdt.approve(bnsMarket.address, ether('100000'), {from: user});
-        await bnsMarket.buy(domainNames, ether('100000'), user, '0x0000000000000000000000000000000000000000', 0, usdt.address, {from: seller});
+        await bnsMarket.buy(domainNames, ether('100000'), user, '0x0000000000000000000000000000000000000000', 0, usdt.address, false, {from: seller});
         expect(await bnsNFT.balanceOf(user)).to.be.bignumber.equal('5');
         expect(await dividendManager.withdrawableDividendOf(0, usdt.address)).to.be.bignumber.equal(ether('100000'));
         expect(await usdt.balanceOf(holder1)).to.be.bignumber.equal('0');
@@ -166,5 +166,27 @@ describe('BNSDomainNameMarket', function () {
         expect(await usdt.balanceOf(holder1)).to.be.bignumber.equal(ether('100000'));
       });
     });
+    context('if flag is true', function () {
+      context('if has referer', function () {
+        it('should mint nft`s, transfer bonus to referer, distribute dividends', async function () {
+          await usdt.transfer(bnsMarket.address, ether('100000'), {from: user});
+          await bnsMarket.buy(domainNames, ether('100000'), user, referer, ether('10000'), usdt.address, true, {from: seller});
+          expect(await bnsNFT.balanceOf(user)).to.be.bignumber.equal('5');
+          expect(await usdt.balanceOf(referer)).to.be.bignumber.equal(ether('10000'));
+          expect(await dividendManager.withdrawableDividendOf(0, usdt.address)).to.be.bignumber.equal(ether('90000'));
+        });
+      });
+      context('if no referer ', async function () {
+        it('should mint nft`s, distribute dividends', async function () {
+          await usdt.transfer(bnsMarket.address, ether('100000'), {from: user});
+          await bnsMarket.buy(domainNames, ether('100000'), user, '0x0000000000000000000000000000000000000000', 0, usdt.address, true, {from: seller});
+          expect(await bnsNFT.balanceOf(user)).to.be.bignumber.equal('5');
+          expect(await dividendManager.withdrawableDividendOf(0, usdt.address)).to.be.bignumber.equal(ether('100000'));
+          expect(await usdt.balanceOf(holder1)).to.be.bignumber.equal('0');
+          await nft.withdrawDividend({from: holder1});
+          expect(await usdt.balanceOf(holder1)).to.be.bignumber.equal(ether('100000'));
+        });
+      });
+    });
   });
-});
+})

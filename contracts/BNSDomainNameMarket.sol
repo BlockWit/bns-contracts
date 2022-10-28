@@ -37,9 +37,11 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         return _removeAsset(key);
     }
 
-    function buy(string[] memory domainNames, uint price, address buyer, address referer, uint refererBonus, Assets.Key assetKey) whenNotPaused external onlyRole(MINTER_ROLE) {
+    function buy(string[] memory domainNames, uint price, address buyer, address referer, uint refererBonus, Assets.Key assetKey, bool flag) whenNotPaused external onlyRole(MINTER_ROLE) {
         // charge payment
-        _transferAssetFrom(buyer, address(this), price, assetKey);
+        if (flag == false) {
+            _transferAssetFrom(buyer, address(this), price, assetKey);
+        }
 
         uint dividends = price;
         if (refererBonus > 0) {

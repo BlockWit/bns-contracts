@@ -38,18 +38,20 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     }
 
     function buy(string[] memory domainNames, uint price, address buyer, address referer, uint refererBonus, Assets.Key assetKey, bool flag) whenNotPaused external onlyRole(MINTER_ROLE) {
-        // charge payment
-        if (flag == false) {
-            _transferAssetFrom(buyer, address(this), price, assetKey);
-        }
+        if (price != 0) {
+            // charge payment
+            if (flag == false) {
+                _transferAssetFrom(buyer, address(this), price, assetKey);
+            }
 
-        uint dividends = price;
-        if (refererBonus > 0) {
-            dividends = dividends - refererBonus;
-            _transferAsset(referer, refererBonus, assetKey);
+            uint dividends = price;
+            if (refererBonus > 0) {
+                dividends = dividends - refererBonus;
+                _transferAsset(referer, refererBonus, assetKey);
+            }
+            _approveAsset(address(dividendManager), dividends, assetKey);
+            dividendManager.distributeDividends(price - refererBonus, assetKey);
         }
-        _approveAsset(address(dividendManager), dividends, assetKey);
-        dividendManager.distributeDividends(price - refererBonus, assetKey);
 
         // mint all NFT
         bnsnft.safeBatchMint(buyer, domainNames);

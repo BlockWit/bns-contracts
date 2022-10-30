@@ -188,5 +188,11 @@ describe('BNSDomainNameMarket', function () {
         });
       });
     });
+    context('if price is 0', function () {
+      it('should mint nft`s', async function () {
+        await bnsMarket.buy(domainNames, 0, user, referer, 0, usdt.address, false, {from: seller});
+        expect(await bnsNFT.balanceOf(user)).to.be.bignumber.equal('5');
+      });
+    });
   });
 })

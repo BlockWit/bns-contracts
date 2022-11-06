@@ -76,7 +76,7 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         require(msg.sender == ownerOf(tokenId) || hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "BNSNFT: Only admin or token owner can set content");
         require(_exists(tokenId), "BNSNFT: Content query for nonexistent token");
         string memory domainName = tokenIdToDomainNames[tokenId];
-	    contentRouter.setContentOrAddress(domainName, "", content, contentType, contentProvider);
+        contentRouter.setContentOrAddress(domainName, "", content, contentType, contentProvider);
     }
 
     function setContentOrAddressByDomainName(string memory domainName, string memory content, IContentRouter.ContentType contentType, address contentProvider) external {
@@ -110,29 +110,28 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
      *
      **/
     function unsafeBatchMint(address to, string[] calldata domainNames) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        for(uint i = 0; i < domainNames.length; i++) {
-           uint256 tokenId = _tokenIdCounter.current();
-           _tokenIdCounter.increment();
-           _balances[to] += 1;
-           _owners[tokenId] = to;
-           bytes32 domainNameHash = keccak256(abi.encodePacked(domainNames[i]));
-           domainNameExists[domainNameHash] = true;
-           tokenIdToDomainNames[tokenId] = domainNames[i];
-           domainNamesToTokenId[domainNameHash] = tokenId;
+        for (uint i = 0; i < domainNames.length; i++) {
+            uint256 tokenId = _tokenIdCounter.current();
+            _tokenIdCounter.increment();
+            _balances[to] += 1;
+            _owners[tokenId] = to;
+            bytes32 domainNameHash = keccak256(abi.encodePacked(domainNames[i]));
+            domainNameExists[domainNameHash] = true;
+            tokenIdToDomainNames[tokenId] = domainNames[i];
+            domainNamesToTokenId[domainNameHash] = tokenId;
         }
     }
 
     function safeBatchMint(address to, string[] calldata domainNames) public onlyRole(MINTER_ROLE) {
-        for(uint i = 0; i < domainNames.length; i++) {
+        for (uint i = 0; i < domainNames.length; i++) {
             bytes32 domainNameHash = keccak256(abi.encodePacked(domainNames[i]));
-            if(!domainNameExists[domainNameHash]){
-                uint256 tokenId = _tokenIdCounter.current();
-                _tokenIdCounter.increment();
-                _safeMint(to, tokenId);
-                domainNameExists[domainNameHash] = true;
-                tokenIdToDomainNames[tokenId] = domainNames[i];
-                domainNamesToTokenId[domainNameHash] = tokenId;
-            }
+            require(!domainNameExists[domainNameHash], "BNSNFT: Domain name already exists");
+            uint256 tokenId = _tokenIdCounter.current();
+            _tokenIdCounter.increment();
+            _safeMint(to, tokenId);
+            domainNameExists[domainNameHash] = true;
+            tokenIdToDomainNames[tokenId] = domainNames[i];
+            domainNamesToTokenId[domainNameHash] = tokenId;
         }
     }
 

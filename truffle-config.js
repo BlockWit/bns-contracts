@@ -22,6 +22,7 @@ const HDWalletProvider = require('@truffle/hdwallet-provider');
 const CONFIG = require('dotenv').config().parsed;
 const ETH_MAIN_PRIVATE_KEYS = JSON.parse(CONFIG.ETH_MAIN_PRIVATE_KEYS);
 const ETH_TEST_MNEMONIC = CONFIG.ETH_TEST_MNEMONIC;
+const ETH_TEST_PRIVATE_KEYS = JSON.parse(CONFIG.ETH_TEST_PRIVATE_KEYS);
 
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
@@ -78,7 +79,7 @@ module.exports = {
       timeoutBlocks: 200,
     },
     bsctestnet: {
-      provider: () => new HDWalletProvider(ETH_TEST_MNEMONIC, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://data-seed-prebsc-1-s1.binance.org:8545`),
       network_id: 97,
       networkCheckTimeout: 10000,
       gas: 12500000,
@@ -93,21 +94,21 @@ module.exports = {
       confirmations: 2,
       timeoutBlocks: 200,
     },
-    kovan: {
-      provider: () => new HDWalletProvider(ETH_TEST_MNEMONIC, `https://kovan.infura.io/v3/${CONFIG.INFURA_KEY}`, 0, 20),
-      network_id: 42,
-      gasPrice: 10000000000, // 10 Gwei
-      gas: 12500000,
-      timeoutBlocks: 200,
-      skipDryRun: true
+    goerli: {
+      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://goerli.infura.io/v3/${CONFIG.INFURA_KEY}`),
+      network_id: 5,
+      gasPrice: 5000000000, // 5 Gwei
+      gas: 30000000,
+      confirmations: 2,
+      timeoutBlocks: 200
     },
-    ropsten: {
-      provider: () => new HDWalletProvider(ETH_TEST_MNEMONIC, `https://ropsten.infura.io/v3/${CONFIG.INFURA_KEY}`, 0, 20),
-      network_id: 3,
-      gasPrice: 80000000000, // 80 Gwei
-      gas: 8000000,
-      timeoutBlocks: 200,   // # of blocks before a deployment times out  (minimum/default: 50)
-      skipDryRun: true      // Skip dry run before migrations? (default: false for public nets )
+    polygon: {
+      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://polygon-rpc.com/`),
+      network_id: 137,
+      gasPrice: 140000000000, // 5 Gwei
+      gas: 20000000,
+      confirmations: 2,
+      timeoutBlocks: 200
     },
     // Useful for private networks
     // private: {

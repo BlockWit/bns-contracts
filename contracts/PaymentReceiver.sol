@@ -9,9 +9,9 @@ import "./RecoverableFunds.sol";
 contract PaymentReceiver is AccessControl, RecoverableFunds {
 
     event TokenPaid(
-        uint256 taskId,
-        uint256 amount,
-        address buyer
+        uint256 indexed taskId,
+        address indexed buyer,
+        uint256 amount
     );
 
     address public recipient;
@@ -27,7 +27,7 @@ contract PaymentReceiver is AccessControl, RecoverableFunds {
 
     function processPayment(address token, address sender, uint256 amount, uint256 taskId, address buyer) external payable {
         IERC20(token).transferFrom(sender, recipient, amount);
-        emit TokenPaid(taskId, amount, buyer);
+        emit TokenPaid(taskId, buyer, amount);
     }
 
     function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {

@@ -110,12 +110,13 @@ module.exports = {
       confirmations: 2,
       timeoutBlocks: 200
     },
-    // Useful for private networks
-    // private: {
-    // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
-    // network_id: 2111,   // This network is yours, in the cloud.
-    // production: true    // Treats this network as if it was a public net. (default: false)
-    // }
+    mumbai: {
+      provider: () => new HDWalletProvider(ETH_TEST_MNEMONIC, `https://matic-mumbai.chainstacklabs.com`),
+      network_id: 80001,
+      gasPrice: 170000000000, // 17 Gwei
+      confirmations: 2,
+      timeoutBlocks: 200
+    }
   },
 
   // Set default mocha options here, use special reporters etc.
@@ -145,7 +146,8 @@ module.exports = {
 
   api_keys: {
     bscscan: CONFIG.BSCSCAN_KEY,
-    etherscan: CONFIG.ETHERSCAN_KEY
+    etherscan: CONFIG.ETHERSCAN_KEY,
+    polygonscan: CONFIG.POLYGONSCAN_KEY
   }
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:

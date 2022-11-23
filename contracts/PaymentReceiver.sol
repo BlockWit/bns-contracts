@@ -12,8 +12,8 @@ contract PaymentReceiver is AccessControl, AssetHandler, RecoverableFunds {
     event PaymentReceived(
         uint256 indexed taskId,
         address indexed buyer,
-        uint256 amount,
-        Assets.Key assetKey
+        Assets.Key indexed assetKey,
+        uint256 amount
     );
 
     address public recipient;
@@ -33,7 +33,7 @@ contract PaymentReceiver is AccessControl, AssetHandler, RecoverableFunds {
 
     function processPayment(uint256 taskId, address buyer, uint256 amount, Assets.Key assetKey, address sender) external payable {
         _transferAssetFrom(sender, recipient, amount, assetKey);
-        emit PaymentReceived(taskId, buyer, amount, assetKey);
+        emit PaymentReceived(taskId, buyer, assetKey, amount);
     }
 
     function removeAsset(Assets.Key key) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {

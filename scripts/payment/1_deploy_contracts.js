@@ -6,8 +6,8 @@ async function deploy () {
   const [deployer] = await web3.eth.getAccounts();
 
   const paymentReceiver = await PaymentReceiver.new({ from: deployer });
-  log(`PaymentProcessor deployed: @address{${paymentReceiver.address}}`);
-  logAddress('Test', paymentReceiver.address);
+  log(`PaymentReceiver deployed: @address{${paymentReceiver.address}}`);
+  logAddress('PaymentReceiver', paymentReceiver.address);
 
 }
 

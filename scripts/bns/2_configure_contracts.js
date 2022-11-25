@@ -16,6 +16,7 @@ async function deploy () {
     DividendManager: DIVIDENDS_ADDRESS,
     BUSD: BUSD_ADDRESS,
     USDT: USDT_ADDRESS,
+    USDC: USDC_ADDRESS
   } = addresses.claim([
     'BNSNFT',
     'BNSDomainNameMarket',
@@ -24,7 +25,8 @@ async function deploy () {
     'BNSContentProvider',
     'DividendManager',
     'BUSD',
-    'USDT'
+    'USDT',
+    'USDC'
   ])
   const [deployer] = await web3.eth.getAccounts();
 
@@ -72,6 +74,11 @@ async function deploy () {
   {
     log(`Market. Set USDT.`);
     const tx = await market.setAsset(USDT_ADDRESS, 'USDT', 1, { from: deployer });
+    log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
+  }
+  {
+    log(`Market. Set USDC.`);
+    const tx = await market.setAsset(USDC_ADDRESS, 'USDC', 1, { from: deployer });
     log(`Result: successful tx: @tx{${tx.receipt.transactionHash}}`);
   }
   {

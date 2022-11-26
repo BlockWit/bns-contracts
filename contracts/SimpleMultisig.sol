@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.14;
 
-import "./token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract SimpleMultiSig {
 
@@ -10,7 +10,7 @@ contract SimpleMultiSig {
 
     bool public initialized;
 
-    mapping (address => bool) public owners;
+    mapping(address => bool) public owners;
 
     uint256 public ownersCount;
 
@@ -25,7 +25,7 @@ contract SimpleMultiSig {
         uint256 amount;
     }
 
-    mapping (uint256 => WithdrawTx) public withdrawTxs;
+    mapping(uint256 => WithdrawTx) public withdrawTxs;
 
     uint256 public txsCounter;
 
@@ -36,7 +36,7 @@ contract SimpleMultiSig {
 
     function initialize(address[] memory addresses, uint8 newApproveLimit) public {
         require(!initialized, "Already initilized");
-        for(uint8 i = 0; i < addresses.length; i++) {
+        for (uint8 i = 0; i < addresses.length; i++) {
             require(!owners[addresses[i]], "Owner address already added");
             owners[addresses[i]] = true;
         }
@@ -45,7 +45,7 @@ contract SimpleMultiSig {
         initialized = true;
     }
 
-    function createWithdrawTransaction(address assetAddress, address receiverAddress, uint256 amount) internal onlyOwner() {
+    function createWithdrawTransaction(address assetAddress, address receiverAddress, uint256 amount) public onlyOwner() {
         WithdrawTx storage withdrawTx = withdrawTxs[txsCounter];
         withdrawTx.active = true;
         withdrawTx.approvedCounter = 1;
@@ -53,6 +53,7 @@ contract SimpleMultiSig {
         withdrawTx.assetAddress = assetAddress;
         withdrawTx.receiverAddress = receiverAddress;
         withdrawTx.amount = amount;
+        txsCounter += 1;
     }
 
     function denyWithdrawTransaction(uint256 txId) public onlyOwner() {
@@ -63,14 +64,13 @@ contract SimpleMultiSig {
     function approveWithdrawTransaction(uint256 txId) public onlyOwner() {
         WithdrawTx storage withdrawTx = withdrawTxs[txId];
         require(withdrawTx.active, "Transaction must be active");
-        require(!withdrawTx.approved[msg.sender], "You alreade approved this transaction");
+        require(!withdrawTx.approved[msg.sender], "You already approved this transaction");
         withdrawTx.approved[msg.sender] = true;
         withdrawTx.approvedCounter += 1;
 
-        if(withdrawTx.approvedCounter >= approveLimit) {
+        if (withdrawTx.approvedCounter >= approveLimit) {
             withdrawTx.active = false;
-            IERC20(withdrawTx.assetAddress).transfer(this, withdrawTx.receiverAddress, withdrawTx.amount);
+            IERC20(withdrawTx.assetAddress).transfer(withdrawTx.receiverAddress, withdrawTx.amount);
         }
     }
-
 }

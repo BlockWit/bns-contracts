@@ -70,7 +70,7 @@ module.exports = {
       timeoutBlocks: 200,
     },
     bsctestnet_special: {
-      provider: () => new HDWalletProvider(ETH_MAIN_PRIVATE_KEYS, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://data-seed-prebsc-1-s3.binance.org:8545`),
       network_id: 97,
       networkCheckTimeout: 999999,
       gas: 12500000,
@@ -98,7 +98,7 @@ module.exports = {
       provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://goerli.infura.io/v3/${CONFIG.INFURA_KEY}`),
       network_id: 5,
       gasPrice: 5000000000, // 5 Gwei
-      gas: 30000000,
+      gas: 20000000,
       confirmations: 2,
       timeoutBlocks: 200
     },
@@ -111,12 +111,22 @@ module.exports = {
       timeoutBlocks: 200
     },
     mumbai: {
-      provider: () => new HDWalletProvider(ETH_TEST_MNEMONIC, `https://matic-mumbai.chainstacklabs.com`),
+      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://matic-mumbai.chainstacklabs.com`),
       network_id: 80001,
-      gasPrice: 170000000000, // 17 Gwei
+      gasPrice: 10000000000, // 17 Gwei
+      gas: 12500000,
       confirmations: 2,
       timeoutBlocks: 200
-    }
+    },
+    mumbai_special: {
+      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://polygon-mumbai.infura.io/v3/39c5bf9a051045ae9ff938d23c540afe`),
+      network_id: 80001,
+      networkCheckTimeout: 999999,
+      gas: 12500000,
+      gasPrice: 10000000000,  // 5 Gwei
+      confirmations: 2,
+      timeoutBlocks: 200,
+    },
   },
 
   // Set default mocha options here, use special reporters etc.

@@ -9,8 +9,6 @@ const InvestNFTMarketPricePolicy = contract.fromArtifact('InvestNFTMarketPricePo
 const DividendManager = contract.fromArtifact('DividendManager');
 const ERC20Mock = contract.fromArtifact('ERC20Mock');
 const BNSDomainNameMarket = contract.fromArtifact('BNSDomainNameMarket');
-const BNSMarketPricePolicy = contract.fromArtifact('BNSMarketPricePolicy');
-const BNSNamesPolicy = contract.fromArtifact('BNSNamesPolicy');
 const BNSNFT = contract.fromArtifact('BNSNFT');
 
 
@@ -66,24 +64,17 @@ describe('Integration test', function () {
       pricing.setPrice(PRICE, {from: deployer})
     ]);
     {
-      const [market, names, nft, pricing] = await Promise.all([
+      const [market, nft] = await Promise.all([
         BNSDomainNameMarket.new({from: deployer}),
-        BNSNamesPolicy.new({from: deployer}),
         BNSNFT.new({from: deployer}),
-        BNSMarketPricePolicy.new({from: deployer}),
       ]);
       bnsMarket = market;
       bnsNFT = nft;
       await Promise.all([
         await market.setBNSNFT(nft.address, {from: deployer}),
         await market.setDividendManager(dividendManager.address, {from: deployer}),
-        await market.setPricePolicy(pricing.address, {from: deployer}),
-        await market.setNamesPolicy(names.address, {from: deployer}),
         await market.setAsset(usdt.address, 'USDT', 1, {from: deployer}),
-        await nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, {from: deployer}),
-        pricing.setPrices(ether(BASE_PRICE_USDT.toString()), SIZES, PRICES_USDT.map(price => ether(price.toString())), {from: deployer}),
-        pricing.setPricesForSymbolsWithinRange(ether(BASE_PRICE_USDT.toString()), SIZES, PRICES_FOR_SYMBOLS.map(price => ether(price.toString())), {from: deployer}),
-        pricing.addUTF8Ranges(UTF8_RANGES_BYTES, {from: deployer})
+        await nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, {from: deployer})
       ])
     }
   });

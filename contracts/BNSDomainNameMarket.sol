@@ -4,6 +4,7 @@ pragma solidity ^0.8.14;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./interfaces/IDividendManager.sol";
 import "./lib/Assets.sol";
@@ -37,22 +38,25 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         return _removeAsset(key);
     }
 
+    function sendDividends(Assets.Key assetKey, uint amount) whenNotPaused public onlyRole(DEFAULT_ADMIN_ROLE) {
+        _approveAsset(address(dividendManager), amount, assetKey);
+        dividendManager.distributeDividends(amount, assetKey);
+    }
+
+    function sendDividends(Assets.Key assetKey) whenNotPaused external onlyRole(DEFAULT_ADMIN_ROLE) {
+        sendDividends(assetKey, IERC20(Assets.Key.unwrap(assetKey)).balanceOf(address(this)));
+    }
+
     function buy(string[] memory domainNames, uint price, address buyer, address referer, uint refererBonus, Assets.Key assetKey, bool flag) whenNotPaused external onlyRole(MINTER_ROLE) {
         if (price != 0) {
             // charge payment
             if (flag == false) {
                 _transferAssetFrom(buyer, address(this), price, assetKey);
             }
-
-            uint dividends = price;
             if (refererBonus > 0) {
-                dividends = dividends - refererBonus;
                 _transferAsset(referer, refererBonus, assetKey);
             }
-            _approveAsset(address(dividendManager), dividends, assetKey);
-            dividendManager.distributeDividends(price - refererBonus, assetKey);
         }
-
         // mint all NFT
         bnsnft.safeBatchMint(buyer, domainNames);
     }

@@ -107,6 +107,9 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         _unpause();
     }
 
+    function setBaseURI(string memory newBaseURI) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        baseURI = newBaseURI;
+    }
 
     /**
      *

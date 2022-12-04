@@ -31,17 +31,6 @@ describe('BNSNFT', async () => {
     bnsnft = await BNSNFT.new({ from: owner });
   });
 
-  describe('Check set and get domain data', function () {
-    it('Check set and get single domain name', async function () {
-      const receipt = await bnsnft.safeMint(account1, DOMAINS_TO_DATA[0].domain, { from: owner });
-      const tokenId = receipt.logs[0].args.tokenId.valueOf();
-      DOMAINS_TO_DATA[0].address = tokenId;
-      const addressTokenId = await bnsnft.getTokenIdByDomainName(DOMAINS_TO_DATA[0].domain);
-      await bnsnft.setContent(tokenId, DOMAINS_TO_DATA[0].content, { from: owner });
-      expect(await bnsnft.getContent(addressTokenId)).to.be.equal(DOMAINS_TO_DATA[0].content);
-    });
-  });
-
   describe('unsafeBatchMint', function () {
     context('when called by admin', function () {
       it('should add domains in array to specified address', async function () {
@@ -66,8 +55,7 @@ describe('BNSNFT', async () => {
       });
       it('shouldn`t mint duplicate domains to specified address', async function () {
         expect(await bnsnft.balanceOf(account2, { from: account2})).to.be.bignumber.equal('0');
-        await bnsnft.safeBatchMint(account2, domainNames1, { from: owner});
-        expect(await bnsnft.balanceOf(account2, { from: account2})).to.be.bignumber.equal('3');
+        await expectRevert.unspecified(bnsnft.safeBatchMint(account2, domainNames1, { from: owner}));
       });
     });
     context('when called not by admin', function () {

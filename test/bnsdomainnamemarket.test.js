@@ -12,7 +12,7 @@ const InvestNFTMarketPricePolicy = contract.fromArtifact('InvestNFTMarketPricePo
 const DividendManager = contract.fromArtifact('DividendManager');
 
 const PRICE = ether('0.000000000000000001');
-const domainNames = ['a', 'ab', 'abc', 'abcd', 'abcde'];
+const domainNames = ["a", "ab", "abc", "abcd", "abcde"];
 
 const [ deployer, user, holder1, holder2, holder3, seller, referer ] = accounts;
 
@@ -96,6 +96,129 @@ describe('BNSDomainNameMarket', function () {
         expect(type).to.be.equal('1');
         await market.removeAsset(tokens.usdt.contract.address, {from: deployer});
         await expectRevert(market.getAsset(tokens.usdt.contract.address), 'Assets.Map: nonexistent key');
+      });
+    });
+  });
+
+  describe('createCustomMint', function () {
+    let dividendManager;
+    let market
+    let pricing
+    let nft;
+    let bnsMarket;
+    let bnsNFT;
+    const share = ether('0.0000000000001');
+    let token = {usdt: {id: 1, contract: undefined, key: 12345}};
+
+    beforeEach(async function () {
+      [nft, dividendManager, market, pricing, token.usdt.contract] = await Promise.all([
+        InvestNFT.new({from: deployer}),
+        DividendManager.new({from: deployer}),
+        InvestNFTMarket.new({from: deployer}),
+        InvestNFTMarketPricePolicy.new({from: deployer}),
+        ERC20Mock.new('USDT Pegged Token', 'USDT', deployer, ether('2000000'), {from: deployer}),
+
+      ]);
+      await Promise.all([
+        nft.setDividendManager(dividendManager.address, {from: deployer}),
+        nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, {from: deployer}),
+        dividendManager.setDepositary(nft.address, {from: deployer}),
+        dividendManager.setAsset(token.usdt.contract.address, 'USDT', 1, {from: deployer}),
+        market.setInvestNFT(nft.address, {from: deployer}),
+        market.setPricePolicy(pricing.address, {from: deployer}),
+        market.setAsset(token.usdt.contract.address, 'USDT', 1, {from: deployer}),
+        pricing.setPrice(PRICE, {from: deployer}),
+        nft.safeMint(holder1, ether('0.0000000000001'), {from: deployer}),
+      ])
+      {
+        const [market, nft] = await Promise.all([
+          BNSDomainNameMarket.new({from: deployer}),
+          BNSNFT.new({from: deployer})
+        ]);
+        bnsMarket = market;
+        bnsNFT = nft;
+        await Promise.all([
+          market.setBNSNFT(nft.address, {from: deployer}),
+          market.setDividendManager(dividendManager.address, {from: deployer}),
+          market.setAsset(token.usdt.contract.address, 'USDT', 1, {from: deployer}),
+          nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, {from: deployer}),
+          market.grantRole(web3.utils.keccak256('MINTER_ROLE'), seller, {from: deployer}),
+          token.usdt.contract.transfer(market.address, ether('500000'), {from: deployer}),
+        ])
+      }
+    });
+    context('if first customMint for address', function () {
+      it('should add struct to mapping', async function () {
+        await bnsMarket.createCustomMint(user, ['a'], referer, ether('10000'), token.usdt.contract.address, {from: deployer});
+        const customMint = await bnsMarket.customMints(user);
+        const customMintFromGetter = await bnsMarket.getCustomMint(user);
+        expect(customMintFromGetter[0]).to.be.equal(['a']);
+        expect(customMintFromGetter[1]).to.be.equal(referer);
+        expect(customMintFromGetter[2]).to.be.equal(ether('10000'));
+        expect(customMintFromGetter[3]).to.be.equal(token.usdt.contract.address);
+        expect(customMintFromGetter[4]).to.be.equal(false);
+      });
+    });
+  });
+
+  describe('performCustomMint', function () {
+    let dividendManager;
+    let market
+    let pricing
+    let nft;
+    let bnsMarket;
+    let bnsNFT;
+    const share = ether('0.0000000000001');
+    let token = {usdt: {id: 1, contract: undefined, key: 12345}};
+
+    beforeEach(async function () {
+      [nft, dividendManager, market, pricing, token.usdt.contract] = await Promise.all([
+        InvestNFT.new({from: deployer}),
+        DividendManager.new({from: deployer}),
+        InvestNFTMarket.new({from: deployer}),
+        InvestNFTMarketPricePolicy.new({from: deployer}),
+        ERC20Mock.new('USDT Pegged Token', 'USDT', deployer, ether('2000000'), {from: deployer}),
+
+      ]);
+      await Promise.all([
+        nft.setDividendManager(dividendManager.address, {from: deployer}),
+        nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, {from: deployer}),
+        dividendManager.setDepositary(nft.address, {from: deployer}),
+        dividendManager.setAsset(token.usdt.contract.address, 'USDT', 1, {from: deployer}),
+        market.setInvestNFT(nft.address, {from: deployer}),
+        market.setPricePolicy(pricing.address, {from: deployer}),
+        market.setAsset(token.usdt.contract.address, 'USDT', 1, {from: deployer}),
+        pricing.setPrice(PRICE, {from: deployer}),
+        nft.safeMint(holder1, ether('0.0000000000001'), {from: deployer}),
+      ])
+      {
+        const [market, nft] = await Promise.all([
+          BNSDomainNameMarket.new({from: deployer}),
+          BNSNFT.new({from: deployer})
+        ]);
+        bnsMarket = market;
+        bnsNFT = nft;
+        await Promise.all([
+          market.setBNSNFT(nft.address, {from: deployer}),
+          market.setDividendManager(dividendManager.address, {from: deployer}),
+          market.setAsset(token.usdt.contract.address, 'USDT', 1, {from: deployer}),
+          nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, {from: deployer}),
+          market.grantRole(web3.utils.keccak256('MINTER_ROLE'), seller, {from: deployer}),
+          token.usdt.contract.transfer(market.address, ether('500000'), {from: deployer}),
+        ])
+      }
+    });
+    context('if first customMint for address', function () {
+      it('should transfer referer bonus and mint tokens', async function () {
+        await bnsMarket.createCustomMint(user, ['a'], referer, ether('10000'), token.usdt.contract.address, {from: deployer});
+        await bnsMarket.performCustomMint({from: user});
+        const performedCustomMint = await bnsMarket.getCustomMint(user);
+        expect(performedCustomMint[0]).to.be.equal(['a']);
+        expect(performedCustomMint[1]).to.be.equal(referer);
+        expect(performedCustomMint[2]).to.be.equal(ether('10000'));
+        expect(performedCustomMint[3]).to.be.equal(tokens.usdt.contract.address);
+        expect(performedCustomMint[4]).to.be.equal(true);
+
       });
     });
   });
@@ -244,11 +367,11 @@ describe('BNSDomainNameMarket', function () {
         bnsMarket = market;
         bnsNFT = nft;
         await Promise.all([
-          await market.setBNSNFT(nft.address, {from: deployer}),
-          await market.setDividendManager(dividendManager.address, {from: deployer}),
-          await market.setAsset(usdt.address, 'USDT', 1, {from: deployer}),
-          await nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, {from: deployer}),
-          await market.grantRole(web3.utils.keccak256('MINTER_ROLE'), seller, {from: deployer}),
+          market.setBNSNFT(nft.address, {from: deployer}),
+          market.setDividendManager(dividendManager.address, {from: deployer}),
+          market.setAsset(usdt.address, 'USDT', 1, {from: deployer}),
+          nft.grantRole(web3.utils.keccak256('MINTER_ROLE'), market.address, {from: deployer}),
+          market.grantRole(web3.utils.keccak256('MINTER_ROLE'), seller, {from: deployer}),
         ])
       }
     });

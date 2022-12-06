@@ -17,6 +17,16 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     IDividendManager public dividendManager;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
+    mapping(address => CustomMint) public customMints;
+
+    struct CustomMint {
+        string[] domainNames;
+        address refererAddress;
+        uint refererBonus;
+        Assets.Key assetKey;
+        bool performed;
+    }
+
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
@@ -36,6 +46,26 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
 
     function removeAsset(Assets.Key key) external onlyRole(DEFAULT_ADMIN_ROLE) returns (bool) {
         return _removeAsset(key);
+    }
+
+    function createCustomMint(address buyer, string[] memory domainNames, address refererAddress, uint refererBonus, Assets.Key assetKey) external onlyRole(MINTER_ROLE) {
+        customMints[buyer] = CustomMint(domainNames, refererAddress, refererBonus, assetKey, false);
+    }
+
+    function getCustomMint(address addr) external view returns (CustomMint memory) {
+        return customMints[addr];
+    }
+
+    function performCustomMint() external {
+        CustomMint storage customMint = customMints[msg.sender];
+        require(!customMint.performed, "Already performed!");
+
+        if (customMint.refererBonus > 0) {
+            _transferAsset(customMint.refererAddress, customMint.refererBonus, customMint.assetKey);
+        }
+
+        bnsnft.safeBatchMint(msg.sender, customMint.domainNames);
+        customMint.performed = true;
     }
 
     function sendDividends(Assets.Key assetKey, uint amount) whenNotPaused public onlyRole(DEFAULT_ADMIN_ROLE) {

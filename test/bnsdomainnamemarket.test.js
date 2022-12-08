@@ -149,12 +149,12 @@ describe('BNSDomainNameMarket', function () {
     });
     context('if first customMint for address', function () {
       it('should add struct to mapping', async function () {
-        await bnsMarket.createCustomMint(user, ['a'], referer, ether('10000'), token.usdt.contract.address, {from: deployer});
+        await bnsMarket.createCustomMint(user, domainNames, referer, ether('10000'), token.usdt.contract.address, {from: deployer});
         const customMint = await bnsMarket.customMints(user);
         const customMintFromGetter = await bnsMarket.getCustomMint(user);
-        expect(customMintFromGetter[0]).to.be.equal(['a']);
+        expect(customMintFromGetter[0][0]).to.be.equal(domainNames[0]);
         expect(customMintFromGetter[1]).to.be.equal(referer);
-        expect(customMintFromGetter[2]).to.be.equal(ether('10000'));
+        expect(customMintFromGetter[2]).to.be.bignumber.equal(ether('10000'));
         expect(customMintFromGetter[3]).to.be.equal(token.usdt.contract.address);
         expect(customMintFromGetter[4]).to.be.equal(false);
       });
@@ -210,12 +210,12 @@ describe('BNSDomainNameMarket', function () {
     });
     context('if first customMint for address', function () {
       it('should transfer referer bonus and mint tokens', async function () {
-        await bnsMarket.createCustomMint(user, ['a'], referer, ether('10000'), token.usdt.contract.address, {from: deployer});
+        await bnsMarket.createCustomMint(user, domainNames, referer, ether('10000'), token.usdt.contract.address, {from: deployer});
         await bnsMarket.performCustomMint({from: user});
         const performedCustomMint = await bnsMarket.getCustomMint(user);
-        expect(performedCustomMint[0]).to.be.equal(['a']);
+        expect(performedCustomMint[0][0]).to.be.equal(domainNames[0]);
         expect(performedCustomMint[1]).to.be.equal(referer);
-        expect(performedCustomMint[2]).to.be.equal(ether('10000'));
+        expect(performedCustomMint[2]).to.be.bignumber.equal(ether('10000'));
         expect(performedCustomMint[3]).to.be.equal(tokens.usdt.contract.address);
         expect(performedCustomMint[4]).to.be.equal(true);
 
@@ -223,7 +223,7 @@ describe('BNSDomainNameMarket', function () {
     });
   });
 
-  describe('sendDividends1', function () {
+  describe('sendDividends(assetKey, amount)', function () {
     let dividendManager;
     let market
     let pricing
@@ -271,12 +271,19 @@ describe('BNSDomainNameMarket', function () {
       }
     });
     it('should distribute dividends', async function () {
-      await bnsMarket.sendDividends(token.usdt.contract.address, ether('100000'), {from: deployer});
+      await bnsMarket.createCustomMint(user, domainNames, referer, ether('100000'), token.usdt.contract.address, {from: deployer});
+      await bnsMarket.sendDividends(token.usdt.contract.address, ether('400000'), {from: deployer});
       expect(await dividendManager.withdrawableDividendOf(0, token.usdt.contract.address)).to.be.bignumber.equal(ether('100000'));
+    });
+    context('if dividends exceeds amount', function () {
+      it('should revert', async function () {
+        await bnsMarket.createCustomMint(user, domainNames, referer, ether('500000'), token.usdt.contract.address, {from: deployer});
+        await expectRevert.unspecified(bnsMarket.sendDividends(token.usdt.contract.address, ether('100000'), {from: deployer}));
+      });
     });
   });
 
-  describe('sendDividends2', function () {
+  describe('sendDividends(assetKey)', function () {
     let dividendManager;
     let market
     let pricing

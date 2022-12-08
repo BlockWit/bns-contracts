@@ -17,6 +17,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     IDividendManager public dividendManager;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
+    mapping(Assets.Key => uint) public dividendsLimit;
     mapping(address => CustomMint) public customMints;
 
     struct CustomMint {
@@ -50,6 +51,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
 
     function createCustomMint(address buyer, string[] memory domainNames, address refererAddress, uint refererBonus, Assets.Key assetKey) external onlyRole(MINTER_ROLE) {
         customMints[buyer] = CustomMint(domainNames, refererAddress, refererBonus, assetKey, false);
+        dividendsLimit[assetKey] = dividendsLimit[assetKey] + refererBonus;
     }
 
     function getCustomMint(address addr) external view returns (CustomMint memory) {
@@ -62,6 +64,7 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
 
         if (customMint.refererBonus > 0) {
             _transferAsset(customMint.refererAddress, customMint.refererBonus, customMint.assetKey);
+            dividendsLimit[customMint.assetKey] = dividendsLimit[customMint.assetKey] - customMint.refererBonus;
         }
 
         bnsnft.safeBatchMint(msg.sender, customMint.domainNames);
@@ -69,12 +72,14 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     }
 
     function sendDividends(Assets.Key assetKey, uint amount) whenNotPaused public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(IERC20(Assets.Key.unwrap(assetKey)).balanceOf(address(this)) >= amount + dividendsLimit[assetKey], "DividendLimit exceeds amount you want to distribute!");
+
         _approveAsset(address(dividendManager), amount, assetKey);
         dividendManager.distributeDividends(amount, assetKey);
     }
 
     function sendDividends(Assets.Key assetKey) whenNotPaused external onlyRole(DEFAULT_ADMIN_ROLE) {
-        sendDividends(assetKey, IERC20(Assets.Key.unwrap(assetKey)).balanceOf(address(this)));
+        sendDividends(assetKey, IERC20(Assets.Key.unwrap(assetKey)).balanceOf(address(this)) - dividendsLimit[assetKey]);
     }
 
     function buy(string[] memory domainNames, uint price, address buyer, address referer, uint refererBonus, Assets.Key assetKey, bool flag) whenNotPaused external onlyRole(MINTER_ROLE) {

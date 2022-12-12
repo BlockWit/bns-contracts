@@ -21,11 +21,15 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     mapping(address => CustomMint) public customMints;
 
     struct CustomMint {
-        string[] domainNames;
+        mapping(string => bool) domainNamesBought;
+        Referral[] referrals;
+        uint lastCompletedRef;
+    }
+
+    struct Referral {
         address refererAddress;
         uint refererBonus;
         Assets.Key assetKey;
-        bool performed;
     }
 
     constructor() {
@@ -50,25 +54,35 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     }
 
     function createCustomMint(address buyer, string[] memory domainNames, address refererAddress, uint refererBonus, Assets.Key assetKey) external onlyRole(MINTER_ROLE) {
-        customMints[buyer] = CustomMint(domainNames, refererAddress, refererBonus, assetKey, false);
-        dividendsLimit[assetKey] = dividendsLimit[assetKey] + refererBonus;
-    }
+        CustomMint storage customMint = customMints[buyer];
 
-    function getCustomMint(address addr) external view returns (CustomMint memory) {
-        return customMints[addr];
-    }
-
-    function performCustomMint() external {
-        CustomMint storage customMint = customMints[msg.sender];
-        require(!customMint.performed, "Already performed!");
-
-        if (customMint.refererBonus > 0) {
-            _transferAsset(customMint.refererAddress, customMint.refererBonus, customMint.assetKey);
-            dividendsLimit[customMint.assetKey] = dividendsLimit[customMint.assetKey] - customMint.refererBonus;
+        for (uint i = 0; i < domainNames.length; i++) {
+            customMint.domainNamesBought[domainNames[i]] = true;
         }
 
-        bnsnft.safeBatchMint(msg.sender, customMint.domainNames);
-        customMint.performed = true;
+        if (refererBonus > 0) {
+            customMint.referrals.push(Referral(refererAddress, refererBonus, assetKey));
+            dividendsLimit[assetKey] = dividendsLimit[assetKey] + refererBonus;
+        }
+    }
+
+//    function getCustomMint(address addr) external view returns (CustomMint memory) {
+//        return customMints[addr];
+//    }
+
+    function performCustomMint(string[] memory domainsToMint) external {
+        CustomMint storage customMint = customMints[msg.sender];
+        for (uint i = 0; i < domainsToMint.length; i++) {
+            require(customMint.domainNamesBought[domainsToMint[i]], "You must buy domain first");
+        }
+
+        for (uint i = customMint.lastCompletedRef; i < customMint.referrals.length; i++) {
+            _transferAsset(customMint.referrals[i].refererAddress, customMint.referrals[i].refererBonus, customMint.referrals[i].assetKey);
+            dividendsLimit[customMint.referrals[i].assetKey] = dividendsLimit[customMint.referrals[i].assetKey] - customMint.referrals[i].refererBonus;
+            customMint.lastCompletedRef++;
+        }
+
+        bnsnft.safeBatchMint(msg.sender, domainsToMint);
     }
 
     function sendDividends(Assets.Key assetKey, uint amount) whenNotPaused public onlyRole(DEFAULT_ADMIN_ROLE) {

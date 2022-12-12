@@ -1628,6 +1628,8 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
 
     IContentRouter public contentRouter;
 
+    string public baseURI;
+
     mapping(bytes32 => bool) public domainNameExists;
     mapping(uint256 => string) public tokenIdToDomainNames;
     mapping(bytes32 => uint256) public domainNamesToTokenId;
@@ -1640,6 +1642,7 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
+        setBaseURI("https://marketing-service-staging.w3dna.store/api/v1/metadata/");
     }
 
     function isDomainNameExists(string memory domainName) external view returns (bool) {
@@ -1650,7 +1653,11 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         contentRouter = IContentRouter(newContentRouter);
     }
 
-    function getTokenIdByDomainName(string calldata domainName) external view returns (uint256)  {
+    function getDomainNameOwner(string calldata domainName) external view returns (address)  {
+        return ownerOf(getTokenIdByDomainName(domainName));
+    }
+
+    function getTokenIdByDomainName(string calldata domainName) public view returns (uint256)  {
         bytes32 domainNameHash = keccak256(abi.encodePacked(domainName));
         require(domainNameExists[domainNameHash], "BNSNFT: Domain name not exists");
         return domainNamesToTokenId[domainNameHash];
@@ -1714,6 +1721,13 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         _unpause();
     }
 
+    function setBaseURI(string memory newBaseURI) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        baseURI = newBaseURI;
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
+    }
 
     /**
      *
@@ -1721,7 +1735,7 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
      *
      **/
     function unsafeBatchMint(address to, string[] calldata domainNames) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        for(uint i = 0; i < domainNames.length; i++) {
+        for (uint i = 0; i < domainNames.length; i++) {
             uint256 tokenId = _tokenIdCounter.current();
             _tokenIdCounter.increment();
             _balances[to] += 1;
@@ -1734,16 +1748,15 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
     }
 
     function safeBatchMint(address to, string[] calldata domainNames) public onlyRole(MINTER_ROLE) {
-        for(uint i = 0; i < domainNames.length; i++) {
+        for (uint i = 0; i < domainNames.length; i++) {
             bytes32 domainNameHash = keccak256(abi.encodePacked(domainNames[i]));
-            if(!domainNameExists[domainNameHash]){
-                uint256 tokenId = _tokenIdCounter.current();
-                _tokenIdCounter.increment();
-                _safeMint(to, tokenId);
-                domainNameExists[domainNameHash] = true;
-                tokenIdToDomainNames[tokenId] = domainNames[i];
-                domainNamesToTokenId[domainNameHash] = tokenId;
-            }
+            require(!domainNameExists[domainNameHash], "BNSNFT: Domain name already exists");
+            uint256 tokenId = _tokenIdCounter.current();
+            _tokenIdCounter.increment();
+            _safeMint(to, tokenId);
+            domainNameExists[domainNameHash] = true;
+            tokenIdToDomainNames[tokenId] = domainNames[i];
+            domainNamesToTokenId[domainNameHash] = tokenId;
         }
     }
 

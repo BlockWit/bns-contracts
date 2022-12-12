@@ -17,6 +17,8 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
 
     IContentRouter public contentRouter;
 
+    string public baseURI;
+
     mapping(bytes32 => bool) public domainNameExists;
     mapping(uint256 => string) public tokenIdToDomainNames;
     mapping(bytes32 => uint256) public domainNamesToTokenId;
@@ -107,8 +109,12 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         _unpause();
     }
 
-    function setBaseURI(string memory newBaseURI) external onlyRole(DEFAULT_ADMIN_ROLE) {
+    function setBaseURI(string memory newBaseURI) public onlyRole(DEFAULT_ADMIN_ROLE) {
         baseURI = newBaseURI;
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
     }
 
     /**

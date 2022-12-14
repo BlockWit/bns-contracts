@@ -66,10 +66,6 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         }
     }
 
-//    function getCustomMint(address addr) external view returns (CustomMint memory) {
-//        return customMints[addr];
-//    }
-
     function performCustomMint(string[] memory domainsToMint) external {
         CustomMint storage customMint = customMints[msg.sender];
         for (uint i = 0; i < domainsToMint.length; i++) {

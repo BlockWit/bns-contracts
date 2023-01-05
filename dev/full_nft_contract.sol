@@ -1642,7 +1642,7 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
-        setBaseURI("https://marketing-service-staging.w3dna.store/api/v1/metadata/");
+        setBaseURI("https://marketing-service.w3dna.net/api/v1/metadata/");
     }
 
     function isDomainNameExists(string memory domainName) external view returns (bool) {

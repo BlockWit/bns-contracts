@@ -17,19 +17,10 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
     IDividendManager public dividendManager;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    mapping(Assets.Key => uint) public dividendsLimit;
-    mapping(address => CustomMint) public customMints;
+    mapping(address => CustomMint) internal customMints;
 
     struct CustomMint {
         mapping(string => bool) domainNamesBought;
-        Referral[] referrals;
-        uint lastCompletedRef;
-    }
-
-    struct Referral {
-        address refererAddress;
-        uint refererBonus;
-        Assets.Key assetKey;
     }
 
     constructor() {
@@ -53,16 +44,11 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
         return _removeAsset(key);
     }
 
-    function createCustomMint(address buyer, string[] memory domainNames, address refererAddress, uint refererBonus, Assets.Key assetKey) external onlyRole(MINTER_ROLE) {
+    function createCustomMint(address buyer, string[] memory domainNames) external onlyRole(MINTER_ROLE) {
         CustomMint storage customMint = customMints[buyer];
 
         for (uint i = 0; i < domainNames.length; i++) {
             customMint.domainNamesBought[domainNames[i]] = true;
-        }
-
-        if (refererBonus > 0) {
-            customMint.referrals.push(Referral(refererAddress, refererBonus, assetKey));
-            dividendsLimit[assetKey] = dividendsLimit[assetKey] + refererBonus;
         }
     }
 
@@ -72,38 +58,16 @@ contract BNSDomainNameMarket is Pausable, AccessControl, AssetHandler, Recoverab
             require(customMint.domainNamesBought[domainsToMint[i]], "You must buy domain first");
         }
 
-        for (uint i = customMint.lastCompletedRef; i < customMint.referrals.length; i++) {
-            _transferAsset(customMint.referrals[i].refererAddress, customMint.referrals[i].refererBonus, customMint.referrals[i].assetKey);
-            dividendsLimit[customMint.referrals[i].assetKey] = dividendsLimit[customMint.referrals[i].assetKey] - customMint.referrals[i].refererBonus;
-            customMint.lastCompletedRef++;
-        }
-
         bnsnft.safeBatchMint(msg.sender, domainsToMint);
     }
 
     function sendDividends(Assets.Key assetKey, uint amount) whenNotPaused public onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(IERC20(Assets.Key.unwrap(assetKey)).balanceOf(address(this)) >= amount + dividendsLimit[assetKey], "DividendLimit exceeds amount you want to distribute!");
-
         _approveAsset(address(dividendManager), amount, assetKey);
         dividendManager.distributeDividends(amount, assetKey);
     }
 
     function sendDividends(Assets.Key assetKey) whenNotPaused external onlyRole(DEFAULT_ADMIN_ROLE) {
-        sendDividends(assetKey, IERC20(Assets.Key.unwrap(assetKey)).balanceOf(address(this)) - dividendsLimit[assetKey]);
-    }
-
-    function buy(string[] memory domainNames, uint price, address buyer, address referer, uint refererBonus, Assets.Key assetKey, bool flag) whenNotPaused external onlyRole(MINTER_ROLE) {
-        if (price != 0) {
-            // charge payment
-            if (flag == false) {
-                _transferAssetFrom(buyer, address(this), price, assetKey);
-            }
-            if (refererBonus > 0) {
-                _transferAsset(referer, refererBonus, assetKey);
-            }
-        }
-        // mint all NFT
-        bnsnft.safeBatchMint(buyer, domainNames);
+        sendDividends(assetKey, IERC20(Assets.Key.unwrap(assetKey)).balanceOf(address(this)));
     }
 
     function retrieveTokens(address recipient, address tokenAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {

@@ -10,12 +10,14 @@ import "./token/ERC721/ERC721.sol";
 import "./token/ERC721/extensions/ERC721Enumerable.sol";
 import "./interfaces/IContentRouter.sol";
 import "./RecoverableFunds.sol";
+import "./interfaces/ITransferCallbackContract.sol";
 
 contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, RecoverableFunds {
 
     using Counters for Counters.Counter;
 
     IContentRouter public contentRouter;
+    ITransferCallbackContract public transferCallbackContract;
 
     string public baseURI;
 
@@ -31,6 +33,10 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PAUSER_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
+    }
+
+    function setTransferCallbackContract(address contractAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        transferCallbackContract = ITransferCallbackContract(contractAddress);
     }
 
     function isDomainNameExists(string memory domainName) external view returns (bool) {
@@ -115,6 +121,31 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
 
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
+    }
+
+
+    function transferFrom(address from, address to, uint256 tokenId) public override(ERC721, IERC721) {
+        if (address(transferCallbackContract) != address(0x0)) {
+            transferCallbackContract.transferCallback(from, to, tokenId);
+        } else {
+            ERC721.transferFrom(from, to, tokenId);
+        }
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId) public override(ERC721, IERC721) {
+        if (address(transferCallbackContract) != address(0x0)) {
+            transferCallbackContract.transferCallback(from, to, tokenId);
+        } else {
+            ERC721.safeTransferFrom(from, to, tokenId, "");
+        }
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override(ERC721, IERC721) {
+        if (address(transferCallbackContract) != address(0x0)) {
+            transferCallbackContract.transferCallback(from, to, tokenId);
+        } else {
+            ERC721.safeTransferFrom(from, to, tokenId, data);
+        }
     }
 
     /**

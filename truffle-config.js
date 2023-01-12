@@ -102,11 +102,12 @@ module.exports = {
       confirmations: 2,
       timeoutBlocks: 200
     },
-    polygon: {
-      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://polygon-rpc.com/`),
+    polygon_s: {
+      provider: () => new HDWalletProvider(ETH_MAIN_PRIVATE_KEYS, `https://polygon-mainnet.infura.io/v3/39c5bf9a051045ae9ff938d23c540afe`),
       network_id: 137,
-      gasPrice: 140000000000, // 5 Gwei
-      gas: 20000000,
+      networkCheckTimeout: 999999,
+      gasPrice: 55000000000, // 50 Gwei
+      gas: 12500000,
       confirmations: 2,
       timeoutBlocks: 200
     },

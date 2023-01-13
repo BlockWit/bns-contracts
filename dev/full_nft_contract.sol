@@ -1653,6 +1653,16 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         setBaseURI("https://marketing-service.w3dna.net/api/v1/metadata/");
     }
 
+    modifier transferCallbacks(address from, address to, uint256 tokenId) {
+        if (address(transferCallbackContract) != address(0x0)) {
+            transferCallbackContract.beforeTransferCallback(from, to, tokenId);
+        }
+        _;
+        if (address(transferCallbackContract) != address(0x0)) {
+            transferCallbackContract.afterTransferCallback(from, to, tokenId);
+        }
+    }
+
     function setTransferCallbackContract(address contractAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
         transferCallbackContract = ITransferCallbackContract(contractAddress);
     }
@@ -1741,40 +1751,17 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         return baseURI;
     }
 
-    function transferFrom(address from, address to, uint256 tokenId) public override(ERC721, IERC721) {
-        if (address(transferCallbackContract) != address(0x0)) {
-            transferCallbackContract.beforeTransferCallback(from, to, tokenId);
-        }
 
+    function transferFrom(address from, address to, uint256 tokenId) public override(ERC721, IERC721) transferCallbacks(from, to, tokenId) {
         ERC721.transferFrom(from, to, tokenId);
-
-        if (address(transferCallbackContract) != address(0x0)) {
-            transferCallbackContract.afterTransferCallback(from, to, tokenId);
-        }
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) public override(ERC721, IERC721) {
-        if (address(transferCallbackContract) != address(0x0)) {
-            transferCallbackContract.beforeTransferCallback(from, to, tokenId);
-        }
-
+    function safeTransferFrom(address from, address to, uint256 tokenId) public override(ERC721, IERC721) transferCallbacks(from, to, tokenId) {
         ERC721.safeTransferFrom(from, to, tokenId, "");
-
-        if (address(transferCallbackContract) != address(0x0)) {
-            transferCallbackContract.afterTransferCallback(from, to, tokenId);
-        }
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override(ERC721, IERC721) {
-        if (address(transferCallbackContract) != address(0x0)) {
-            transferCallbackContract.beforeTransferCallback(from, to, tokenId);
-        }
-
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override(ERC721, IERC721) transferCallbacks(from, to, tokenId) {
         ERC721.safeTransferFrom(from, to, tokenId, data);
-
-        if (address(transferCallbackContract) != address(0x0)) {
-            transferCallbackContract.afterTransferCallback(from, to, tokenId);
-        }
     }
 
     /**

@@ -1764,24 +1764,6 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         ERC721.safeTransferFrom(from, to, tokenId, data);
     }
 
-    /**
-     *
-     * Check domain names before call this method!!!
-     *
-     **/
-    function unsafeBatchMint(address to, string[] calldata domainNames) public onlyRole(DEFAULT_ADMIN_ROLE) {
-        for (uint i = 0; i < domainNames.length; i++) {
-            uint256 tokenId = _tokenIdCounter.current();
-            _tokenIdCounter.increment();
-            _balances[to] += 1;
-            _owners[tokenId] = to;
-            bytes32 domainNameHash = keccak256(abi.encodePacked(domainNames[i]));
-            domainNameExists[domainNameHash] = true;
-            tokenIdToDomainNames[tokenId] = domainNames[i];
-            domainNamesToTokenId[domainNameHash] = tokenId;
-        }
-    }
-
     function safeBatchMint(address to, string[] calldata domainNames) public onlyRole(MINTER_ROLE) {
         for (uint i = 0; i < domainNames.length; i++) {
             bytes32 domainNameHash = keccak256(abi.encodePacked(domainNames[i]));

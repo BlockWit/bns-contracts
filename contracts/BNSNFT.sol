@@ -172,12 +172,10 @@ contract BNSNFT is ERC721, ERC721Enumerable, Pausable, AccessControl, Recoverabl
         return tokenId;
     }
 
-    // FIXME: Why?
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal whenNotPaused override(ERC721, ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    // FIXME: Why?
     function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }

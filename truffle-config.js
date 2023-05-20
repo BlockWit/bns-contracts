@@ -94,6 +94,18 @@ module.exports = {
       confirmations: 2,
       timeoutBlocks: 200,
     },
+    okx_t: {
+      // verify: {
+      //   apiUrl: 'https://www.oklink.com/api/v5/explorer/contract/multipartVerify',
+      //   apiKey: CONFIG.OKLINK_KEY,
+      //   explorerUrl: 'https://www.oklink.com/okc-test/address'
+      // },
+      provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://exchaintestrpc.okex.org`),
+      network_id: 65,
+      timeoutBlocks: 200,
+      confirmations: 5,
+      production: true
+    },
     goerli: {
       provider: () => new HDWalletProvider(ETH_TEST_PRIVATE_KEYS, `https://goerli.infura.io/v3/${CONFIG.INFURA_KEY}`),
       network_id: 5,
@@ -106,7 +118,7 @@ module.exports = {
       provider: () => new HDWalletProvider(ETH_MAIN_PRIVATE_KEYS, `https://polygon-mainnet.infura.io/v3/39c5bf9a051045ae9ff938d23c540afe`),
       network_id: 137,
       networkCheckTimeout: 999999,
-      gasPrice: 55000000000, // 50 Gwei
+      gasPrice: 220000000000, // 50 Gwei
       gas: 12500000,
       confirmations: 2,
       timeoutBlocks: 200
@@ -158,7 +170,8 @@ module.exports = {
   api_keys: {
     bscscan: CONFIG.BSCSCAN_KEY,
     etherscan: CONFIG.ETHERSCAN_KEY,
-    polygonscan: CONFIG.POLYGONSCAN_KEY
+    polygonscan: CONFIG.POLYGONSCAN_KEY,
+    OKLink: CONFIG.OKLINK_KEY
   }
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:

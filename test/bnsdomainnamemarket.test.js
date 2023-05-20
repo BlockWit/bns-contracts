@@ -159,6 +159,9 @@ describe('BNSDomainNameMarket', function () {
 
             await bnsMarket.performCustomMint([domainNames[2]], {from: user});
             expect(await bnsNFT.balanceOf(user)).to.be.bignumber.equal("3");
+
+            await expectRevert(bnsMarket.performCustomMint(["ahsdhasdh"], {from: user}), "You must buy domain first");
+            expect(await bnsNFT.balanceOf(user)).to.be.bignumber.equal("3");
         });
     });
 
